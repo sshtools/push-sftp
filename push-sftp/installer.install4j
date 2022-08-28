@@ -499,5 +499,6 @@ return console.askYesNo(message, true);
     <macosFolder name="macOS Folder" id="36" architecture="universal" signLaunchers="true">
       <jreBundle usePack200="false" />
     </macosFolder>
+    <linuxRPM name="Linux RPM" id="37" />
   </mediaSets>
 </install4j>
