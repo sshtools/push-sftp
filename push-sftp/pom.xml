@@ -8,6 +8,9 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maverick.synergy.version>3.1.0-SNAPSHOT</maverick.synergy.version>
+		<install4j.licenseKey>***REMOVED***</install4j.licenseKey>
+		<install4j.appleId>lee@sshtools.com</install4j.appleId>
+		<install4j.appleIdPassword>***REMOVED***</install4j.appleIdPassword>
 	</properties>
 
 	<dependencies>
