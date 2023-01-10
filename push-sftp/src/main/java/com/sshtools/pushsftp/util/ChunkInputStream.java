@@ -1,15 +1,15 @@
-package com.sshtools.pushsftp;
+package com.sshtools.pushsftp.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-class ChunkInputStream extends InputStream {
+public class ChunkInputStream extends InputStream {
 
 	RandomAccessFile file;
 	long length;
 	
-	ChunkInputStream(RandomAccessFile file, long length) {
+	public ChunkInputStream(RandomAccessFile file, long length) {
 		this.file = file;
 		this.length = length;
 	}

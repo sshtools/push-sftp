@@ -1,6 +1,5 @@
-package com.sshtools.pushsftp;
+package com.sshtools.pushsftp.commands;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -26,28 +25,29 @@ import com.sshtools.client.shell.ShellProcess;
 import com.sshtools.client.shell.ShellTimeoutException;
 import com.sshtools.client.tasks.FileTransferProgress;
 import com.sshtools.client.tasks.ShellTask;
-import com.sshtools.commands.SshCommand;
+import com.sshtools.common.files.AbstractFile;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpFileAttributes;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.ChannelOpenException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.FileUtils;
-import com.sshtools.common.util.IOUtils;
 import com.sshtools.common.util.UnsignedInteger64;
 import com.sshtools.common.util.Utils;
+import com.sshtools.pushsftp.util.ChunkInputStream;
 
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-public class PSFTP extends SshCommand {
+@Command(name = "push", mixinStandardHelpOptions = true, description = "Push file to remote")
+public class Push extends SftpCommand {
 
     @Parameters(paramLabel = "FILE", description = "one or more files/folders to transfer")
-    File[] files;
+    String[] files;
     
     @Option(names = { "-c", "--chunks" }, paramLabel = "COUNT", description = "the number of concurrent parts (chunks) to transfer")
-    int chunks = 1;
+    int chunks = 3;
     
     @Option(names = { "-M", "--multiplex" }, description = "multiplex channels over the same connection for each chunk")
     boolean multiplex;
@@ -70,14 +70,9 @@ public class PSFTP extends SshCommand {
     private boolean reportDone;
     private SftpFileAttributes remoteAttrs = null;
     LinkedList<SshClient> clients = new LinkedList<>();
-    
-	public static void main(String... args) {
-        int exitCode = new CommandLine(new PSFTP()).execute(args);
-        System.exit(exitCode);
-    }
 
 	@Override
-	protected int runCommand() {
+	public Integer call() {
 		
 		try {
 
@@ -100,7 +95,7 @@ public class PSFTP extends SshCommand {
 
 	private void transferFiles() throws SftpStatusException, SshException, TransferCancelledException, IOException, PermissionDeniedException, ChannelOpenException {
 		
-		for(File file : files) {
+		for(String file : files) {
 			transferFile(file);
 		}
 	}
@@ -109,43 +104,42 @@ public class PSFTP extends SshCommand {
 		
 		if(multiplex) {
 			System.out.println(String.format("Connecting to %s@%s:%d", getUsername(), getHost(), getPort()));
-			SshClient ssh = connect();
-			for(int i=0;i<chunks+1;i++) {
+			SshClient ssh = getInteractiveCommand().getParentCommand().connect();
+			for(int i=0;i<chunks;i++) {
 				clients.add(ssh);
 			}
 		} else {
-			System.out.println(String.format("Creating %d connections to %s@%s:%d", chunks+1, getUsername(), getHost(), getPort()));
-			for(int i=0;i<chunks+1;i++) {
-				clients.add(connect(false, i==0));
+			System.out.println(String.format("Creating %d connections to %s@%s:%d", chunks, getUsername(), getHost(), getPort()));
+			for(int i=0;i<chunks;i++) {
+				clients.add(getInteractiveCommand().getParentCommand().connect(false, i==0));
 			}
 		}
 	}
 
 	private void configureRemoteFolder() throws IOException, SshException, PermissionDeniedException, SftpStatusException {
 		
-		SshClient ssh = clients.removeFirst();
-		
-		try(SftpClient sftp = new SftpClient(ssh)) {
-			
-			if(Utils.isNotBlank(remoteFolder)) {
-				remoteFolder = sftp.getAbsolutePath(remoteFolder);
-			} else {
-				remoteFolder = sftp.getAbsolutePath(".");
-			}
-			
-			remoteAttrs = sftp.stat(remoteFolder);
-			if(!remoteAttrs.isDirectory()) {
-				throw new IOException("--remote-dir must be a directory!");
-			}
-			
-			System.out.printf("The files will be transferred to %s%s", remoteFolder, System.lineSeparator());
-
-		} finally {
-			clients.addLast(ssh);
+		SftpClient sftp = getSftpClient();
+	
+		if(Utils.isNotBlank(remoteFolder)) {
+			remoteFolder = sftp.getAbsolutePath(remoteFolder);
+		} else {
+			remoteFolder = sftp.getAbsolutePath(".");
 		}
+		
+		remoteAttrs = sftp.stat(remoteFolder);
+		if(!remoteAttrs.isDirectory()) {
+			throw new IOException("--remote-dir must be a directory!");
+		}
+		
+		System.out.printf("The files will be transferred to %s%s", remoteFolder, System.lineSeparator());
+		
 	}
 
-	private void transferFile(File localFile) throws SftpStatusException, SshException, TransferCancelledException, IOException, PermissionDeniedException, ChannelOpenException {
+	private void transferFile(String file) throws SftpStatusException, SshException, TransferCancelledException, IOException, PermissionDeniedException, ChannelOpenException {
+		
+		SftpClient sftp = getSftpClient();
+		
+		AbstractFile localFile = sftp.getCurrentWorkingDirectory().resolveFile(file);
 		
 		if(!localFile.exists()) {
 			throw new IOException(String.format("%s does not exist!", localFile.getName()));
@@ -184,7 +178,7 @@ public class PSFTP extends SshCommand {
 		throw new IOException("Transfer could not be completed due to multiple errors!");
 	}
 
-	private void combineChunks(File localFile) throws IOException {
+	private void combineChunks(AbstractFile localFile) throws IOException {
 		
 		System.out.println("Combining parts into final file on remote machine");
 		
@@ -194,52 +188,50 @@ public class PSFTP extends SshCommand {
 	
 	}
 	
-	private void performRemoteCat(File localFile) throws IOException {
+	private void performRemoteCat(AbstractFile localFile) throws IOException {
 		
-		SshClient ssh = clients.removeFirst();
-		try {
-			ssh.runTask(new ShellTask(ssh) {
+		SshClient ssh = getSshClient();
 
-				private void execute(String command, ExpectShell shell) throws IOException, SshException {
-					ShellProcess process = shell.executeCommand(command);
-					process.drain();
-					if(process.hasSucceeded()) {
-						if(Utils.isNotBlank(process.getCommandOutput())) {
-							System.out.println(process.getCommandOutput());
-						}
-					} else {
-						if(Utils.isNotBlank(process.getCommandOutput())) {
-							System.err.println(process.getCommandOutput());
-						}
-						throw new IOException("Command failed");
+		ssh.runTask(new ShellTask(ssh) {
+
+			private void execute(String command, ExpectShell shell) throws IOException, SshException {
+				ShellProcess process = shell.executeCommand(command);
+				process.drain();
+				if(process.hasSucceeded()) {
+					if(Utils.isNotBlank(process.getCommandOutput())) {
+						System.out.println(process.getCommandOutput());
 					}
+				} else {
+					if(Utils.isNotBlank(process.getCommandOutput())) {
+						System.err.println(process.getCommandOutput());
+					}
+					throw new IOException("Command failed");
 				}
-				@Override
-				protected void onOpenSession(SessionChannelNG session)
-						throws IOException, SshException, ShellTimeoutException {
-					
-					System.out.println("Opening shell");
-					ExpectShell shell = new ExpectShell(this);
-					execute(String.format("cd %s", remoteFolder), shell);
-					System.out.println("Combining files");
-					execute(String.format("cat %s_* > %s",localFile.getName(), localFile.getName()), shell);
-					System.out.println("Deleting parts");
-					execute(String.format("rm -f %s_*",localFile.getName(), localFile.getName()), shell);
-				}
+			}
+			@Override
+			protected void onOpenSession(SessionChannelNG session)
+					throws IOException, SshException, ShellTimeoutException {
 				
-			});
-		} finally {
-			clients.addLast(ssh);
-		}
+				System.out.println("Opening shell");
+				ExpectShell shell = new ExpectShell(this);
+				execute(String.format("cd %s", remoteFolder), shell);
+				System.out.println("Combining files");
+				execute(String.format("cat %s_* > %s",localFile.getName(), localFile.getName()), shell);
+				System.out.println("Deleting parts");
+				execute(String.format("rm -f %s_*",localFile.getName(), localFile.getName()), shell);
+			}
+			
+		});
+		
 	}
 
-	private boolean performCopyData(File localFile) throws IOException {
+	private boolean performCopyData(AbstractFile localFile) throws IOException {
 		
-		SshClient ssh = clients.removeFirst();
 		List<Throwable> errors = new ArrayList<>();
 		
-		try(SftpClient sftp = new SftpClient(ssh)) {
-			
+		SftpClient sftp = getSftpClient();
+
+		try {
 			if(sftp.getSubsystemChannel().supportsExtension("copy-data")) {
 				System.err.println("Remote server does not support copy-data SFTP extension");
 				return false;
@@ -282,20 +274,18 @@ public class PSFTP extends SshCommand {
 			checkErrors(removeChunks(localFile, remoteChunks));
 		} catch(Throwable e)  { 
 			errors.add(e);
-		} finally {
-			clients.addLast(ssh);;
-		}
+		} 
 		
 		checkErrors(errors);
 		
 		return true;
 	}
 
-	private Collection<Throwable> removeChunks(File localFile, Collection<SftpFile> remoteChunks) throws IOException {
+	private Collection<Throwable> removeChunks(AbstractFile localFile, Collection<SftpFile> remoteChunks) throws IOException {
 		
 		List<Throwable> errors = new ArrayList<>();
-		SshClient ssh = clients.removeFirst();
-		try(SftpClient sftp = new SftpClient(ssh)) {
+		
+		try {
 			for(SftpFile remoteChunk : remoteChunks) {
 				try {
 					remoteChunk.delete();
@@ -309,7 +299,7 @@ public class PSFTP extends SshCommand {
 		return errors;
 	}
 
-	private Collection<Throwable> sendChunks(File localFile) {
+	private Collection<Throwable> sendChunks(AbstractFile localFile) throws PermissionDeniedException, IOException {
 		
 		System.out.printf("Splitting %s into %d chunks%s", localFile.getName(), chunks, System.lineSeparator());
 		long started = System.currentTimeMillis();
@@ -348,7 +338,7 @@ public class PSFTP extends SshCommand {
 		return errors;
 	}
 
-	private void sendFileViaSFTP(File localFile, String remotePath) throws IOException, SshException, PermissionDeniedException, SftpStatusException, TransferCancelledException {
+	private void sendFileViaSFTP(AbstractFile localFile, String remotePath) throws IOException, SshException, PermissionDeniedException, SftpStatusException, TransferCancelledException {
 		SshClient ssh = clients.removeFirst();
 		try(SftpClient sftp = new SftpClient(ssh)) {
 			sftp.cd(remoteFolder);
@@ -358,11 +348,11 @@ public class PSFTP extends SshCommand {
 		}
 	}
 
-	private void sendFileViaSCP(File localPath, String remotePath) throws SshException, ChannelOpenException, IOException, PermissionDeniedException {
+	private void sendFileViaSCP(AbstractFile localPath, String remotePath) throws SshException, ChannelOpenException, IOException, PermissionDeniedException {
 		
 		SshClient ssh = clients.removeFirst();
 		try {
-			ScpClient scp = new ScpClient(clients.pop());
+			ScpClient scp = new ScpClient(ssh);
 			 scp.putFile(localPath.getAbsolutePath(), remotePath, false, 
 				new SingleTransferConsoleProgress(localPath.length()), false);
 		} finally {
@@ -371,12 +361,12 @@ public class PSFTP extends SshCommand {
 	
 	}
 
-	private void verifyIntegrity(File localFile) throws SshException, SftpStatusException, IOException, PermissionDeniedException {
+	private void verifyIntegrity(AbstractFile localFile) throws SshException, SftpStatusException, IOException, PermissionDeniedException {
 		
 		if(verifyIntegrity) {
-			SshClient ssh = clients.removeFirst();
-			
-			try(SftpClient sftp = new SftpClient(ssh)) {
+						
+			SftpClient sftp = getSftpClient();
+			try {
 				sftp.cd(remoteFolder);
 				System.out.printf("Verifying %s%s", localFile.getName(), System.lineSeparator());
 				if(sftp.verifyFiles(localFile.getAbsolutePath(), localFile.getName(), digest)) {
@@ -393,19 +383,17 @@ public class PSFTP extends SshCommand {
 				} else {
 					throw e;
 				}
-			} finally {
-				clients.addLast(ssh);;
-			}
+			} 
 		}
 		
 	}
 
-	private void sendChunk(File localFile, long pointer, long chunkLength, Integer chunkNumber, boolean lastChunk, FileTransferProgress progress) throws IOException, SftpStatusException, SshException, TransferCancelledException, ChannelOpenException, PermissionDeniedException {
+	private void sendChunk(AbstractFile localFile, long pointer, long chunkLength, Integer chunkNumber, boolean lastChunk, FileTransferProgress progress) throws IOException, SftpStatusException, SshException, TransferCancelledException, ChannelOpenException, PermissionDeniedException {
 		
 		System.out.printf("Starting chunk %d at position %d with length of %d bytes%s", chunkNumber, pointer, chunkLength, System.lineSeparator());
 		
 		SshClient ssh = clients.removeFirst();
-		try (RandomAccessFile file = new RandomAccessFile(localFile, "r")) {
+		try (RandomAccessFile file = new RandomAccessFile(localFile.getAbsolutePath(), "r")) {
 			file.seek(pointer);
 			
 			if(forceSFTP) {
@@ -425,60 +413,20 @@ public class PSFTP extends SshCommand {
 			clients.addLast(ssh);;
 		}
 	}
-
-	@Override
-	protected String getCommandName() {
-		return "PSFTP";
-	}
 	
 	public synchronized void report(List<ChunkedConsoleProgress> progress, long length, long started) {
 		
-		long totalSoFar = 0;
-		for(ChunkedConsoleProgress p : progress) {
-			totalSoFar += p.getLength();
-		}
-		
-		report(totalSoFar, length, started);
-	}
-		
-	public synchronized void report(long totalSoFar, long length, long started) {
-		
-		if(totalSoFar > 0 && !reportDone) {
-			
-			String state = "ETA";
-			if(totalSoFar >= length) {
-				state = "DONE";
-				reportDone = true;
+		if(!reportDone) {
+			long totalSoFar = 0;
+			for(ChunkedConsoleProgress p : progress) {
+				totalSoFar += p.getLength();
 			}
 			
-			Double percentage = ((double) totalSoFar / (double)length) * 100;
-			String percentageStr = String.format("%.0f%%", percentage);
-			
-			String humanBytes = IOUtils.toByteSize(totalSoFar);
-			
-			long time = (System.currentTimeMillis() - started);
-		
-			Double megabytesPerSecond = (totalSoFar / time) / 1024D;
-			String transferRate = String.format("%.1fMB/s", megabytesPerSecond);
-			
-			long remaining = (length - totalSoFar);
-			long perSecond = (long) (megabytesPerSecond * 1024);
-			long seconds = (remaining / perSecond) / 1000;
-			
-			String output = String.format("%4s %8s %10s %02d:%02d %4s ", 
-					percentageStr, humanBytes, transferRate,
-					(int) (seconds > 60 ? seconds / 60 : 0), 
-					(int) (seconds % 60), 
-					state);
-			
-			System.out.print("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-			
-			System.out.print(output);
-			if(reportDone || Boolean.getBoolean("maverick.development")) {
-				System.out.println();
-			}
+			reportDone = report(totalSoFar, length, started);
 		}
 	}
+		
+	
 	
 	class ChunkedConsoleProgress implements FileTransferProgress {
 
