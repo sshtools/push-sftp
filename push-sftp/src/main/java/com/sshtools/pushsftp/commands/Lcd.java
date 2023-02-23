@@ -3,7 +3,7 @@ package com.sshtools.pushsftp.commands;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "lcd", mixinStandardHelpOptions = true, description = "Change local directory")
+@Command(name = "lcd", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "Change local directory")
 public class Lcd extends SftpCommand {
 
 	

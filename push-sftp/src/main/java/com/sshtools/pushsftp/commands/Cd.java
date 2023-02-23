@@ -3,7 +3,7 @@ package com.sshtools.pushsftp.commands;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "cd", mixinStandardHelpOptions = true, description = "Change remote directory")
+@Command(name = "cd", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "Change remote directory")
 public class Cd extends SftpCommand {
 
 	

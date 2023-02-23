@@ -2,13 +2,12 @@ package com.sshtools.pushsftp.commands;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "pwd", mixinStandardHelpOptions = true, description = "Display current remote directory")
+@Command(name = "pwd", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "Display current remote directory")
 public class Pwd extends SftpCommand {
 
 	@Override
 	public Integer call() throws Exception {
-
-		System.out.println(getSftpClient().pwd());
+		getTerminal().messageln("Remote working directory: {0}", getSftpClient().pwd());
 		return 0;
 	}
 }

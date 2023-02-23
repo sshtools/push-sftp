@@ -5,7 +5,7 @@ import com.sshtools.pushsftp.PSFTPCommands;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "help", mixinStandardHelpOptions = false, description = "Print this help")
+@Command(name = "help", helpCommand = true, usageHelpAutoWidth = true, mixinStandardHelpOptions = false, description = "Print this help")
 public class Help extends SftpCommand {
 
 	@Override

@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "chmod", mixinStandardHelpOptions = false, description = "Change permissions of file path")
+@Command(name = "chmod", usageHelpAutoWidth = true, mixinStandardHelpOptions = false, description = "Change permissions of file path")
 public class Chmod extends SftpCommand  {
 
 	@Option(names = { "-h" }, description = "Do not follow symlinks")

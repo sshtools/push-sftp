@@ -4,7 +4,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "chgrp", mixinStandardHelpOptions = false, description = "Change group of file path")
+@Command(name = "chgrp", usageHelpAutoWidth = true, mixinStandardHelpOptions = false, description = "Change group of file path")
 public class Chgrp extends SftpCommand  {
 
 	@Option(names = { "-h" }, description = "Do not follow symlinks")

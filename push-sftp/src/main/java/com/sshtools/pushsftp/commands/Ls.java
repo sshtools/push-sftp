@@ -2,13 +2,8 @@ package com.sshtools.pushsftp.commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
-import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpFile;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
@@ -17,7 +12,7 @@ import com.sshtools.common.util.Utils;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "ls", mixinStandardHelpOptions = true, description = "List directory")
+@Command(name = "ls", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "List directory")
 public class Ls extends SftpCommand {
 
 	@Option(names = "-l", description = "show files with the long name format")
@@ -40,18 +35,16 @@ public class Ls extends SftpCommand {
 
 	private void printNames() throws SftpStatusException, SshException {
 
-		SftpClient sftp = getSftpClient();
+		var sftp = getSftpClient();
 		
-		Set<String> results = new TreeSet<>();
+		var results = new TreeSet<String>();
 		int maximumFilenameLength = 0;
-		int columns = 120;
-		try {
-			columns = Integer.parseInt(System.getenv("COLUMNS"));
-		} catch(NumberFormatException e) {} 
- 		Iterator<com.sshtools.client.sftp.SftpFile> it = sftp.lsIterator();
+		int columns = getInteractiveCommand().getParentCommand().getTerminal().getWidth();
+		
+ 		var it = sftp.lsIterator();
 		while(it.hasNext()) {
-			SftpFile file = it.next();
-			String displayName = longnames ? file.getLongname() : file.getFilename();
+			var file = it.next();
+			var displayName = longnames ? file.getLongname() : file.getFilename();
 			if(Utils.isBlank(displayName) || (displayName.startsWith(".") && !showHidden)) {
 				continue;
 			}
@@ -65,8 +58,8 @@ public class Ls extends SftpCommand {
 		}
 		
 		if(printingColumns > 1) {
-			String format = "%1$-"+ (columns / printingColumns) + "s";
-			Iterator<String> itr = results.iterator();
+			var format = "%1$-"+ (columns / printingColumns) + "s";
+			var itr = results.iterator();
 			while(itr.hasNext()) {
 				for(int i=0;i<printingColumns;i++) {
 					System.out.print(String.format(format, itr.next()));
@@ -77,7 +70,7 @@ public class Ls extends SftpCommand {
 				System.out.println();
 			}
 		} else {
-			for(String result : results) {
+			for(var result : results) {
 				System.out.println(result);
 			}
 		}
@@ -85,29 +78,21 @@ public class Ls extends SftpCommand {
 
 	private void printLongnames() throws SftpStatusException, SshException {
 		
-		SftpClient sftp = getSftpClient();
+		var sftp = getSftpClient();
+		var results = new ArrayList<SftpFile>();
 		
-		List<SftpFile> results = new ArrayList<>();
-		
-		Iterator<com.sshtools.client.sftp.SftpFile> it = sftp.lsIterator();
+		var it = sftp.lsIterator();
 		while(it.hasNext()) {
-			SftpFile file = it.next();
+			var file = it.next();
 			if(file.getFilename().startsWith(".") && !showHidden) {
 				continue;
 			}
 			results.add(file);
 		}
 		
-		Collections.sort(results, new Comparator<SftpFile>() {
-
-			@Override
-			public int compare(SftpFile o1, SftpFile o2) {
-				return o1.getFilename().compareTo(o2.getFilename());
-			}
-			
-		});
+		Collections.sort(results, (o1, o2) -> o1.getFilename().compareTo(o2.getFilename()));
 		
-		for(SftpFile result : results) {
+		for(var result : results) {
 			System.out.println(result.getLongname());
 		}
 	}

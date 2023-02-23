@@ -1,0 +1,36 @@
+{
+  "resources":{
+  "includes":[
+    {
+      "pattern":"\\QMETA-INF/maven/com.sshtools.hotfixes/maverick-synergy-common/pom.properties\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/maven/com.sshtools/push-sftp/pom.properties\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.agent.AgentProvider\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.client.SshKeyExchangeClientFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.common.ssh.components.DigestFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.common.ssh.components.SshCipherFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.common.ssh.components.SshHmacFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.common.ssh.components.SshPublicKeyFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.common.ssh.compression.SshCompressionFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.sshtools.sequins.TerminalFactory\\E"
+    }
+  ]},
+  "bundles":[]
+}

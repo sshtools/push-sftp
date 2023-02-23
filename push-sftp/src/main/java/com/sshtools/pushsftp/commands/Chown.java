@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "chown", mixinStandardHelpOptions = false, description = "Change owner of file path")
+@Command(name = "chown", usageHelpAutoWidth = true, mixinStandardHelpOptions = false, description = "Change owner of file path")
 public class Chown extends SftpCommand  {
 
 	@Option(names = { "-h" }, description = "Do not follow symlinks")

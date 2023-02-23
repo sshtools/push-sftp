@@ -5,18 +5,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TreeSet;
 
-import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.common.files.AbstractFile;
 import com.sshtools.common.permissions.PermissionDeniedException;
-import com.sshtools.common.sftp.SftpFileAttributes;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.UnsignedInteger64;
@@ -25,7 +19,7 @@ import com.sshtools.common.util.Utils;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "lls", mixinStandardHelpOptions = true, description = "List directory")
+@Command(name = "lls", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "List directory")
 public class Lls extends SftpCommand {
 
 	static final String SftpLongnameDateFormat = "MMM dd  yyyy";
@@ -51,24 +45,20 @@ public class Lls extends SftpCommand {
 
 	private void printNames() throws IOException, SftpStatusException, SshException {
 
-		SftpClient sftp = getSftpClient();
+		var sftp = getSftpClient();
 		
-		Set<String> results = new TreeSet<>();
-		int maximumFilenameLength = 0;
-		int columns = 120;
-		try {
-			columns = Integer.parseInt(System.getenv("COLUMNS"));
-		} catch(NumberFormatException e) {} 
- 		
+		var results = new TreeSet<String>();
+		var maximumFilenameLength = 0;
+		var columns = getInteractiveCommand().getParentCommand().getTerminal().getWidth();
 		
 		try {
-			AbstractFile cwd = sftp.getCurrentWorkingDirectory();
-			for(AbstractFile file : cwd.getChildren()) {
+			var cwd = sftp.getCurrentWorkingDirectory();
+			for(var file : cwd.getChildren()) {
 				String displayName = file.getName();
 				if(Utils.isBlank(displayName) || (displayName.startsWith(".") && !showHidden)) {
 					continue;
 				}
-				maximumFilenameLength = Math.max(displayName.length(), maximumFilenameLength);
+				maximumFilenameLength = Math.max(displayName.length() + 1, maximumFilenameLength);
 				results.add(displayName);
 			}
 			
@@ -78,8 +68,8 @@ public class Lls extends SftpCommand {
 			}
 			
 			if(printingColumns > 1) {
-				String format = "%1$-"+ (columns / printingColumns) + "s";
-				Iterator<String> itr = results.iterator();
+				var format = "%1$-"+ (columns / printingColumns) + "s";
+				var itr = results.iterator();
 				while(itr.hasNext()) {
 					for(int i=0;i<printingColumns;i++) {
 						System.out.print(String.format(format, itr.next()));
@@ -101,8 +91,8 @@ public class Lls extends SftpCommand {
 	
 	private String getLongname(AbstractFile file) throws FileNotFoundException, IOException, PermissionDeniedException {
 		
-		SftpFileAttributes attrs = file.getAttributes();	
-		StringBuffer str = new StringBuffer();
+		var attrs = file.getAttributes();	
+		var str = new StringBuffer();
 		str.append(Utils.pad(10 - attrs.getPermissionsString().length())
 				+ attrs.getPermissionsString());
 		if(attrs.isDirectory()) {
@@ -128,7 +118,7 @@ public class Lls extends SftpCommand {
 				+ attrs.getSize().toString());
 		str.append(" ");
 		
-		String modTime = getModTimeStringInContext(attrs.getModifiedTime(), Locale.getDefault());
+		var modTime = getModTimeStringInContext(attrs.getModifiedTime(), Locale.getDefault());
 		str.append(Utils.pad(12 - modTime.length()) + modTime);
 		str.append(" ");
 		str.append(file.getName());
@@ -157,30 +147,23 @@ public class Lls extends SftpCommand {
 
 	private void printLongnames() throws SftpStatusException, SshException, IOException {
 		
-		SftpClient sftp = getSftpClient();
+		var sftp = getSftpClient();
 		
-		List<AbstractFile> results = new ArrayList<>();
+		var results = new ArrayList<AbstractFile>();
 		
 		try {
-			AbstractFile cwd = sftp.getCurrentWorkingDirectory();
-			for(AbstractFile file : cwd.getChildren()) {
-				String displayName = file.getName();
+			var cwd = sftp.getCurrentWorkingDirectory();
+			for(var file : cwd.getChildren()) {
+				var displayName = file.getName();
 				if(Utils.isBlank(displayName) || (displayName.startsWith(".") && !showHidden)) {
 					continue;
 				}
 				results.add(file);
 			}
 			
-			Collections.sort(results, new Comparator<AbstractFile>() {
-	
-				@Override
-				public int compare(AbstractFile o1, AbstractFile o2) {
-					return o1.getName().compareTo(o2.getName());
-				}
-				
-			});
+			Collections.sort(results, (o1, o2) -> o1.getName().compareTo(o2.getName()));
 			
-			for(AbstractFile result : results) {
+			for(var result : results) {
 				try {
 					System.out.println(getLongname(result));
 				} catch (IOException | PermissionDeniedException e) {

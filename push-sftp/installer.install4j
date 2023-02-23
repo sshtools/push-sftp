@@ -15,8 +15,8 @@
     </entries>
   </files>
   <launchers>
-    <launcher name="psftp" id="25" excludeFromMenu="true">
-      <executable name="psftp" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
+    <launcher name="push-sftp" id="25" excludeFromMenu="true">
+      <executable name="push-sftp" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
       <java mainClass="com.sshtools.pushsftp.PSFTP">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
@@ -144,12 +144,12 @@ return console.askOkCancel(message, true);
                 <serializedBean>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>psftp</string>
+                      <string>push-sftp</string>
                     </object>
                   </property>
                   <property name="linkFile">
                     <object class="java.io.File">
-                      <string>/usr/local/bin/psftp</string>
+                      <string>/usr/local/bin/push-sftp</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -158,12 +158,12 @@ return console.askOkCancel(message, true);
                 <serializedBean>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>psftp</string>
+                      <string>push-sftp</string>
                     </object>
                   </property>
                   <property name="linkFile">
                     <object class="java.io.File">
-                      <string>/usr/bin/psftp</string>
+                      <string>/usr/bin/push-sftp</string>
                     </object>
                   </property>
                 </serializedBean>
