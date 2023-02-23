@@ -14,7 +14,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 	public final static class Version implements IVersionProvider {
 		@Override
 		public String[] getVersion() throws Exception {
-			return new String[] { ArtifactVersion.getVersion("com.sshtools", "push-sftp-jfx") };
+			return new String[] { ArtifactVersion.getVersion("com.sshtools", "push-sftp-gui") };
 		}
 	}
 	
