@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="9.0.6" transformSequenceNumber="9">
+<install4j version="10.0.4" transformSequenceNumber="10">
   <directoryPresets config="./target/maverick-hpssh-3.1.0-SNAPSHOT.jar" />
-  <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="psftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
+  <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <codeSigning macEnabled="true" macPkcs12File="./jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="./jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest" />
   </application>
@@ -17,10 +17,10 @@
   <launchers>
     <launcher name="push-sftp" id="25" excludeFromMenu="true">
       <executable name="push-sftp" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp.PSFTP">
-        <classPath>
-          <scanDirectory location="lib" failOnError="false" />
-        </classPath>
+      <java mainClass="com.sshtools.pushsftp.PSFTPInteractive" mainMode="module">
+        <modulePath>
+          <directory location="lib" failOnError="false" />
+        </modulePath>
       </java>
     </launcher>
   </launchers>
@@ -493,7 +493,7 @@ return console.askYesNo(message, true);
   </installerGui>
   <mediaSets>
     <linuxDeb name="Linux Deb Archive" id="26" />
-    <windows name="Windows" id="34" installDir="HPSFTP">
+    <windows name="Windows" id="34" installDir="HPSFTP" architecture="64">
       <jreBundle usePack200="false" />
     </windows>
     <macosFolder name="macOS Folder" id="36" architecture="universal" signLaunchers="true">
