@@ -157,7 +157,7 @@
 						</goals>
 						<configuration>
 							<stripVersion>true</stripVersion>
-							<outputDirectory>third-party</outputDirectory>
+							<outputDirectory>${project.build.directory}/third-party</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
