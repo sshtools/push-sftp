@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.4" transformSequenceNumber="10">
-  <directoryPresets config="./target/push-sftp-jfx.jar" />
+  <directoryPresets config="./target/push-sftp-gui.jar" />
   <application name="Push SFTP GUI" applicationId="1464-8895-9044-3070" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp-gui" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <codeSigning macEnabled="true" macPkcs12File="../jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="../jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com">
       <macSearchedJars>
@@ -20,7 +20,7 @@
       <mountPoint id="47" location="linux" />
     </mountPoints>
     <entries>
-      <fileEntry mountPoint="24" file="./target/push-sftp-jfx.jar" />
+      <fileEntry mountPoint="24" file="./target/push-sftp-gui.jar" />
       <dirEntry mountPoint="24" file="./target/dependencies/common" subDirectory="third-party" />
       <dirEntry mountPoint="45" file="./target/dependencies/mac" subDirectory="mac" />
       <dirEntry mountPoint="46" file="./target/dependencies/win" subDirectory="win" />

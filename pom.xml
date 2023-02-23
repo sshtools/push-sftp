@@ -22,7 +22,7 @@
 
     <modules>
         <module>push-sftp</module>
-        <module>push-sftp-jfx</module>
+        <module>push-sftp-gui</module>
     </modules>
 	
 	<dependencyManagement>
