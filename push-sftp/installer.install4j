@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.4" transformSequenceNumber="10">
-  <directoryPresets config="./target/maverick-hpssh-3.1.0-SNAPSHOT.jar" />
+  <directoryPresets config="./target" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <codeSigning macEnabled="true" macPkcs12File="./jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="./jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest" />
@@ -11,7 +11,7 @@
     </mountPoints>
     <entries>
       <fileEntry mountPoint="24" file="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
-      <dirEntry mountPoint="24" file="./target" subDirectory="third-party" />
+      <dirEntry mountPoint="24" file="./target/third-party" subDirectory="third-party" />
     </entries>
   </files>
   <launchers>
