@@ -7,5 +7,6 @@ module com.sshtools.pushsftp {
 	requires transitive com.sshtools.synergy.client;
 	requires transitive com.sshtools.commands;
 	opens com.sshtools.pushsftp;
+	opens com.sshtools.pushsftp.commands;
 	exports com.sshtools.pushsftp;
 }
