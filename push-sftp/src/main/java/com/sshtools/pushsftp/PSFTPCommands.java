@@ -21,7 +21,7 @@ import com.sshtools.pushsftp.commands.Umask;
 
 import picocli.CommandLine.Command;
 
-@Command(name = "psftp-interactive", mixinStandardHelpOptions = false, 
+@Command(name = "push-sftp", mixinStandardHelpOptions = false, 
 			description = "Interactive shell", 
 			subcommands = { Ls.class, Cd.class, Lcd.class, Pwd.class, Lls.class, 
 					Lpwd.class, Help.class, Rm.class, Rmdir.class,

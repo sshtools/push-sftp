@@ -18,7 +18,7 @@ import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "push-sftp", description = "Push secure file transfer", versionProvider = PSFTPInteractive.Version.class)
+@Command(name = "push-sftp-interactive", description = "Push secure file transfer", versionProvider = PSFTPInteractive.Version.class)
 public class PSFTPInteractive extends CliCommand {
 	
 	public final static class Version implements IVersionProvider {
