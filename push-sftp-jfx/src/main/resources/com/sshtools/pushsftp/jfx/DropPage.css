@@ -1,0 +1,15 @@
+#phaseText {
+    -fx-text-fill: accent_color;
+}
+
+#text {
+    -fx-opacity: 0.25;
+}
+
+#magnifyingGlass {
+	-fx-icon-color: accent_color;
+}
+
+#networkIcon {
+    -fx-opacity: 0.25;
+}

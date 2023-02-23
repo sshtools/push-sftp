@@ -1,27 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.4" transformSequenceNumber="10">
-  <directoryPresets config="./target" />
-  <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
-    <codeSigning macEnabled="true" macPkcs12File="../jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="../jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com" />
+  <directoryPresets config="./target/push-sftp-jfx.jar" />
+  <application name="Push SFTP GUI" applicationId="1464-8895-9044-3070" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp-gui" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
+    <codeSigning macEnabled="true" macPkcs12File="../jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="../jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com">
+      <macSearchedJars>
+        <entry>jna-*</entry>
+        <entry>swt-*</entry>
+        <entry>javafx-*</entry>
+        <entry>jkeychain-*</entry>
+      </macSearchedJars>
+    </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest" />
   </application>
   <files>
     <mountPoints>
       <mountPoint id="24" location="lib" />
+      <mountPoint id="45" location="mac" />
+      <mountPoint id="46" location="win" />
+      <mountPoint id="47" location="linux" />
     </mountPoints>
     <entries>
-      <fileEntry mountPoint="24" file="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
-      <dirEntry mountPoint="24" file="./target/third-party" subDirectory="third-party" />
+      <fileEntry mountPoint="24" file="./target/push-sftp-jfx.jar" />
+      <dirEntry mountPoint="24" file="./target/dependencies/common" subDirectory="third-party" />
+      <dirEntry mountPoint="45" file="./target/dependencies/mac" subDirectory="mac" />
+      <dirEntry mountPoint="46" file="./target/dependencies/win" subDirectory="win" />
+      <dirEntry mountPoint="47" file="./target/dependencies/linux" subDirectory="linux" />
     </entries>
   </files>
   <launchers>
-    <launcher name="push-sftp" id="25" excludeFromMenu="true">
-      <executable name="push-sftp" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module">
+    <launcher name="push-sftp-gui" id="52" menuName="Key Server Integration">
+      <executable name="push-sftp-gui" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
+      <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module">
         <modulePath>
           <directory location="lib" failOnError="false" />
+          <directory location="mac" failOnError="false" />
+          <directory location="win" failOnError="false" />
+          <directory location="linux" failOnError="false" />
         </modulePath>
       </java>
+      <iconImageFiles>
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon.png" />
+      </iconImageFiles>
     </launcher>
   </launchers>
   <installerGui>
@@ -30,7 +49,15 @@
         <startup>
           <screen id="1" beanClass="com.install4j.runtime.beans.screens.StartupScreen" rollbackBarrierExitCode="0">
             <actions>
-              <action id="22" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" actionElevationType="none" rollbackBarrierExitCode="0" />
+              <action id="22" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" actionElevationType="none" rollbackBarrierExitCode="0" failureStrategy="quit">
+                <serializedBean>
+                  <property name="failIfNotRootUnix" type="boolean" value="true" />
+                  <property name="linuxPrivilegeRequirement" type="enum" class="com.install4j.runtime.beans.actions.misc.PrivilegeRequirement" value="ROOT" />
+                  <property name="obtainIfAdminMac" type="boolean" value="true" />
+                  <property name="obtainIfNormalMac" type="boolean" value="true" />
+                  <property name="obtainIfNormalWin" type="boolean" value="true" />
+                </serializedBean>
+              </action>
             </actions>
           </screen>
         </startup>
@@ -134,23 +161,34 @@ return console.askOkCancel(message, true);
           </screen>
           <screen id="15" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" rollbackBarrier="true" rollbackBarrierExitCode="0">
             <actions>
-              <action id="45" beanClass="com.install4j.runtime.beans.actions.UninstallPreviousAction" actionElevationType="none" rollbackBarrierExitCode="0" />
+              <action id="53" beanClass="com.install4j.runtime.beans.actions.UninstallPreviousAction" actionElevationType="none" rollbackBarrierExitCode="0" />
               <action id="17" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" actionElevationType="elevated" rollbackBarrierExitCode="0" failureStrategy="quit" errorMessage="${i18n:FileCorrupted}" />
               <action id="19" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
                   <property name="itemName" type="string">${compiler:sys.fullName} ${compiler:sys.version}</property>
                 </serializedBean>
               </action>
+              <action id="41" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
+                <serializedBean>
+                  <property name="script">
+                    <object class="com.install4j.api.beans.ScriptProperty">
+                      <property name="value" type="string">new File("/usr/local/bin").mkdirs();
+return true;</property>
+                    </object>
+                  </property>
+                </serializedBean>
+                <condition>return !System.getProperty("os.name").startsWith("Windows");</condition>
+              </action>
               <action id="28" beanClass="com.install4j.runtime.beans.actions.files.CreateSymlinkAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>push-sftp</string>
+                      <string>kdeploy</string>
                     </object>
                   </property>
                   <property name="linkFile">
                     <object class="java.io.File">
-                      <string>/usr/local/bin/push-sftp</string>
+                      <string>/usr/local/bin/kdeploy</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -159,12 +197,12 @@ return console.askOkCancel(message, true);
                 <serializedBean>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>push-sftp</string>
+                      <string>kclean</string>
                     </object>
                   </property>
                   <property name="linkFile">
                     <object class="java.io.File">
-                      <string>/usr/bin/push-sftp</string>
+                      <string>/usr/local/bin/kclean</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -493,13 +531,31 @@ return console.askYesNo(message, true);
     </styles>
   </installerGui>
   <mediaSets>
-    <linuxDeb name="Linux Deb Archive" id="26" />
+    <linuxDeb name="Linux Deb Archive" id="26">
+      <exclude>
+        <entry location="mac" />
+        <entry location="win" />
+      </exclude>
+    </linuxDeb>
     <windows name="Windows" id="34" installDir="HPSFTP" architecture="64">
+      <exclude>
+        <entry location="mac" />
+        <entry location="linux" />
+      </exclude>
       <jreBundle usePack200="false" />
     </windows>
     <macosFolder name="macOS Folder" id="36" architecture="universal" signLaunchers="true">
+      <exclude>
+        <entry location="win" />
+        <entry location="linux" />
+      </exclude>
       <jreBundle usePack200="false" />
     </macosFolder>
-    <linuxRPM name="Linux RPM" id="37" />
+    <linuxRPM name="Linux RPM" id="37">
+      <exclude>
+        <entry location="mac" />
+        <entry location="win" />
+      </exclude>
+    </linuxRPM>
   </mediaSets>
 </install4j>

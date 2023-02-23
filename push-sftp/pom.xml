@@ -1,17 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.sshtools</groupId>
 	<artifactId>push-sftp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<parent>
+		<groupId>com.sshtools</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+		<artifactId>push-sftp-group</artifactId>
+		<relativePath>..</relativePath>
+	</parent>
 
 	<properties>
-		<maven.compiler.target>17</maven.compiler.target>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maverick.synergy.version>3.1.0-SNAPSHOT</maverick.synergy.version>
-		<install4j.licenseKey>***REMOVED***</install4j.licenseKey>
-		<install4j.appleId>lee@sshtools.com</install4j.appleId>
-		<install4j.appleIdPassword>***REMOVED***</install4j.appleIdPassword>
-		
 		<!-- For exec:java -->
 		
 		<psftp.host>localhost</psftp.host>
@@ -27,27 +24,22 @@
 		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
 			<artifactId>maverick-synergy-client</artifactId>
-			<version>${maverick.synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
 			<artifactId>maverick-bc</artifactId>
-			<version>${maverick.synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
 			<artifactId>maverick-sshagent</artifactId>
-			<version>${maverick.synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
 			<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
-			<version>${maverick.synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
 			<artifactId>maverick-sshagent-named-pipes</artifactId>
-			<version>${maverick.synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
@@ -56,6 +48,9 @@
 		</dependency>
 	</dependencies>
 	
+	<dependencyManagement>
+		
+	</dependencyManagement>
 	<profiles>
 		
 		<!-- Graal Native Image -->
@@ -77,7 +72,7 @@
 						<version>${graalvm.version}</version>
 						<executions>
 							<execution>
-								<id>volume-manager-native-image</id>
+								<id>push-sftp-native-image</id>
 								<goals>
 									<goal>native-image</goal>
 								</goals>
@@ -106,20 +101,17 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.sonatype.install4j</groupId>
-						<artifactId>install4j-maven-plugin</artifactId>
-						<version>1.1.2</version>
+						<groupId>com.install4j</groupId>
+						<artifactId>install4j-maven</artifactId>
 						<executions>
 							<execution>
 								<id>compile-installers</id>
-								<phase>install</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>compile</goal>
 								</goals>
 								<configuration>
 									<projectFile>${project.basedir}/installer.install4j</projectFile>
-									<winKeystorePassword>***REMOVED***</winKeystorePassword>
-									<macKeystorePassword>***REMOVED***</macKeystorePassword>
 								</configuration>
 							</execution>
 						</executions>
@@ -132,9 +124,12 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-    			<version>3.10.1</version>
 				<configuration>
 					<annotationProcessorPaths>
 						<path>
@@ -176,23 +171,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-	<repositories>
-		<repository>
-			<id>sshtools-releases</id>
-			<name>sshtools-releases</name>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<url>https://artifactory.jadaptive.com/public-releases</url>
-		</repository>
-		<repository>
-			<id>sshtools-snapshots</id>
-			<name>sshtools-snapshots</name>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>https://artifactory.jadaptive.com/public-snapshots</url>
-		</repository>
-	</repositories>
 </project>
