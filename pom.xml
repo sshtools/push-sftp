@@ -103,9 +103,7 @@
 		<repository>
 			<id>oss-snapshots</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
+			<snapshots/>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -113,6 +111,7 @@
 		<repository>
 			<id>sshtools-releases</id>
 			<name>sshtools-releases</name>
+			<releases/>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -121,18 +120,24 @@
 		<repository>
 			<id>sshtools-snapshots</id>
 			<name>sshtools-snapshots</name>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
+			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
 			<url>https://artifactory.jadaptive.com/public-snapshots</url>
 		</repository>
 		<repository>
 			<id>ext-snapshots-local</id>
 			<name>ext-snapshots-local</name>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
+			<snapshots/>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
 			<url>https://artifactory.jadaptive.com/ext-snapshots-local</url>
+		</repository>
+		<repository>
+			<id>ej-technologies</id>
+			<url>https://maven.ej-technologies.com/repository</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
