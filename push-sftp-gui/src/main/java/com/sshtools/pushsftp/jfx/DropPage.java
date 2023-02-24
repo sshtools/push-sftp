@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.AbstractWizardPage;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
@@ -44,6 +45,7 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 	private SequinsProgress progress;
 
 	private Button addTarget;
+	private Button about;
 	private SequentialTransition anim;
 	private FileTransferService service;
 
@@ -68,6 +70,10 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 		addTarget.setOnAction(e -> getWizard().popup(EditTargetPage.class));
 //		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.PLUS));
 		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.COG));
+
+		about = new Button(RESOURCES.getString("about"));
+		about.setOnAction(e -> getWizard().popup(AboutPage.class));
+		about.setGraphic(new FontIcon(FontAwesomeSolid.HANDS_HELPING));
 
 		var t1 = new TranslateTransition(Duration.seconds(3));
 		t1.setFromX(0);
@@ -98,14 +104,14 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 
 	@Override
 	public void shown() {
-		getWizard().getAccessories().getChildren().add(addTarget);
+		getWizard().getAccessories().getChildren().addAll(addTarget, about);
 		getWizard().nextVisibleProperty().set(false);
 
 	}
 
 	@Override
 	public void hidden() {
-		getWizard().getAccessories().getChildren().remove(addTarget);
+		getWizard().getAccessories().getChildren().removeAll(addTarget, about);
 		getWizard().nextVisibleProperty().set(true);
 	}
 
