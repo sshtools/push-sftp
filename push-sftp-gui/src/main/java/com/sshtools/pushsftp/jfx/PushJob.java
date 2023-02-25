@@ -167,7 +167,7 @@ public final class PushJob implements Callable<Void> {
 
 	private PushJob(PushJobBuilder builder) {
 		this.target = builder.target
-				.orElseThrow(() -> new IllegalStateException(RESOURCES.getString("error.noTarget"))); //$NON-NLS-1$
+				.orElseThrow(() -> new IllegalStateException(RESOURCES.getString("result.noTarget"))); //$NON-NLS-1$
 		this.files = Collections.unmodifiableList(builder.files);
 		this.progress = builder.progress.orElse(Progress.sink());
 		this.agentSocket = builder.agentSocket;
@@ -197,7 +197,7 @@ public final class PushJob implements Callable<Void> {
 				progress.error(RESOURCES.getString("cancelled"), e); //$NON-NLS-1$
 			} else {
 
-				progress.error(RESOURCES.getString("error.failedToPush"), e, files.size(), //$NON-NLS-1$
+				progress.error(RESOURCES.getString("result.failedToPush"), e, files.size(), //$NON-NLS-1$
 						e.getMessage() == null ? "" : e.getMessage()); //$NON-NLS-1$
 
 				Toast.toast(ToastType.ERROR, RESOURCES.getString("toast.error.title"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -234,12 +234,12 @@ public final class PushJob implements Callable<Void> {
 						}
 					} catch (IOException e) {
 						if (agentSocket.isPresent() && verbose) {
-							innerProgress.error(RESOURCES.getString("error.failedToConnectToAgent"), e); //$NON-NLS-1$
+							innerProgress.error(RESOURCES.getString("result.failedToConnectToAgent"), e); //$NON-NLS-1$
 						}
 					}
 				} catch (AgentNotAvailableException e) {
 					if (verbose)
-						innerProgress.error(RESOURCES.getString("error.noAgent")); //$NON-NLS-1$
+						innerProgress.error(RESOURCES.getString("result.noAgent")); //$NON-NLS-1$
 				}
 			} else {
 				if (verbose)
@@ -288,14 +288,14 @@ public final class PushJob implements Callable<Void> {
 									@Override
 									public String get() {
 										return password.orElseThrow(() -> new IllegalStateException(
-												RESOURCES.getString("error.passwordImpossible"))).get(); //$NON-NLS-1$
+												RESOURCES.getString("result.passwordImpossible"))).get(); //$NON-NLS-1$
 									}
 
 									@Override
 									public void completed(boolean success, String value,
 											ClientAuthenticator authenticator) {
 										password.orElseThrow(() -> new IllegalStateException(
-												RESOURCES.getString("error.passwordImpossible"))) //$NON-NLS-1$
+												RESOURCES.getString("result.passwordImpossible"))) //$NON-NLS-1$
 												.completed(success, value, authenticator);
 									}
 
@@ -315,11 +315,11 @@ public final class PushJob implements Callable<Void> {
 			}
 
 			if (!ssh.isConnected()) {
-				throw new IOException(RESOURCES.getString("error.noConnection")); //$NON-NLS-1$
+				throw new IOException(RESOURCES.getString("result.noConnection")); //$NON-NLS-1$
 			}
 
 			if (!ssh.isAuthenticated()) {
-				throw new IOException(RESOURCES.getString("error.failedAuthentication")); //$NON-NLS-1$
+				throw new IOException(RESOURCES.getString("result.failedAuthentication")); //$NON-NLS-1$
 			}
 
 			if (verbose)
@@ -334,14 +334,14 @@ public final class PushJob implements Callable<Void> {
 			@Override
 			public String getPasshrase(String keyinfo) {
 				return passphrasePrompt.orElseThrow(
-						() -> new IllegalStateException(RESOURCES.getString("error.noProgress"))) //$NON-NLS-1$
+						() -> new IllegalStateException(RESOURCES.getString("result.noProgress"))) //$NON-NLS-1$
 						.getPasshrase(keyinfo);
 			}
 
 			@Override
 			public void completed(boolean success, String value, ClientAuthenticator authenticator) {
 				passphrasePrompt.orElseThrow(
-						() -> new IllegalStateException(RESOURCES.getString("error.noProgress"))) //$NON-NLS-1$
+						() -> new IllegalStateException(RESOURCES.getString("result.noProgress"))) //$NON-NLS-1$
 						.completed(success, value, authenticator);
 			}
 

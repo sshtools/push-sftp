@@ -4,6 +4,7 @@ import static com.sshtools.simjac.AttrBindBuilder.xboolean;
 import static com.sshtools.simjac.AttrBindBuilder.xinteger;
 import static com.sshtools.simjac.AttrBindBuilder.xstring;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -46,6 +47,7 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 
 	private Button addTarget;
 	private Button about;
+	private Button options;
 	private SequentialTransition anim;
 	private FileTransferService service;
 
@@ -69,11 +71,15 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 		addTarget = new Button(RESOURCES.getString("addTarget"));
 		addTarget.setOnAction(e -> getWizard().popup(EditTargetPage.class));
 //		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.PLUS));
-		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.COG));
+		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.USER_COG));
 
 		about = new Button(RESOURCES.getString("about"));
 		about.setOnAction(e -> getWizard().popup(AboutPage.class));
 		about.setGraphic(new FontIcon(FontAwesomeSolid.HANDS_HELPING));
+
+		options = new Button(RESOURCES.getString("options"));
+		options.setOnAction(e -> getWizard().popup(OptionsPage.class));
+		options.setGraphic(new FontIcon(FontAwesomeSolid.COGS));
 
 		var t1 = new TranslateTransition(Duration.seconds(3));
 		t1.setFromX(0);
@@ -104,14 +110,14 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 
 	@Override
 	public void shown() {
-		getWizard().getAccessories().getChildren().addAll(addTarget, about);
+		getWizard().getAccessories().getChildren().addAll(addTarget, about, options);
 		getWizard().nextVisibleProperty().set(false);
 
 	}
 
 	@Override
 	public void hidden() {
-		getWizard().getAccessories().getChildren().removeAll(addTarget, about);
+		getWizard().getAccessories().getChildren().removeAll(addTarget, about, options);
 		getWizard().nextVisibleProperty().set(true);
 	}
 
@@ -156,7 +162,11 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 					.build().retrieve();
 
 			var target = bldr.build();
-			service.submit(PushJobBuilder.builder().withVerbose()
+			var agentSocket = PushSFTPUIApp.PREFERENCES.get("agentSocket", "");
+			
+			service.submit(PushJobBuilder.builder()
+					.withVerbose(PushSFTPUIApp.PREFERENCES.getBoolean("verbose", false))
+					.withAgentSocket(agentSocket.equals("")? Optional.empty() : Optional.of(agentSocket))
 					.withProgress(progress.createProgress(RESOURCES.getString("progressMessage"), db.getFiles().size()))
 					.withFiles(db.getFiles()).withTarget(target)
 					.withPassphrasePrompt(getContext().createPassphrasePrompt(target))

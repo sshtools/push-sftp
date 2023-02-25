@@ -20,7 +20,7 @@ import com.sshtools.jajafx.Wizard;
 import javafx.application.Platform;
 import javafx.scene.Node;
 
-public class PushSFTPUIApp extends JajaFXApp {
+public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUI.class.getName());
 	final static Preferences PREFERENCES = Preferences.userNodeForPackage(PushSFTPUI.class);
@@ -30,7 +30,7 @@ public class PushSFTPUIApp extends JajaFXApp {
 	private Keyring keyring;
 
 	public PushSFTPUIApp() {
-		super(PushSFTPUIApp.class.getResource("icon.png"));
+		super(PushSFTPUIApp.class.getResource("icon.png"), (PushSFTPUI) PushSFTPUI.getInstance());
 		service = new FileTransferService();
 		try {
 			keyring = Keyring.create();
@@ -68,6 +68,7 @@ public class PushSFTPUIApp extends JajaFXApp {
 
 			@Override
 			public void completed(boolean success, String value, ClientAuthenticator authenticator) {
+				// TODO need store against keyinfo?
 //				if(keyring != null) {
 //					// TODO ideally we should only save or delete if the prompt was actually used
 //					try {
@@ -106,7 +107,6 @@ public class PushSFTPUIApp extends JajaFXApp {
 			@Override
 			public void completed(boolean success, String value, ClientAuthenticator authenticator) {
 				if(keyring != null) {
-					// TODO ideally we should only save or delete if the prompt was actually used
 					try {
 						if(success) {
 							if(save.get())

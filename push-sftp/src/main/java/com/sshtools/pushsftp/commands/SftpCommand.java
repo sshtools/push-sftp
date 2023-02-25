@@ -153,7 +153,7 @@ public abstract class SftpCommand extends ChildCommand {
 			
 			
 			if(name.length() > nameLen) {
-				name = "..." + name.substring(0, Math.max(3, available) - 3);
+				name = "..." + name.substring(0, Math.max(3, nameLen) - 3);
 			}
 			
 			var output = String.format("%-" + nameLen + "s %s%4s %8s %10s %5d:%02d %-4s", 
