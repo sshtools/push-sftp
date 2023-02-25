@@ -3,6 +3,7 @@ package com.sshtools.pushsftp.jfx;
 import java.text.MessageFormat;
 
 import com.sshtools.jajafx.JajaApp;
+import com.sshtools.jajafx.Phase;
 import com.sshtools.sequins.ArtifactVersion;
 
 import picocli.CommandLine;
@@ -55,7 +56,8 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 				withInceptionYear(2023).
 				withApp(PushSFTPUIApp.class).
 				withAppResources(PushSFTPUIApp.RESOURCES).
-				withUpdatesUrl("https://sshtools-public.s3.eu-west-1.amazonaws.com/sshtools-public/push-sftp-gui/updates.xml");
+				withDefaultPhase(Phase.STABLE).
+				withUpdatesUrl("https://sshtools-public.s3.eu-west-1.amazonaws.com/sshtools-public/push-sftp-gui/${phase}/updates.xml");
 		System.exit(new CommandLine(bldr.build()).execute(args));
 	}
 }

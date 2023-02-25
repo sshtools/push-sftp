@@ -18,7 +18,6 @@
 			<groupId>com.install4j</groupId>
 			<artifactId>install4j-runtime</artifactId>
 			<version>9.0.7</version>
-			
 			<!-- MUST be provided, the runtime is added by I4J itself -->
 			<scope>provided</scope>
 		</dependency>
@@ -142,7 +141,7 @@
 				<os>
 					<family>linux</family>
 				</os>
-			</activation>
+			</activation> 
 			<properties>
 				<javafx.os.family>linux</javafx.os.family>
 			</properties>
@@ -195,15 +194,18 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.8</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
 								<configuration>
 									<target>
-										<copy file="${project.build.directory}/${project.artifactId}-${version}.jar" tofile="${project.build.directory}/${project.artifactId}.jar" />
+										<copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/${project.artifactId}.jar" />
 									</target>
 								</configuration>
 								<goals>
@@ -357,6 +359,11 @@
 									<goal>compile</goal>
 								</goals>
 								<configuration>
+									<variables>
+										<build.phase>${build.phase}</build.phase>
+									</variables>
+									<release>${product.version}-${build.number}</release>
+									<mediaTypes>${build.mediaTypes}</mediaTypes>
 									<projectFile>${project.basedir}/installer.install4j</projectFile>
 								</configuration>
 							</execution>

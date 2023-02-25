@@ -34,7 +34,7 @@ public class OptionsPage extends AbstractWizardPage<PushSFTPUIApp> {
 	@Override
 	protected void onConfigure() {
 		
-		phase.getItems().addAll(Phase.values());
+		phase.getItems().addAll(getContext().getContainer().getUpdateService().getPhases());
 		
 		prefBind = new PrefBind(PushSFTPUIApp.PREFERENCES);
 		prefBind.bind(verbose, automaticUpdates);

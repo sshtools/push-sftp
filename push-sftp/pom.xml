@@ -7,19 +7,14 @@
 		<artifactId>push-sftp-group</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
-
 	<properties>
 		<!-- For exec:java -->
-		
 		<psftp.host>localhost</psftp.host>
 		<psftp.user>${user.name}</psftp.user>
 		<psftp.args>-DI</psftp.args>
-		
 		<graalvm.version>21.2.0</graalvm.version>
 		<main.class>com.sshtools.pushsftp.PSFTPInteractive</main.class>
-		
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
@@ -47,12 +42,8 @@
 			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	
-	<dependencyManagement>
-		
-	</dependencyManagement>
+	<dependencyManagement></dependencyManagement>
 	<profiles>
-		
 		<!-- Graal Native Image -->
 		<profile>
 			<id>native-image</id>
@@ -90,7 +81,6 @@
 				</plugins>
 			</build>
 		</profile>
-		
 		<profile>
 			<activation>
 				<property>
@@ -120,7 +110,6 @@
 			</build>
 		</profile>
 	</profiles>
-	
 	<build>
 		<plugins>
 			<plugin>

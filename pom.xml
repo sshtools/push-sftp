@@ -4,62 +4,108 @@
 	<artifactId>push-sftp-group</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
 	<properties>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		
 		<maverick.synergy.version>3.1.0-SNAPSHOT</maverick.synergy.version>
-		
 		<install4j.home>_SET_IN_HOME_DOT_JADAPTIVE_DOT_BUILD_DOT_PROPERTIES_</install4j.home>
 		<install4j.licenseKey>_SET_IN_HOME_DOT_JADAPTIVE_DOT_BUILD_DOT_PROPERTIES_</install4j.licenseKey>
 		<install4j.appleId>_SET_IN_HOME_DOT_JADAPTIVE_DOT_BUILD_DOT_PROPERTIES_</install4j.appleId>
 		<install4j.appleIdPassword>_SET_HOME_IN_DOT_JADAPTIVE_DOT_BUILD_DOT_PROPERTIES_</install4j.appleIdPassword>
-				
+		<!-- For configuring Install4J -->
+		<build.phase>continuous</build.phase>
+		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
 	</properties>
-
-    <modules>
-        <module>push-sftp</module>
-        <module>push-sftp-gui</module>
-    </modules>
-	
+	<modules>
+		<module>push-sftp</module>
+		<module>push-sftp-gui</module>
+	</modules>
 	<dependencyManagement>
-	    <dependencies>
-		    <dependency>
-			    <groupId>com.sshtools.hotfixes</groupId>
-			    <artifactId>maverick-synergy-client</artifactId>
-			    <version>${maverick.synergy.version}</version>
-		    </dependency>
-		    <dependency>
-			    <groupId>com.sshtools.hotfixes</groupId>
-			    <artifactId>maverick-bc</artifactId>
-			    <version>${maverick.synergy.version}</version>
-		    </dependency>
-		    <dependency>
-			    <groupId>com.sshtools.hotfixes</groupId>
-			    <artifactId>maverick-sshagent</artifactId>
-			    <version>${maverick.synergy.version}</version>
-		    </dependency>
-		    <dependency>
-			    <groupId>com.sshtools.hotfixes</groupId>
-			    <artifactId>maverick-sshagent-jdk16-sockets</artifactId>
-			    <version>${maverick.synergy.version}</version>
-		    </dependency>
-		    <dependency>
-			    <groupId>com.sshtools.hotfixes</groupId>
-			    <artifactId>maverick-sshagent-named-pipes</artifactId>
-			    <version>${maverick.synergy.version}</version>
-		    </dependency>
-    	</dependencies>
-    </dependencyManagement>
-	
+		<dependencies>
+			<dependency>
+				<groupId>com.sshtools.hotfixes</groupId>
+				<artifactId>maverick-synergy-client</artifactId>
+				<version>${maverick.synergy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sshtools.hotfixes</groupId>
+				<artifactId>maverick-bc</artifactId>
+				<version>${maverick.synergy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sshtools.hotfixes</groupId>
+				<artifactId>maverick-sshagent</artifactId>
+				<version>${maverick.synergy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sshtools.hotfixes</groupId>
+				<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
+				<version>${maverick.synergy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sshtools.hotfixes</groupId>
+				<artifactId>maverick-sshagent-named-pipes</artifactId>
+				<version>${maverick.synergy.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<!-- The build number. This will be set to ZERO if BUILD_NUMBER is not 
+						set. Jenkins will set BUILD_NUMBER, or you can set it in the environment 
+						before running maven for build testing. -->
+					<execution>
+						<id>build-number-property</id>
+						<goals>
+							<goal>regex-property</goal>
+						</goals>
+						<phase>initialize</phase>
+						<configuration>
+							<!-- Set build.number to zero if it is blank. This uses a bit of regular 
+								expression trickery. Because Jenkins supplies BUILD_NUMBER as an environment 
+								variable, and we also want the build to work outside of Jenkins, then the 
+								below is used to set build.number to zero if BUILD_NUMBER is not set. There 
+								is no easy way to do this with basic Maven, and build-helper doesn't like 
+								empty variables either, so we prefix it with zero, then use capture groups 
+								to correct the format for both situations -->
+							<name>product.version</name>
+							<value>${project.version}</value>
+							<regex>^([0-9]+)\.([0-9]+)\.([0-9]+)-([0-9A-Za-z]+)$</regex>
+							<replacement>$1.$2.$3</replacement>
+							<failIfNoMatch>true</failIfNoMatch>
+						</configuration>
+					</execution>
+					<execution>
+						<id>product-version-property</id>
+						<goals>
+							<goal>regex-property</goal>
+						</goals>
+						<phase>initialize</phase>
+						<configuration>
+							<!-- Strip off -SNAPSHOT (or other suffix) -->
+							<name>build.number</name>
+							<value>0${env.BUILD_NUMBER}</value>
+							<regex>^(?:0?)([0-9]+)(?:\$\{env\.BUILD_NUMBER\})?$</regex>
+							<replacement>$1</replacement>
+							<failIfNoMatch>true</failIfNoMatch>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
-        <pluginManagement>
-            <plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>2.15.0</version>
+				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>properties-maven-plugin</artifactId>
@@ -83,27 +129,71 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-	    			<version>3.10.1</version>
+					<version>3.10.1</version>
 				</plugin>
-			    <plugin>
-				    <groupId>org.apache.maven.plugins</groupId>
-				    <artifactId>maven-dependency-plugin</artifactId>
-    				<version>3.5.0</version>
-			    </plugin>
-					<plugin>
-						<groupId>com.install4j</groupId>
-						<artifactId>install4j-maven</artifactId>
-						<version>9.0.5</version>
-					</plugin>
-            </plugins>
-        </pluginManagement>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.5.0</version>
+				</plugin>
+				<plugin>
+					<groupId>com.install4j</groupId>
+					<artifactId>install4j-maven</artifactId>
+					<version>9.0.5</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.3.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.8</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
-	
+	<profiles>
+		<profile>
+			<id>install4j-installers</id>
+			<activation>
+				<property>
+					<name>buildInstaller</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<!--
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>versions-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>strip-snaphost-version</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>set</goal>
+								</goals>
+								<configuration>
+									<removeSnapshot>true</removeSnapshot>
+									<generateBackupPoms>false</generateBackupPoms>
+									<processDependencies>false</processDependencies>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+				-->
+			</build>
+		</profile>
+	</profiles>
 	<repositories>
 		<repository>
 			<id>oss-snapshots</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<snapshots/>
+			<snapshots />
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -111,7 +201,7 @@
 		<repository>
 			<id>sshtools-releases</id>
 			<name>sshtools-releases</name>
-			<releases/>
+			<releases />
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -120,7 +210,7 @@
 		<repository>
 			<id>sshtools-snapshots</id>
 			<name>sshtools-snapshots</name>
-			<snapshots/>
+			<snapshots />
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -129,7 +219,7 @@
 		<repository>
 			<id>ext-snapshots-local</id>
 			<name>ext-snapshots-local</name>
-			<snapshots/>
+			<snapshots />
 			<releases>
 				<enabled>false</enabled>
 			</releases>
