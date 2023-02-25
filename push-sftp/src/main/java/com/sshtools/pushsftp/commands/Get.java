@@ -18,7 +18,7 @@ public class Get extends SftpCommand implements Callable<Integer> {
 	boolean timing;
 
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		SftpClient sftp = getSftpClient();
 
 		try(var progress = getTerminal().progressBuilder().withRateLimit().withTiming(timing).withInterruptable().build()) {

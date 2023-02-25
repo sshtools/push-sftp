@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 public class Bye extends SftpCommand {
 
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		System.exit(0);
 		return null;
 	}

@@ -12,7 +12,7 @@ public class Mkdir extends SftpCommand {
 	private String directory;
 	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		
 		SftpClient sftp = getSftpClient();
 		sftp.mkdir(directory);

@@ -8,9 +8,9 @@ public class Umask extends SftpCommand {
 
 	@Parameters(index = "0", arity = "1", description = "Set the umask")
 	private String umask;
-
+	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		getSftpClient().umask(umask);
 		return 0;
 	}

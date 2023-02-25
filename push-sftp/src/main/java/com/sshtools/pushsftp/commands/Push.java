@@ -53,9 +53,9 @@ public class Push extends SftpCommand {
 
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
-
+	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 
 		try (var progress = getTerminal().progressBuilder().withTiming(timing).withRateLimit().build()) {
 			getSshClient().runTask(PushTaskBuilder.create().
@@ -64,7 +64,7 @@ public class Push extends SftpCommand {
 						return getSshClient();
 					else {
 						try {
-							return getInteractiveCommand().getParentCommand().connect(false, idx < 2);
+							return getRootCommand().connect(false, idx < 2);
 						} catch (IOException e) {
 							throw new UncheckedIOException(e);
 						} catch (SshException e) {

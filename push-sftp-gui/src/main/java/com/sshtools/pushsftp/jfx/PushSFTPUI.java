@@ -1,7 +1,10 @@
 package com.sshtools.pushsftp.jfx;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
+import com.sshtools.common.logger.Log;
+import com.sshtools.common.logger.Log.Level;
 import com.sshtools.jajafx.JajaApp;
 import com.sshtools.jajafx.Phase;
 import com.sshtools.sequins.ArtifactVersion;
@@ -43,13 +46,18 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 		}
 	}
 	
-	@Option(names = { "-m", "--maverick-debug" }, paramLabel = "PATH", description = "Enable Maverick API debugging (for SSH related output).")
-	boolean maverickDebug;
+	@Option(names = { "-m", "--ssh-log" }, paramLabel = "PATH", description = "Enable Maverick API debugging (for SSH related output).")
+	Optional<Level> sshLog;
 
 	PushSFTPUI(PushSFTPUIBuilder builder) {
 		super(builder);
 	}
 	
+	@Override
+	protected void beforeCall() throws Exception {
+		sshLog.ifPresent(l -> Log.enableConsole(Level.DEBUG));
+	}
+
 	public static void main(String[] args) {
 		var bldr = PushSFTPUIBuilder.create().
 				withLauncherId("54").
@@ -57,7 +65,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 				withApp(PushSFTPUIApp.class).
 				withAppResources(PushSFTPUIApp.RESOURCES).
 				withDefaultPhase(Phase.STABLE).
-				withUpdatesUrl("https://sshtools-public.s3.eu-west-1.amazonaws.com/sshtools-public/push-sftp-gui/${phase}/updates.xml");
+				withUpdatesUrl("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml");
 		System.exit(new CommandLine(bldr.build()).execute(args));
 	}
 }

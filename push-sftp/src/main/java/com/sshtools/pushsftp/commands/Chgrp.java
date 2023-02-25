@@ -17,7 +17,7 @@ public class Chgrp extends SftpCommand  {
 	private String path;
 
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		expand(path, (fp) -> {
 			getSftpClient().chgrp(fp, gid);
 		}, false);

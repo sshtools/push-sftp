@@ -10,6 +10,24 @@ import com.sshtools.commands.ExceptionHandler;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
+import com.sshtools.pushsftp.commands.Bye;
+import com.sshtools.pushsftp.commands.Cd;
+import com.sshtools.pushsftp.commands.Chgrp;
+import com.sshtools.pushsftp.commands.Chmod;
+import com.sshtools.pushsftp.commands.Chown;
+import com.sshtools.pushsftp.commands.Get;
+import com.sshtools.pushsftp.commands.Help;
+import com.sshtools.pushsftp.commands.Lcd;
+import com.sshtools.pushsftp.commands.Lls;
+import com.sshtools.pushsftp.commands.Lpwd;
+import com.sshtools.pushsftp.commands.Ls;
+import com.sshtools.pushsftp.commands.Mkdir;
+import com.sshtools.pushsftp.commands.Push;
+import com.sshtools.pushsftp.commands.Put;
+import com.sshtools.pushsftp.commands.Pwd;
+import com.sshtools.pushsftp.commands.Rm;
+import com.sshtools.pushsftp.commands.Rmdir;
+import com.sshtools.pushsftp.commands.Umask;
 import com.sshtools.sequins.ArtifactVersion;
 
 import picocli.CommandLine;
@@ -18,7 +36,11 @@ import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "push-sftp-interactive", description = "Push secure file transfer", versionProvider = PSFTPInteractive.Version.class)
+@Command(name = "push-sftp-interactive", description = "Push secure file transfer", subcommands = { Ls.class, Cd.class, Lcd.class, Pwd.class, Lls.class, 
+		Lpwd.class, Help.class, Rm.class, Rmdir.class,
+		Mkdir.class, Umask.class, Bye.class, Chgrp.class, 
+		Chown.class, Chmod.class, Push.class, Put.class, Get.class
+		}, versionProvider = PSFTPInteractive.Version.class)
 public class PSFTPInteractive extends CliCommand {
 	
 	public final static class Version implements IVersionProvider {
@@ -107,11 +129,6 @@ public class PSFTPInteractive extends CliCommand {
 	}
 
 	@Override
-	protected Object createInteractiveCommand() {
-		return new PSFTPCommands(this);
-	}
-
-	@Override
 	protected String getCommandName() {
 		return "push-sftp";
 	}
@@ -123,6 +140,11 @@ public class PSFTPInteractive extends CliCommand {
 
 	public SshClient getSshClient() {
 		return ssh;
+	}
+
+	@Override
+	protected Object createInteractiveCommand() {
+		return new PSFTPCommands(this);
 	}
 
 }

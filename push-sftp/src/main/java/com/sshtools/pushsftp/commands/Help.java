@@ -1,7 +1,5 @@
 package com.sshtools.pushsftp.commands;
 
-import com.sshtools.pushsftp.PSFTPCommands;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -9,8 +7,8 @@ import picocli.CommandLine.Command;
 public class Help extends SftpCommand {
 
 	@Override
-	public Integer call() throws Exception {
-		PSFTPCommands container = getInteractiveCommand();
+	protected Integer onCall() throws Exception {
+		var container = getInteractiveCommand();
 		CommandLine.usage(container, System.out);
 		return 0;
 	}

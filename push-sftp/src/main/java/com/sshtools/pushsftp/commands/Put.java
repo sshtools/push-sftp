@@ -20,7 +20,7 @@ public class Put extends SftpCommand implements Callable<Integer> {
 	boolean timing;
 
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 
 		var sftp = getSftpClient();
 		var target = Objects.nonNull(destination) ? destination : sftp.pwd();

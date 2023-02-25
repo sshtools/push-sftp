@@ -19,7 +19,7 @@ public class Chmod extends SftpCommand  {
 	private String path;
 
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		
 		int actualPermissions = parsePermissions(perms);
 		

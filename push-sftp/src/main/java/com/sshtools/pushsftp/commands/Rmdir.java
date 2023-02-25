@@ -14,7 +14,7 @@ public class Rmdir extends SftpCommand {
 	private boolean force;
 	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		getSftpClient().rm(file, force, true);
 		return 0;
 	}

@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 public class Lpwd extends SftpCommand {
 
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		getTerminal().messageln("Local working directory: {0}", getSftpClient().lpwd());
 		return 0;
 	}

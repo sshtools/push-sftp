@@ -17,9 +17,9 @@ public class Chown extends SftpCommand  {
 
 	@Parameters(index = "1", arity = "1", description = "Path to change group of")
 	private String path;
-
+	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		
 		StringBuffer UID = new StringBuffer();
 		StringBuffer GID = new StringBuffer();

@@ -22,7 +22,7 @@ public class Ls extends SftpCommand {
 	boolean showHidden;
 	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		
 		if(longnames) {
 			printLongnames();
@@ -39,7 +39,7 @@ public class Ls extends SftpCommand {
 		
 		var results = new TreeSet<String>();
 		int maximumFilenameLength = 0;
-		int columns = getInteractiveCommand().getParentCommand().getTerminal().getWidth();
+		int columns = getRootCommand().getTerminal().getWidth();
 		
  		var it = sftp.lsIterator();
 		while(it.hasNext()) {

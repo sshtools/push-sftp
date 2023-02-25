@@ -10,7 +10,7 @@ public class Rm extends SftpCommand {
 	private String file;
 	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		getSftpClient().rm(file);
 		return 0;
 	}

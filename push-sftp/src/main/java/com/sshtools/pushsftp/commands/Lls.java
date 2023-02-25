@@ -30,9 +30,9 @@ public class Lls extends SftpCommand {
 	
 	@Option(names = "-a", description = "show hidden files")
 	boolean showHidden;
-	
+
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 		
 		if(longnames) {
 			printLongnames();
@@ -49,7 +49,7 @@ public class Lls extends SftpCommand {
 		
 		var results = new TreeSet<String>();
 		var maximumFilenameLength = 0;
-		var columns = getInteractiveCommand().getParentCommand().getTerminal().getWidth();
+		var columns = getRootCommand().getTerminal().getWidth();
 		
 		try {
 			var cwd = sftp.getCurrentWorkingDirectory();

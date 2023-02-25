@@ -11,7 +11,7 @@ public class Cd extends SftpCommand {
 	String path;
 	
 	@Override
-	public Integer call() throws Exception {
+	protected Integer onCall() throws Exception {
 
 		getSftpClient().cd(path);
 		return 0;
