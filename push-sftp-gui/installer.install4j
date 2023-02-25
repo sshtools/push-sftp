@@ -1159,5 +1159,6 @@ return true;</property>
         <entry location="win" />
       </exclude>
     </linuxRPM>
+    <unixInstaller name="Unix Installer" id="116" />
   </mediaSets>
 </install4j>
