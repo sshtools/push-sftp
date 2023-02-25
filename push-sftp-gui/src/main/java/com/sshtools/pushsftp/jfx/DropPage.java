@@ -162,10 +162,11 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 					.build().retrieve();
 
 			var target = bldr.build();
-			var agentSocket = PushSFTPUIApp.PREFERENCES.get("agentSocket", "");
+			var prefs = getContext().getContainer().getAppPreferences();
+			var agentSocket = prefs.get("agentSocket", "");
 			
 			service.submit(PushJobBuilder.builder()
-					.withVerbose(PushSFTPUIApp.PREFERENCES.getBoolean("verbose", false))
+					.withVerbose(prefs.getBoolean("verbose", false))
 					.withAgentSocket(agentSocket.equals("")? Optional.empty() : Optional.of(agentSocket))
 					.withProgress(progress.createProgress(RESOURCES.getString("progressMessage"), db.getFiles().size()))
 					.withFiles(db.getFiles()).withTarget(target)

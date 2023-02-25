@@ -13,8 +13,10 @@ import com.github.javakeyring.PasswordAccessException;
 import com.sshtools.client.ClientAuthenticator;
 import com.sshtools.client.PassphrasePrompt;
 import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
+import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
+import com.sshtools.jajafx.UpdatePage;
 import com.sshtools.jajafx.Wizard;
 
 import javafx.application.Platform;
@@ -51,6 +53,14 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		return keyring != null;
 	}
 	
+	@Override
+	protected void needUpdate() {
+		if(!(wiz.getCurrentPage() instanceof AboutPage) && !(wiz.getCurrentPage() instanceof UpdatePage)
+				&& !service.busyProperty().get()) {
+			wiz.popup(UpdatePage.class);
+		}
+	}
+
 	public PassphrasePrompt createPassphrasePrompt(Target target) {
 		var save = new AtomicBoolean();
 		return new PassphrasePrompt() {

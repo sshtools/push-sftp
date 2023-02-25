@@ -33,14 +33,11 @@ public class OptionsPage extends AbstractWizardPage<PushSFTPUIApp> {
 
 	@Override
 	protected void onConfigure() {
-		
 		phase.getItems().addAll(getContext().getContainer().getUpdateService().getPhases());
-		
-		prefBind = new PrefBind(PushSFTPUIApp.PREFERENCES);
+		prefBind = new PrefBind(getContext().getContainer().getAppPreferences());
 		prefBind.bind(verbose, automaticUpdates);
 		prefBind.bind(agentSocket);
 		prefBind.bind(Phase.class, phase);
-
 		agentSocket.setPromptText(System.getenv("SSH_AUTH_SOCK"));
 		
 	}
