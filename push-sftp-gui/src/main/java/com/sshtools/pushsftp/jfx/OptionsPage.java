@@ -5,8 +5,8 @@ import java.util.ResourceBundle;
 
 import com.sshtools.jajafx.AbstractWizardPage;
 import com.sshtools.jajafx.FXUtil;
-import com.sshtools.jajafx.Phase;
 import com.sshtools.jajafx.PrefBind;
+import com.sshtools.jaul.Phase;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
