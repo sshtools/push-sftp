@@ -298,7 +298,7 @@ return console.askYesNo(message, true);
           </screen>
         </screens>
       </application>
-      <application name="Standalone update downloader" id="54" beanClass="com.install4j.runtime.beans.applications.CustomApplication" launchInNewProcess="false">
+      <application name="Standalone update downloader" id="54" beanClass="com.install4j.runtime.beans.applications.CustomApplication" actionElevationType="elevated" launchInNewProcess="false">
         <serializedBean>
           <property name="customIconImageFiles">
             <add>
