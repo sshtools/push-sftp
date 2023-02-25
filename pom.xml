@@ -93,7 +93,7 @@
 							<value>0${env.BUILD_NUMBER}</value>
 							<regex>^(?:0?)([0-9]+)(?:\$\{env\.BUILD_NUMBER\})?$</regex>
 							<replacement>$1</replacement>
-							<failIfNoMatch>true</failIfNoMatch>
+							<failIfNoMatch>false</failIfNoMatch>
 						</configuration>
 					</execution>
 				</executions>
