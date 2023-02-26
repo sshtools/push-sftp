@@ -11,7 +11,7 @@
 		<!-- For exec:java -->
 		<psftp.host>localhost</psftp.host>
 		<psftp.user>${user.name}</psftp.user>
-		<psftp.args>-DI</psftp.args>
+		<psftp.args>-X</psftp.args>
 		<graalvm.version>21.2.0</graalvm.version>
 		<main.class>com.sshtools.pushsftp.PSFTPInteractive</main.class>
 	</properties>

@@ -98,7 +98,7 @@ public class PSFTPInteractive extends CliCommand {
 	public String getHost() {
 		if(destination.isPresent()) {
 			var dst = destination.get();
-			var idx = dst.indexOf('@');
+			var idx = dst.lastIndexOf('@');
 			return idx == -1 ? dst : dst.substring(idx  +1);
 		}
 		return host.orElseThrow(() -> new IllegalArgumentException("Host must be supplied either as an option or as part of the destination."));
@@ -108,7 +108,7 @@ public class PSFTPInteractive extends CliCommand {
 	public String getUsername() {
 		if(destination.isPresent()) {
 			var dst = destination.get();
-			var idx = dst.indexOf('@');
+			var idx = dst.lastIndexOf('@');
 			if(idx > -1)
 				return dst.substring(0, idx);
 		}
