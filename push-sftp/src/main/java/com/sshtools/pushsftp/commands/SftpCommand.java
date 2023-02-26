@@ -32,27 +32,19 @@ public abstract class SftpCommand extends ChildCommand {
 	}
 
 	protected Terminal getTerminal() {
-		return getRootCommand().getTerminal();
+		return ((PSFTPInteractive)getRootCommand()).getTerminal();
 	}
 
 	protected SftpClient getSftpClient() {
-		return getRootCommand().getSftpClient();
+		return ((PSFTPInteractive)getRootCommand()).getSftpClient();
 	}
 
 	protected SshClient getSshClient() {
-		return getRootCommand().getSshClient();
+		return ((PSFTPInteractive)getRootCommand()).getSshClient();
 	}
 
 	protected PSFTPCommands getInteractiveCommand() {
 		return (PSFTPCommands)getSpec().parent().userObject();
-	}
-
-	protected PSFTPInteractive getRootCommand() {
-		var parentCmd = getSpec().parent().userObject();
-		if(parentCmd instanceof PSFTPInteractive)
-			return (PSFTPInteractive)parentCmd;
-		else
-			return ((PSFTPCommands)parentCmd).getParentCommand();
 	}
 
 	protected String getUsername() {

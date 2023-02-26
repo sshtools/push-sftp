@@ -64,7 +64,6 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 				withInceptionYear(2023).
 				withApp(PushSFTPUIApp.class).
 				withAppResources(PushSFTPUIApp.RESOURCES).
-				withDefaultPhase(Phase.STABLE).
 				withUpdatesUrl("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml");
 		System.exit(new CommandLine(bldr.build()).execute(args));
 	}

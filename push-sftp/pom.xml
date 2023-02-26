@@ -17,6 +17,13 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>com.install4j</groupId>
+			<artifactId>install4j-runtime</artifactId>
+			<version>10.0.4</version>
+			<!-- MUST be provided, the runtime is added by I4J itself -->
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.sshtools.hotfixes</groupId>
 			<artifactId>maverick-synergy-client</artifactId>
 		</dependency>
@@ -82,6 +89,7 @@
 			</build>
 		</profile>
 		<profile>
+			<id>install4j-installers</id>
 			<activation>
 				<property>
 					<name>buildInstaller</name>
@@ -91,8 +99,51 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<configuration>
+									<target>
+										<copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/${project.artifactId}.jar" />
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<configuration>
+							<outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+						</configuration>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<stripVersion>true</stripVersion>
+									<outputDirectory>${project.build.directory}/dependencies/common</outputDirectory>
+									<stripVersion>true</stripVersion>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
 						<groupId>com.install4j</groupId>
 						<artifactId>install4j-maven</artifactId>
+						<version>9.0.5</version>
 						<executions>
 							<execution>
 								<id>compile-installers</id>
@@ -101,6 +152,11 @@
 									<goal>compile</goal>
 								</goals>
 								<configuration>
+									<variables>
+										<build.phase>${build.phase}</build.phase>
+									</variables>
+									<release>${product.version}-${build.number}</release>
+									<mediaTypes>${build.mediaTypes}</mediaTypes>
 									<projectFile>${project.basedir}/installer.install4j</projectFile>
 								</configuration>
 							</execution>
@@ -128,23 +184,6 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<stripVersion>true</stripVersion>
-							<outputDirectory>${project.build.directory}/third-party</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

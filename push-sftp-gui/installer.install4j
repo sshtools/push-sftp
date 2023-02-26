@@ -32,7 +32,7 @@
     </entries>
   </files>
   <launchers>
-    <launcher name="push-sftp-gui" id="52" menuName="Key Server Integration">
+    <launcher name="push-sftp-gui" id="52" menuName="Quick File Drop">
       <executable name="push-sftp-gui" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
       <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module">
         <modulePath>
@@ -187,26 +187,12 @@ return true;</property>
                 <serializedBean>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>kdeploy</string>
+                      <string>push-sftp-gui</string>
                     </object>
                   </property>
                   <property name="linkFile">
                     <object class="java.io.File">
-                      <string>/usr/local/bin/kdeploy</string>
-                    </object>
-                  </property>
-                </serializedBean>
-              </action>
-              <action id="29" beanClass="com.install4j.runtime.beans.actions.files.CreateSymlinkAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
-                <serializedBean>
-                  <property name="file">
-                    <object class="java.io.File">
-                      <string>kclean</string>
-                    </object>
-                  </property>
-                  <property name="linkFile">
-                    <object class="java.io.File">
-                      <string>/usr/local/bin/kclean</string>
+                      <string>/usr/local/bin/push-sftp-gui</string>
                     </object>
                   </property>
                 </serializedBean>

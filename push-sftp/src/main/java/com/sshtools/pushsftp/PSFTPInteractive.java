@@ -7,6 +7,8 @@ import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.commands.CliCommand;
 import com.sshtools.commands.ExceptionHandler;
+import com.sshtools.commands.Update;
+import com.sshtools.commands.UpdateCheck;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
@@ -39,7 +41,8 @@ import picocli.CommandLine.Parameters;
 @Command(name = "push-sftp-interactive", description = "Push secure file transfer", subcommands = { Ls.class, Cd.class, Lcd.class, Pwd.class, Lls.class, 
 		Lpwd.class, Help.class, Rm.class, Rmdir.class,
 		Mkdir.class, Umask.class, Bye.class, Chgrp.class, 
-		Chown.class, Chmod.class, Push.class, Put.class, Get.class
+		Chown.class, Chmod.class, Push.class, Put.class, Get.class,
+		UpdateCheck.class, Update.class
 		}, versionProvider = PSFTPInteractive.Version.class)
 public class PSFTPInteractive extends CliCommand {
 	
@@ -71,6 +74,11 @@ public class PSFTPInteractive extends CliCommand {
 	
 	@Parameters(index = "0", arity = "0..1", description = "The remote server, with optional username.")
 	private Optional<String> destination;
+
+	public PSFTPInteractive() {
+		super(Optional.of("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml"), 
+				Optional.of("XXXXXXXXXXX"), Optional.empty());
+	}
 
 	public SftpClient getSftpClient() {
 		return sftp;
@@ -146,5 +154,4 @@ public class PSFTPInteractive extends CliCommand {
 	protected Object createInteractiveCommand() {
 		return new PSFTPCommands(this);
 	}
-
 }

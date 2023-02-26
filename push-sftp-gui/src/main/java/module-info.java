@@ -7,7 +7,7 @@ module com.sshtools.pushsftp.jfx {
 	requires info.picocli;
 	requires org.kordamp.ikonli.javafx;
 	requires com.sshtools.common.logger;
-	requires transitive com.install4j.runtime;
+	requires com.install4j.runtime;
 	requires transitive com.sshtools.synergy.client;
 	requires transitive com.sshtools.agent;
 	requires com.sshtools.simjac;
