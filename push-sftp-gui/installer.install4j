@@ -32,7 +32,7 @@
     </entries>
   </files>
   <launchers>
-    <launcher name="push-sftp-gui" id="52" menuName="Quick File Drop">
+    <launcher name="push-sftp-gui" id="52" menuName="Push SFTP GUI">
       <executable name="push-sftp-gui" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
       <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
@@ -276,7 +276,7 @@ return console.askYesNo(message, true);
           </screen>
         </screens>
       </application>
-      <application name="Standalone update downloader" id="54" beanClass="com.install4j.runtime.beans.applications.CustomApplication" actionElevationType="elevated" launchInNewProcess="false">
+      <application name="Standalone update downloader" id="54" beanClass="com.install4j.runtime.beans.applications.CustomApplication" launchInNewProcess="false">
         <serializedBean>
           <property name="customIconImageFiles">
             <add>
