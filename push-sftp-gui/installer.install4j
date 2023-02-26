@@ -34,7 +34,7 @@
   <launchers>
     <launcher name="push-sftp-gui" id="52" menuName="Quick File Drop">
       <executable name="push-sftp-gui" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module">
+      <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
           <directory location="lib" failOnError="false" />
           <directory location="mac" failOnError="false" />
