@@ -76,7 +76,7 @@ public class PSFTPInteractive extends CliCommand {
 	private Optional<String> destination;
 
 	public PSFTPInteractive() {
-		super(Optional.of("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml"), 
+		super(Optional.of("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${phase}/updates.xml"), 
 				Optional.of("XXXXXXXXXXX"), Optional.empty());
 	}
 
