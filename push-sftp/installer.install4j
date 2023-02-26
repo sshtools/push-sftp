@@ -5,7 +5,15 @@
     <variables>
       <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
     </variables>
-    <codeSigning macEnabled="true" macPkcs12File="../jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="../jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com" />
+    <codeSigning macEnabled="true" macPkcs12File="../jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="../jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com">
+      <macSearchedJars>
+        <entry>jna-*</entry>
+        <entry>swt-*</entry>
+        <entry>javafx-*</entry>
+        <entry>jkeychain-*</entry>
+        <entry>install4j-*</entry>
+      </macSearchedJars>
+    </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest" />
   </application>
   <files>
