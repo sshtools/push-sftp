@@ -17,6 +17,7 @@ public final class Target {
 		private Optional<Path> identity = Optional.empty();
 		private Optional<Path> remoteFolder = Optional.empty();
 		private int authenticationTimeout = 120;
+		private Optional<Mode> mode = Optional.empty();
 
 		public TargetBuilder withUsername(String username) {
 			return withUsername(Optional.ofNullable(username));
@@ -47,6 +48,15 @@ public final class Target {
 
 		public TargetBuilder withHostname(Optional<String> hostname) {
 			this.hostname = hostname;
+			return this;
+		}
+
+		public TargetBuilder withMode(Mode mode) {
+			return withMode(Optional.ofNullable(mode)); 
+		}
+
+		public TargetBuilder withMode(Optional<Mode> mode) {
+			this.mode = mode;
 			return this;
 		}
 
@@ -118,6 +128,7 @@ public final class Target {
 	private final Optional<Path> identity;
 	private final Optional<Path> remoteFolder;
 	private final int authenticationTimeout;
+	private final Mode mode;
 
 	private Target(TargetBuilder builder) {
 		this.username = builder.username.orElse(System.getProperty("user.name"));
@@ -129,6 +140,7 @@ public final class Target {
 		this.identity = builder.identity;
 		this.remoteFolder = builder.remoteFolder;
 		this.authenticationTimeout = builder.authenticationTimeout;
+		this.mode = builder.mode.orElse(Mode.CHUNKED);
 	}
 
 	@Override
@@ -171,6 +183,10 @@ public final class Target {
 
 	public boolean agent() {
 		return agent;
+	}
+
+	public Mode mode() {
+		return mode;
 	}
 
 	public boolean password() {

@@ -25,9 +25,11 @@ import com.sshtools.client.PasswordAuthenticator;
 import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
 import com.sshtools.client.PrivateKeyFileAuthenticator;
 import com.sshtools.client.SshClient;
+import com.sshtools.client.scp.ScpClientIO;
 import com.sshtools.client.sftp.TransferCancelledException;
 import com.sshtools.client.tasks.FileTransferProgress;
 import com.sshtools.client.tasks.PushTask.PushTaskBuilder;
+import com.sshtools.client.tasks.UploadFileTask.UploadFileTaskBuilder;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.FileUtils;
 import com.sshtools.common.util.IOUtils;
@@ -183,11 +185,37 @@ public final class PushJob implements Callable<Void> {
 	public Void call() throws Exception {
 		try {
 			var client = connect();
-			client.runTask(PushTaskBuilder.create().withClient(client).withChunks(chunks)
-					.withRemoteFolder(target.remoteFolder()).withPaths(files)
-					.withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args))
-					.withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
-					build());
+			switch(target.mode()) {
+			case CHUNKED:
+			case CHUNKED_SFTP:
+				client.runTask(PushTaskBuilder.create().withClient(client).withChunks(chunks)
+						.withRemoteFolder(target.remoteFolder()).withPaths(files)
+						.withSFTPForcing(target.mode() == Mode.CHUNKED_SFTP)
+						.withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args))
+						.withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
+						build());
+				break;
+			case SCP:
+				var scp = new ScpClientIO(client);
+				for(var file : files) {
+					try(var in = Files.newInputStream(file)) {
+						scp.put(in, Files.size(file), file.toString(),
+								target.remoteFolder().map(r -> r.toString()).orElse(""), true, //$NON-NLS-1$
+								fileTransferProgress(progress, RESOURCES.getString("progress.uploading")));
+					}
+				}
+				break;
+			default:
+				for(var file : files) {
+					client.runTask(UploadFileTaskBuilder.create().
+							withClient(client).
+							withLocalFile(file.toFile()).
+							withRemote(target.remoteFolder()).
+							withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
+							build());
+				}
+				break;
+			}
 			progress.message(Level.VERBOSE, RESOURCES.getString("completed")); //$NON-NLS-1$
 			Toast.toast(ToastType.INFO, RESOURCES.getString("toast.completed.title"), //$NON-NLS-1$ //$NON-NLS-2$
 					MessageFormat.format(RESOURCES.getString("toast.completed.text"), files.size(), target.username(),

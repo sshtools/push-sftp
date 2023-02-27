@@ -1,8 +1,10 @@
 package com.sshtools.pushsftp.jfx;
 
+
 import static com.sshtools.simjac.AttrBindBuilder.xboolean;
 import static com.sshtools.simjac.AttrBindBuilder.xinteger;
 import static com.sshtools.simjac.AttrBindBuilder.xstring;
+import static com.sshtools.simjac.AttrBindBuilder.xobject;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -200,8 +202,8 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 						xstring("privateKey", bldr::withIdentity).build(), xinteger("port", bldr::withPort).build(),
 						xboolean("agentAuthentication", bldr::withAgent).build(),
 						xboolean("defaultIdentities", bldr::withIdentities).build(),
-						xboolean("passwordAuthentication", bldr::withPassword).build())
-				.build().retrieve();
+						xobject(Mode.class, "mode", bldr::withMode).build(),
+						xboolean("passwordAuthentication", bldr::withPassword).build()).build().retrieve();
 
 		var target = bldr.build();
 		var prefs = getContext().getContainer().getAppPreferences();

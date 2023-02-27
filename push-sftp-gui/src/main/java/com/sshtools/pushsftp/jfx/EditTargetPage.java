@@ -6,6 +6,7 @@ import static com.sshtools.jajafx.FXUtil.makeIntegerTextField;
 import static com.sshtools.simjac.AttrBindBuilder.xboolean;
 import static com.sshtools.simjac.AttrBindBuilder.xinteger;
 import static com.sshtools.simjac.AttrBindBuilder.xstring;
+import static com.sshtools.simjac.AttrBindBuilder.xobject;
 
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
@@ -41,7 +42,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	CheckBox defaultIdentities;
 	@FXML
-	ComboBox<TransferMode> mode;
+	ComboBox<Mode> mode;
 
 	private ConfigurationStore store;
 
@@ -68,8 +69,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@Override
 	protected void onConfigure() {
 		username.setPromptText(System.getProperty("user.name"));
-		mode.getItems().addAll(TransferMode.values());
-
+		mode.getItems().addAll(Mode.values());
+		mode.getSelectionModel().select(Mode.CHUNKED);
 		makeIntegerTextField(0, 65535, port);
 		store = ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets")
 				.withoutFailOnMissingFile()
@@ -83,7 +84,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 						xboolean("defaultIdentities", defaultIdentities::setSelected, defaultIdentities::isSelected)
 								.build(),
 						xboolean("passwordAuthentication", passwordAuthentication::setSelected,
-								passwordAuthentication::isSelected).build())
+								passwordAuthentication::isSelected).build(),
+						xobject(Mode.class, "mode", (m) -> mode.getSelectionModel().select(m), () -> mode.getSelectionModel().getSelectedItem()).build())
 				.build();
 		store.retrieve();
 	}
