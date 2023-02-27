@@ -3,18 +3,19 @@ package com.sshtools.pushsftp.jfx;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-import com.sshtools.jajafx.AbstractWizardPage;
+import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PrefBind;
 import com.sshtools.jaul.Phase;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
-public class OptionsPage extends AbstractWizardPage<PushSFTPUIApp> {
+public class OptionsPage extends AbstractTile<PushSFTPUIApp> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(OptionsPage.class.getName());
 
@@ -41,15 +42,10 @@ public class OptionsPage extends AbstractWizardPage<PushSFTPUIApp> {
 		agentSocket.setPromptText(System.getenv("SSH_AUTH_SOCK"));
 		
 	}
-
-	@Override
-	public void shown() {
-		getWizard().nextVisibleProperty().set(false);
-	}
-
-	@Override
-	public void hidden() {
-		getWizard().nextVisibleProperty().set(true);
+	@FXML
+	private void back(ActionEvent evt) {
+		getTiles().remove(this);
+		
 	}
 
 	@FXML

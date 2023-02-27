@@ -3,46 +3,65 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.OptionsPage">   <children>
-      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="spaced" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.OptionsPage">
+   <center>
+      <AnchorPane BorderPane.alignment="CENTER">
          <children>
-            <Label styleClass="h2" text="%title" />
-            <HBox alignment="CENTER_LEFT" styleClass="spaced">
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="spaced" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Label prefWidth="120.0" text="%agentSocket" />
-                  <TextField fx:id="agentSocket" prefWidth="350.0">
+                  <Label styleClass="h2" text="%title" />
+                  <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                     <children>
+                        <Label prefWidth="120.0" text="%agentSocket" />
+                        <TextField fx:id="agentSocket" prefWidth="350.0">
+                           <tooltip>
+                              <Tooltip text="%agentSocket.toolTip" />
+                           </tooltip>
+                        </TextField>
+                        <Button mnemonicParsing="false" onAction="#browseAgentSocket" text="%browse" />
+                     </children>
+                  </HBox>
+                  <CheckBox fx:id="verbose" mnemonicParsing="false" text="%verbose">
                      <tooltip>
-                        <Tooltip text="%agentSocket.toolTip" />
+                        <Tooltip text="%verbose.toolTip" />
                      </tooltip>
-                  </TextField>
-                  <Button mnemonicParsing="false" onAction="#browseAgentSocket" text="%browse" />
+                  </CheckBox>
+                  <Label styleClass="h2" text="%updates" />
+                  <CheckBox fx:id="automaticUpdates" mnemonicParsing="false" selected="true" text="%automaticUpdates">
+                     <tooltip>
+                        <Tooltip text="%verbose.toolTip" />
+                     </tooltip>
+                  </CheckBox>
+                  <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                     <children>
+                        <Label prefWidth="120.0" text="%phase" />
+                        <ComboBox fx:id="phase" prefWidth="150.0" />
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
-            <CheckBox fx:id="verbose" mnemonicParsing="false" text="%verbose">
-               <tooltip>
-                  <Tooltip text="%verbose.toolTip" />
-               </tooltip>
-            </CheckBox>
-            <Label styleClass="h2" text="%updates" />
-            <CheckBox fx:id="automaticUpdates" mnemonicParsing="false" selected="true" text="%automaticUpdates">
-               <tooltip>
-                  <Tooltip text="%verbose.toolTip" />
-               </tooltip>
-            </CheckBox>
-            <HBox alignment="CENTER_LEFT" styleClass="spaced">
-               <children>
-                  <Label prefWidth="120.0" text="%phase" />
-                  <ComboBox fx:id="phase" prefWidth="150.0" />
-               </children>
-            </HBox>
+            </VBox>
          </children>
-      </VBox>
-   </children>
-</AnchorPane>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <Hyperlink onAction="#back" text="%back">
+               <graphic>
+                  <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="48" styleClass="icon-accent" />
+               </graphic>
+            </Hyperlink>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

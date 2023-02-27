@@ -9,7 +9,7 @@ import static com.sshtools.simjac.AttrBindBuilder.xstring;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-import com.sshtools.jajafx.AbstractWizardPage;
+import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.simjac.ConfigurationStore;
 import com.sshtools.simjac.ConfigurationStoreBuilder;
 
@@ -18,7 +18,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
-public class EditTargetPage extends AbstractWizardPage<PushSFTPUIApp> {
+public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(EditTargetPage.class.getName());
 
@@ -45,23 +45,21 @@ public class EditTargetPage extends AbstractWizardPage<PushSFTPUIApp> {
 	@Override
 	public void shown() {
 		store.retrieve();
-		getWizard().toolsVisibleProperty().set(false);
 	}
 
 	@Override
 	public void hidden() {
-		getWizard().toolsVisibleProperty().set(true);
 	}
 	
 	@FXML
 	private void save() {
 		store.store();
-		getWizard().remove(this);
+		getTiles().remove(this);
 	}
 	
 	@FXML
 	private void cancel() {
-		getWizard().remove(this);
+		getTiles().remove(this);
 	}
 
 	@Override

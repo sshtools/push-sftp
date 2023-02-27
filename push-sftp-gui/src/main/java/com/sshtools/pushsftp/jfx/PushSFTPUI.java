@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.sshtools.common.logger.Log;
 import com.sshtools.common.logger.Log.Level;
 import com.sshtools.jajafx.JajaApp;
-import com.sshtools.jaul.Phase;
 import com.sshtools.sequins.ArtifactVersion;
 
 import picocli.CommandLine;

@@ -11,7 +11,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.sshtools.jajafx.AboutPage;
-import com.sshtools.jajafx.AbstractWizardPage;
+import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
@@ -23,14 +23,14 @@ import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.util.Duration;
 
-public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
+public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(DropPage.class.getName());
 
@@ -45,9 +45,9 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 	@FXML
 	private SequinsProgress progress;
 
-	private Button addTarget;
-	private Button about;
-	private Button options;
+//	private Button addTarget;
+//	private Button about;
+//	private Button options;
 	private SequentialTransition anim;
 	private FileTransferService service;
 
@@ -68,18 +68,18 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 			updateFolderIcon();
 		});
 
-		addTarget = new Button(RESOURCES.getString("addTarget"));
-		addTarget.setOnAction(e -> getWizard().popup(EditTargetPage.class));
-//		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.PLUS));
-		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.USER_COG));
-
-		about = new Button(RESOURCES.getString("about"));
-		about.setOnAction(e -> getWizard().popup(AboutPage.class));
-		about.setGraphic(new FontIcon(FontAwesomeSolid.HANDS_HELPING));
-
-		options = new Button(RESOURCES.getString("options"));
-		options.setOnAction(e -> getWizard().popup(OptionsPage.class));
-		options.setGraphic(new FontIcon(FontAwesomeSolid.COGS));
+//		addTarget = new Button(RESOURCES.getString("addTarget"));
+//		addTarget.setOnAction(e -> getTiles().popup(EditTargetPage.class));
+////		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.PLUS));
+//		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.USER_COG));
+//
+//		about = new Button(RESOURCES.getString("about"));
+//		about.setOnAction(e -> getTiles().popup(AboutPage.class));
+//		about.setGraphic(new FontIcon(FontAwesomeSolid.HANDS_HELPING));
+//
+//		options = new Button(RESOURCES.getString("options"));
+//		options.setOnAction(e -> getTiles().popup(OptionsPage.class));
+//		options.setGraphic(new FontIcon(FontAwesomeSolid.COGS));
 
 		var t1 = new TranslateTransition(Duration.seconds(3));
 		t1.setFromX(0);
@@ -110,15 +110,30 @@ public class DropPage extends AbstractWizardPage<PushSFTPUIApp> {
 
 	@Override
 	public void shown() {
-		getWizard().getAccessories().getChildren().addAll(addTarget, about, options);
-		getWizard().nextVisibleProperty().set(false);
+//		getTiles().getAccessories().getChildren().addAll(addTarget, about, options);
+//		getTiles().nextVisibleProperty().set(false);
 
 	}
 
 	@Override
 	public void hidden() {
-		getWizard().getAccessories().getChildren().removeAll(addTarget, about, options);
-		getWizard().nextVisibleProperty().set(true);
+//		getTiles().getAccessories().getChildren().removeAll(addTarget, about, options);
+//		getTiles().nextVisibleProperty().set(true);
+	}
+	
+	@FXML
+	void addTarget(ActionEvent evt) {
+		getTiles().popup(EditTargetPage.class);
+	}
+	
+	@FXML
+	void about(ActionEvent evt) {
+		 getTiles().popup(AboutPage.class);
+	}
+	
+	@FXML
+	void options(ActionEvent evt) {
+		getTiles().popup(OptionsPage.class);
 	}
 
 	@FXML

@@ -16,8 +16,8 @@ import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
+import com.sshtools.jajafx.Tiles;
 import com.sshtools.jajafx.UpdatePage;
-import com.sshtools.jajafx.Wizard;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -28,7 +28,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	final static Preferences PREFERENCES = Preferences.userNodeForPackage(PushSFTPUI.class);
 	
 	private FileTransferService service;
-	private Wizard<PushSFTPUIApp> wiz;
+	private Tiles<PushSFTPUIApp> wiz;
 	private Keyring keyring;
 
 	public PushSFTPUIApp() {
@@ -167,8 +167,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	@Override
 	protected Node createContent() {
-		wiz = new Wizard<>(this);
+		wiz = new Tiles<>(this);
 		wiz.add(DropPage.class);
+		wiz.getStyleClass().add("padded");
 		return wiz;
 	}
 }

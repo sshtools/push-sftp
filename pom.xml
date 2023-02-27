@@ -155,39 +155,6 @@
 		</pluginManagement>
 	</build>
 	<profiles>
-		<profile>
-			<id>install4j-installers</id>
-			<activation>
-				<property>
-					<name>buildInstaller</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<!--
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>versions-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>strip-snaphost-version</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>set</goal>
-								</goals>
-								<configuration>
-									<removeSnapshot>true</removeSnapshot>
-									<generateBackupPoms>false</generateBackupPoms>
-									<processDependencies>false</processDependencies>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-				-->
-			</build>
-		</profile>
 	</profiles>
 	<repositories>
 		<repository>
