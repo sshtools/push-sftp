@@ -1,5 +1,6 @@
 package com.sshtools.pushsftp.jfx;
 
+import static com.sshtools.jajafx.FXUtil.chooseFileAndRememeber;
 import static com.sshtools.jajafx.FXUtil.intTextfieldValue;
 import static com.sshtools.jajafx.FXUtil.makeIntegerTextField;
 import static com.sshtools.simjac.AttrBindBuilder.xboolean;
@@ -42,7 +43,6 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	ComboBox<TransferMode> mode;
 
-	private FileChooser keyChooser;
 	private ConfigurationStore store;
 
 	@Override
@@ -53,13 +53,13 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@Override
 	public void hidden() {
 	}
-	
+
 	@FXML
 	private void save() {
 		store.store();
 		getTiles().remove(this);
 	}
-	
+
 	@FXML
 	private void cancel() {
 		getTiles().remove(this);
@@ -71,34 +71,31 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		mode.getItems().addAll(TransferMode.values());
 
 		makeIntegerTextField(0, 65535, port);
-		store = ConfigurationStoreBuilder.builder().
-				withApp(PushSFTPUI.class).
-				withName("targets").
-				withoutFailOnMissingFile().
-				withBinding(
-					xstring("hostname", hostname::setText, hostname::getText).build(),
-					xstring("username", username::setText, username::getText).build(),
-					xstring("remoteFolder", remoteFolder::setText, remoteFolder::getText).build(),
-					xstring("privateKey", privateKey::setText, privateKey::getText).build(),
-					xinteger("port", v-> port.setText(String.valueOf(v)), ()-> intTextfieldValue(port)).build(),
-					xboolean("agentAuthentication", agentAuthentication::setSelected, agentAuthentication::isSelected).build(),
-					xboolean("defaultIdentities", defaultIdentities::setSelected, defaultIdentities::isSelected).build(),
-					xboolean("passwordAuthentication", passwordAuthentication::setSelected, passwordAuthentication::isSelected).build()
-				).build();
+		store = ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets")
+				.withoutFailOnMissingFile()
+				.withBinding(xstring("hostname", hostname::setText, hostname::getText).build(),
+						xstring("username", username::setText, username::getText).build(),
+						xstring("remoteFolder", remoteFolder::setText, remoteFolder::getText).build(),
+						xstring("privateKey", privateKey::setText, privateKey::getText).build(),
+						xinteger("port", v -> port.setText(String.valueOf(v)), () -> intTextfieldValue(port)).build(),
+						xboolean("agentAuthentication", agentAuthentication::setSelected,
+								agentAuthentication::isSelected).build(),
+						xboolean("defaultIdentities", defaultIdentities::setSelected, defaultIdentities::isSelected)
+								.build(),
+						xboolean("passwordAuthentication", passwordAuthentication::setSelected,
+								passwordAuthentication::isSelected).build())
+				.build();
 		store.retrieve();
 	}
 
 	@FXML
 	private void browsePrivateKey() {
-		if (keyChooser == null) {
-			keyChooser = new FileChooser();
-			keyChooser.setInitialDirectory(Paths.get(System.getProperty("user.home"), ".ssh").toFile());
-		}
+		var keyChooser = new FileChooser();
 		keyChooser.setTitle(RESOURCES.getString("privateKey.choose.title"));
-		var selectedDirectory = keyChooser.showOpenDialog(getScene().getWindow());
-		if (selectedDirectory != null) {
-			privateKey.setText(selectedDirectory.getAbsolutePath());
-		}
+
+		chooseFileAndRememeber(getContext().getContainer().getAppPreferences(), keyChooser,
+				Paths.get(System.getProperty("user.home"), ".ssh"), "privateKey", getScene().getWindow())
+				.ifPresent(f -> privateKey.setText(f.getAbsolutePath()));
 	}
 
 	@Override

@@ -4,14 +4,21 @@ import static com.sshtools.simjac.AttrBindBuilder.xboolean;
 import static com.sshtools.simjac.AttrBindBuilder.xinteger;
 import static com.sshtools.simjac.AttrBindBuilder.xstring;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.AbstractTile;
+import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
@@ -28,7 +35,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 public class DropPage extends AbstractTile<PushSFTPUIApp> {
@@ -42,6 +51,8 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	private Label text;
+	@FXML
+	private Label folderText;
 
 	@FXML
 	private SequinsProgress progress;
@@ -49,10 +60,15 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 	private SequentialTransition anim;
 	private FileTransferService service;
 
-	private boolean hovering;
+	private boolean dragHovering;
+	private boolean mouseHovering;
+
+	private FadeTransition fade;
 
 	@Override
 	protected void onConfigure() {
+		folderText.setOpacity(0);
+		
 		service = getContext().getService();
 		service.busyProperty().addListener((c, o, n) -> {
 			if (n) {
@@ -105,25 +121,35 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 //		getTiles().getAccessories().getChildren().removeAll(addTarget, about, options);
 //		getTiles().nextVisibleProperty().set(true);
 	}
-	
+
 	@FXML
 	void addTarget(ActionEvent evt) {
-		getTiles().popup(EditTargetPage.class,PageTransition.FROM_RIGHT);
+		getTiles().popup(EditTargetPage.class, PageTransition.FROM_RIGHT);
 	}
-	
+
 	@FXML
 	void about(ActionEvent evt) {
-		 getTiles().popup(AboutPage.class);
+		getTiles().popup(AboutPage.class);
 	}
-	
+
 	@FXML
 	void options(ActionEvent evt) {
 		getTiles().popup(OptionsPage.class);
 	}
 
 	@FXML
+	void click(MouseEvent evt) {
+
+		var keyChooser = new FileChooser();
+		keyChooser.setTitle(RESOURCES.getString("drop.choose.title"));
+		FXUtil.chooseFileAndRememeber(getContext().getContainer().getAppPreferences(), keyChooser,
+				Paths.get(System.getProperty("user.home"), "Desktop"), "dropFile", getScene().getWindow())
+				.ifPresent(f -> drop(Arrays.asList(f.toPath())));
+	}
+
+	@FXML
 	void dragEnter(DragEvent evt) {
-		hovering = true;
+		dragHovering = true;
 		updateFolderIcon();
 	}
 
@@ -136,8 +162,20 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 	}
 
 	@FXML
+	void mouseEnter(MouseEvent evt) {
+		mouseHovering = true;
+		updateFolderIcon();
+	}
+
+	@FXML
 	void dragExit(DragEvent evt) {
-		hovering = false;
+		dragHovering = false;
+		updateFolderIcon();
+	}
+
+	@FXML
+	void mouseExit(MouseEvent evt) {
+		mouseHovering = false;
 		updateFolderIcon();
 	}
 
@@ -148,39 +186,68 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 		evt.consume();
 
 		if (db.hasFiles()) {
-
-			var bldr = TargetBuilder.builder();
-
-			ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets").withoutFailOnMissingFile()
-					.withBinding(xstring("hostname", bldr::withHostname).build(),
-							xstring("username", bldr::withUsername).build(),
-							xstring("remoteFolder", bldr::withRemoteFolder).build(),
-							xstring("privateKey", bldr::withIdentity).build(), xinteger("port", bldr::withPort).build(),
-							xboolean("agentAuthentication", bldr::withAgent).build(),
-							xboolean("defaultIdentities", bldr::withIdentities).build(),
-							xboolean("passwordAuthentication", bldr::withPassword).build())
-					.build().retrieve();
-
-			var target = bldr.build();
-			var prefs = getContext().getContainer().getAppPreferences();
-			var agentSocket = prefs.get("agentSocket", "");
-			
-			service.submit(PushJobBuilder.builder()
-					.withVerbose(prefs.getBoolean("verbose", false))
-					.withAgentSocket(agentSocket.equals("")? Optional.empty() : Optional.of(agentSocket))
-					.withProgress(progress.createProgress(RESOURCES.getString("progressMessage"), db.getFiles().size()))
-					.withFiles(db.getFiles()).withTarget(target)
-					.withPassphrasePrompt(getContext().createPassphrasePrompt(target))
-					.withPassword(getContext().createPasswordPrompt(target))
-					.build());
+			drop(db.getFiles().stream().map(File::toPath).collect(Collectors.toList()));
 		}
 	}
+
+	private void drop(List<Path> files) {
+		var bldr = TargetBuilder.builder();
+
+		ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets").withoutFailOnMissingFile()
+				.withBinding(xstring("hostname", bldr::withHostname).build(),
+						xstring("username", bldr::withUsername).build(),
+						xstring("remoteFolder", bldr::withRemoteFolder).build(),
+						xstring("privateKey", bldr::withIdentity).build(), xinteger("port", bldr::withPort).build(),
+						xboolean("agentAuthentication", bldr::withAgent).build(),
+						xboolean("defaultIdentities", bldr::withIdentities).build(),
+						xboolean("passwordAuthentication", bldr::withPassword).build())
+				.build().retrieve();
+
+		var target = bldr.build();
+		var prefs = getContext().getContainer().getAppPreferences();
+		var agentSocket = prefs.get("agentSocket", "");
+
+		service.submit(PushJobBuilder.builder().withVerbose(prefs.getBoolean("verbose", false))
+				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
+				.withProgress(progress.createProgress(RESOURCES.getString("progressMessage"), files.size()))
+				.withPaths(files).withTarget(target).withPassphrasePrompt(getContext().createPassphrasePrompt(target))
+				.withPassword(getContext().createPasswordPrompt(target)).build());
+	}
 	
+	private void showFolderText(boolean show) {
+		if(fade != null) {
+			fade.stop();
+			fade.getOnFinished().handle(null);
+		}
+		if(show && folderText.getOpacity() == 0.0) {
+			fade = new FadeTransition(Duration.millis(125), folderText);
+			fade.setFromValue(0);
+			fade.setToValue(1);
+			fade.setOnFinished((e) -> fade = null);
+			fade.play();
+		}
+		else if(!show && folderText.getOpacity() != 0) {
+			fade = new FadeTransition(Duration.millis(125), folderText);
+			fade.setFromValue(1);
+			fade.setToValue(0);
+			fade.setOnFinished((e) -> fade = null);
+			fade.play();
+		}
+	}
+
 	private void updateFolderIcon() {
-		if(hovering || service.busyProperty().get())
+		
+		if (mouseHovering || dragHovering || service.busyProperty().get()) {
+			folderIcon.setTranslateX(16);
 			folderIcon.setIconCode(FontAwesomeSolid.FOLDER_OPEN);
-		else
+			
+			showFolderText(mouseHovering && !dragHovering && !service.busyProperty().get());
+		}
+		else {			
+			showFolderText(false);
+			folderIcon.setTranslateX(0);
 			folderIcon.setIconCode(FontAwesomeSolid.FOLDER);
+		}
 	}
 
 }

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.sshtools.jajafx.SequinsProgress?>
 <?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import com.sshtools.jajafx.SequinsProgress?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.DropPage">
    <children>
@@ -16,15 +17,20 @@
                <children>
                   <BorderPane prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <center>
-                        <StackPane fx:id="dropAnimation" onDragDropped="#drop" onDragEntered="#dragEnter" onDragExited="#dragExit" onDragOver="#dragOver" prefHeight="380.0">
-                           <children>
-                              <FontIcon fx:id="fileIcon" iconLiteral="fas-file" iconSize="128" visible="false" />
-                              <FontIcon fx:id="folderIcon" iconLiteral="fas-folder" iconSize="256" opacity="0.5" />
-                           </children>
-                        </StackPane>
+                        <BorderPane>
+                           <center>
+                              <StackPane fx:id="dropAnimation" onDragDropped="#drop" onDragEntered="#dragEnter" onDragExited="#dragExit" onDragOver="#dragOver" onMouseClicked="#click" prefHeight="380.0">
+                                 <children>
+                        			<SequinsProgress fx:id="progress" BorderPane.alignment="CENTER" />
+                                    <Label fx:id="folderText" styleClass="pill-accent" text="%folderText" translateY="130.0" />
+                                    <FontIcon fx:id="fileIcon" iconLiteral="fas-file" iconSize="128" visible="false" />
+                                    <FontIcon fx:id="folderIcon" iconLiteral="fas-folder" iconSize="256" onMouseEntered="#mouseEnter" onMouseExited="#mouseExit" opacity="0.5" />
+                                 </children>
+                              </StackPane>
+                           </center>
+                        </BorderPane>
                      </center>
                      <bottom>
-                        <SequinsProgress fx:id="progress" BorderPane.alignment="CENTER" />
                      </bottom>
                   </BorderPane>
                </children>
@@ -35,7 +41,7 @@
                <left>
                   <Hyperlink onAction="#addTarget" text="%addTarget" BorderPane.alignment="CENTER">
                      <graphic>
-                        <FontIcon styleClass="icon-accent" iconLiteral="fas-folder-plus" iconSize="48" />
+                        <FontIcon iconLiteral="fas-folder-plus" iconSize="48" styleClass="icon-accent" />
                      </graphic>
                   </Hyperlink>
                </left>
