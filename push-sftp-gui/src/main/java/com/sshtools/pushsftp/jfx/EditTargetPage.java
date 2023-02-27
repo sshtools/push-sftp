@@ -15,6 +15,7 @@ import com.sshtools.simjac.ConfigurationStoreBuilder;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
@@ -38,6 +39,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	CheckBox passwordAuthentication;
 	@FXML
 	CheckBox defaultIdentities;
+	@FXML
+	ComboBox<TransferMode> mode;
 
 	private FileChooser keyChooser;
 	private ConfigurationStore store;
@@ -65,6 +68,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@Override
 	protected void onConfigure() {
 		username.setPromptText(System.getProperty("user.name"));
+		mode.getItems().addAll(TransferMode.values());
 
 		makeIntegerTextField(0, 65535, port);
 		store = ConfigurationStoreBuilder.builder().

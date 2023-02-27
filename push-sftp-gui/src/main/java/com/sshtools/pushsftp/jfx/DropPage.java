@@ -12,6 +12,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.AbstractTile;
+import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
@@ -45,9 +46,6 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	private SequinsProgress progress;
 
-//	private Button addTarget;
-//	private Button about;
-//	private Button options;
 	private SequentialTransition anim;
 	private FileTransferService service;
 
@@ -67,19 +65,6 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 			}
 			updateFolderIcon();
 		});
-
-//		addTarget = new Button(RESOURCES.getString("addTarget"));
-//		addTarget.setOnAction(e -> getTiles().popup(EditTargetPage.class));
-////		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.PLUS));
-//		addTarget.setGraphic(new FontIcon(FontAwesomeSolid.USER_COG));
-//
-//		about = new Button(RESOURCES.getString("about"));
-//		about.setOnAction(e -> getTiles().popup(AboutPage.class));
-//		about.setGraphic(new FontIcon(FontAwesomeSolid.HANDS_HELPING));
-//
-//		options = new Button(RESOURCES.getString("options"));
-//		options.setOnAction(e -> getTiles().popup(OptionsPage.class));
-//		options.setGraphic(new FontIcon(FontAwesomeSolid.COGS));
 
 		var t1 = new TranslateTransition(Duration.seconds(3));
 		t1.setFromX(0);
@@ -123,7 +108,7 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 	
 	@FXML
 	void addTarget(ActionEvent evt) {
-		getTiles().popup(EditTargetPage.class);
+		getTiles().popup(EditTargetPage.class,PageTransition.FROM_RIGHT);
 	}
 	
 	@FXML
