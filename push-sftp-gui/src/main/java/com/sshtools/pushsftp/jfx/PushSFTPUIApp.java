@@ -1,5 +1,7 @@
 package com.sshtools.pushsftp.jfx;
 
+import static com.sshtools.jajafx.FXUtil.maybeQueue;
+
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
@@ -26,9 +28,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUI.class.getName());
 	final static Preferences PREFERENCES = Preferences.userNodeForPackage(PushSFTPUI.class);
-	
+
 	private FileTransferService service;
-	private Tiles<PushSFTPUIApp> wiz;
+	private Tiles<PushSFTPUIApp> tiles;
 	private Keyring keyring;
 
 	public PushSFTPUIApp() {
@@ -41,24 +43,30 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		}
 	}
 
+	public final Tiles<PushSFTPUIApp> getTiles() {
+		return tiles;
+	}
+
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 	public FileTransferService getService() {
 		return service;
 	}
-	
+
 	public boolean isKeyringAvailable() {
 		return keyring != null;
 	}
-	
+
 	@Override
 	protected void needUpdate() {
-		if(!(wiz.getCurrentPage() instanceof AboutPage) && !(wiz.getCurrentPage() instanceof UpdatePage)
-				&& !service.busyProperty().get()) {
-			wiz.popup(UpdatePage.class);
-		}
+		maybeQueue(() -> {
+			if (!(tiles.getCurrentPage() instanceof AboutPage) && !(tiles.getCurrentPage() instanceof UpdatePage)
+					&& !service.busyProperty().get()) {
+				tiles.popup(UpdatePage.class);
+			}
+		});
 	}
 
 	public PassphrasePrompt createPassphrasePrompt(Target target) {
@@ -67,11 +75,10 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			@Override
 			public String getPasshrase(String keyinfo) {
 				try {
-					if(keyring == null)
+					if (keyring == null)
 						throw new PasswordAccessException("No keyring.");
 					return keyring.getPassword(keyinfo, target.username());
-				}
-				catch(PasswordAccessException pae) {
+				} catch (PasswordAccessException pae) {
 					return password(save, target.username(), RESOURCES.getString("passphraseDialog.title"));
 				}
 			}
@@ -96,37 +103,35 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			}
 		};
 	}
-	
+
 	public PasswordPrompt createPasswordPrompt(Target target) {
 		var save = new AtomicBoolean();
-		var serviceName = target.hostname() + ":" + target.port() + "/" + target.remoteFolder().map(Path::toString).orElse("");
+		var serviceName = target.hostname() + ":" + target.port() + "/"
+				+ target.remoteFolder().map(Path::toString).orElse("");
 		return new PasswordPrompt() {
-			
+
 			@Override
 			public String get() {
 				try {
-					if(keyring == null)
+					if (keyring == null)
 						throw new PasswordAccessException("No keyring.");
 					return keyring.getPassword(serviceName, target.username());
-				}
-				catch(PasswordAccessException pae) {
+				} catch (PasswordAccessException pae) {
 					return password(save, target.username(), RESOURCES.getString("passwordDialog.title"));
 				}
 			}
 
 			@Override
 			public void completed(boolean success, String value, ClientAuthenticator authenticator) {
-				if(keyring != null) {
+				if (keyring != null) {
 					try {
-						if(success) {
-							if(save.get())
+						if (success) {
+							if (save.get())
 								keyring.setPassword(serviceName, target.username(), value);
-						}
-						else {
+						} else {
 							keyring.deletePassword(serviceName, target.username());
 						}
-					}
-					catch(PasswordAccessException pae) {
+					} catch (PasswordAccessException pae) {
 					}
 				}
 			}
@@ -140,7 +145,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			sem.acquire();
 			Platform.runLater(() -> {
 				@SuppressWarnings("unchecked")
-				var passwordPage = (PasswordPage<PushSFTPUIApp>) wiz.popup(PasswordPage.class);
+				var passwordPage = (PasswordPage<PushSFTPUIApp>) tiles.popup(PasswordPage.class);
 				var txt = MessageFormat.format(fmt, args);
 				passwordPage.titleText().set(txt);
 				passwordPage.textText()
@@ -148,11 +153,11 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 				passwordPage.setConfirm((e) -> {
 					save.set(passwordPage.isSave());
 					buf.append(passwordPage.password().get());
-					wiz.remove(passwordPage);
+					tiles.remove(passwordPage);
 					sem.release();
 				});
 				passwordPage.setCancel((e) -> {
-					wiz.remove(passwordPage);
+					tiles.remove(passwordPage);
 					sem.release();
 				});
 			});
@@ -167,9 +172,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	@Override
 	protected Node createContent() {
-		wiz = new Tiles<>(this);
-		wiz.add(DropPage.class);
-		wiz.getStyleClass().add("padded");
-		return wiz;
+		tiles = new Tiles<>(this);
+		tiles.add(DropPage.class);
+		tiles.getStyleClass().add("padded");
+		return tiles;
 	}
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<fx:root maxHeight="380.0" maxWidth="340.0" onDragDropped="#drop" onDragEntered="#dragEnter" onDragExited="#dragExit" onDragOver="#dragOver" onMouseClicked="#click" prefHeight="380.0" prefWidth="340.0" type="StackPane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<Label fx:id="folderText" styleClass="pill-accent" text="%folderText" translateY="130.0" />
+		<FontIcon fx:id="fileIcon" iconLiteral="fas-file" iconSize="128" visible="false" />
+		<FontIcon fx:id="folderIcon" iconLiteral="fas-folder" iconSize="256" onMouseEntered="#mouseEnter" onMouseExited="#mouseExit" opacity="0.5" />
+      <Hyperlink onAction="#edit" styleClass="circle-button-accent" translateX="-120.0" translateY="-92.0">
+         <graphic>
+            <FontIcon iconLiteral="fas-cog" iconSize="48" />
+         </graphic>
+      </Hyperlink>
+	</children>
+</fx:root>

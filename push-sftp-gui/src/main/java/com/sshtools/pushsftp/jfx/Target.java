@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.sshtools.client.sftp.RemoteHash;
+
 public final class Target {
 
 	public final static class TargetBuilder {
@@ -18,14 +20,78 @@ public final class Target {
 		private Optional<Path> remoteFolder = Optional.empty();
 		private int authenticationTimeout = 120;
 		private Optional<Mode> mode = Optional.empty();
+		private Optional<Integer> chunks= Optional.empty();
+		private boolean verifyIntegrity;
+		private boolean ignoreIntegrity;
+		private boolean copyDataExtension = true;
+		private boolean preAllocate = true;
+		private Optional<RemoteHash> hash = Optional.empty();
+		
+		public TargetBuilder withVerifyIntegrity(boolean verifyIntegrity) {
+			this.verifyIntegrity = verifyIntegrity;
+			return this;
+		}
+		
+		public TargetBuilder withVerifiedIntegrity() {
+			return withVerifyIntegrity(true);
+		}
+		
+		public TargetBuilder withIgnoredIntegrity() {
+			return withIgnoreIntegrity(true);
+		}
+		
+		public TargetBuilder withIgnoreIntegrity(boolean ignoreIntegrity) {
+			this.ignoreIntegrity = ignoreIntegrity;
+			return this;
+		}
+		
+		public TargetBuilder withoutCopyDataExtension() {
+			return withCopyDataExtension(false);
+		}
+		
+		public TargetBuilder withCopyDataExtension(boolean copyDataExtension) {
+			this.copyDataExtension = copyDataExtension;
+			return this;
+		}
+		
+		public TargetBuilder withoutPreAllocate() {
+			return withPreAllocate(false);
+		}
+		
+		public TargetBuilder withPreAllocate(boolean preAllocate) {
+			this.preAllocate = preAllocate;
+			return this;
+		}
+
+		public TargetBuilder withHash(RemoteHash hash) {
+			return withHash(Optional.of(hash));
+		}
+		
+		public TargetBuilder withHash(Optional<RemoteHash> hash) {
+			this.hash = hash;
+			return this;
+		}
+
+		public TargetBuilder withChunks(int chunks) {
+			return withChunks(Optional.of(chunks));
+		}
+		
+		public TargetBuilder withChunks(Optional<Integer> chunks) {
+			this.chunks = chunks;
+			return this;
+		}
 
 		public TargetBuilder withUsername(String username) {
 			return withUsername(Optional.ofNullable(username));
 		}
 
-		public TargetBuilder withRemoteFolder(String remoteFolder) {
+		public TargetBuilder withRemoteFolderPath(String remoteFolder) {
 			return withRemoteFolder(remoteFolder == null || remoteFolder.equals("") ? Optional.empty()
 					: Optional.of(Path.of(remoteFolder)));
+		}
+
+		public TargetBuilder withRemoteFolderPath(Optional<String> remoteFolder) {
+			return withRemoteFolder(remoteFolder.map(Path::of));
 		}
 
 		public TargetBuilder withRemoteFolder(Path remoteFolder) {
@@ -92,8 +158,12 @@ public final class Target {
 			return this;
 		}
 
-		public TargetBuilder withIdentity(String identity) {
+		public TargetBuilder withIdentityPath(String identity) {
 			return withIdentity(identity == null || identity.equals("") ? Optional.empty() : Optional.of(Path.of(identity)));
+		}
+
+		public TargetBuilder withIdentityPath(Optional<String> identity) {
+			return withIdentity(identity.map(Path::of));
 		}
 
 		public TargetBuilder withIdentity(Path identity) {
@@ -129,6 +199,12 @@ public final class Target {
 	private final Optional<Path> remoteFolder;
 	private final int authenticationTimeout;
 	private final Mode mode;
+	private final int chunks;
+	private final boolean verifyIntegrity;
+	private final boolean ignoreIntegrity;
+	private final boolean copyDataExtension;
+	private final boolean preAllocate;
+	private final RemoteHash hash;
 
 	private Target(TargetBuilder builder) {
 		this.username = builder.username.orElse(System.getProperty("user.name"));
@@ -141,6 +217,12 @@ public final class Target {
 		this.remoteFolder = builder.remoteFolder;
 		this.authenticationTimeout = builder.authenticationTimeout;
 		this.mode = builder.mode.orElse(Mode.CHUNKED);
+		this.chunks = builder.chunks.orElse(3);
+		this.verifyIntegrity = builder.verifyIntegrity;
+		this.ignoreIntegrity = builder.ignoreIntegrity;
+		this.copyDataExtension = builder.copyDataExtension;
+		this.preAllocate = builder.preAllocate;
+		this.hash = builder.hash.orElse(RemoteHash.sha512);
 	}
 
 	@Override
@@ -199,6 +281,30 @@ public final class Target {
 
 	public int authenticationTimeout() {
 		return authenticationTimeout;
+	}
+
+	public int chunks() {
+		return chunks;
+	}
+
+	public boolean verifyIntegrity() {
+		return verifyIntegrity;
+	}
+
+	public boolean ignoreIntegrity() {
+		return ignoreIntegrity;
+	}
+
+	public boolean copyDataExtension() {
+		return copyDataExtension;
+	}
+
+	public boolean preAllocate() {
+		return preAllocate;
+	}
+
+	public RemoteHash hash() {
+		return hash;
 	}
 
 }

@@ -312,7 +312,7 @@ public final class PushJob implements Callable<Void> {
 							|| ssh.getAuthenticationMethods().contains("keyboard-interactive")) { //$NON-NLS-1$
 						for (int i = 0; i < 3; i++) {
 							while (ssh.isConnected() && !ssh.isAuthenticated()) {
-								if (ssh.authenticate(new PasswordAuthenticator(new PasswordPrompt() {
+								if (ssh.authenticate(PasswordAuthenticator.of(new PasswordPrompt() {
 									@Override
 									public String get() {
 										return password.orElseThrow(() -> new IllegalStateException(

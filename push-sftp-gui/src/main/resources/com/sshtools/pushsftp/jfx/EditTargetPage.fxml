@@ -64,63 +64,89 @@
                                     <String fx:value="tpad" />
                                  </styleClass>
                               </VBox>
-                              <Label styleClass="h3" text="%authenticationTitle" />
-                              <HBox alignment="CENTER_LEFT" styleClass="spaced">
-                                 <children>
-                                    <Label prefWidth="120.0" text="%username" />
-                                    <TextField fx:id="username">
-                                       <tooltip>
-                                          <Tooltip text="%username.toolTip" />
-                                       </tooltip>
-                                    </TextField>
-                                 </children>
-                              </HBox>
-                              <HBox alignment="CENTER_LEFT" styleClass="spaced">
-                                 <children>
-                                    <Label prefWidth="120.0" text="%privateKey" />
-                                    <TextField fx:id="privateKey" prefWidth="250.0">
-                                       <tooltip>
-                                          <Tooltip text="%privateKey.toolTip" />
-                                       </tooltip>
-                                    </TextField>
-                                    <Button mnemonicParsing="false" onAction="#browsePrivateKey" text="%browse" />
-                                 </children>
-                              </HBox>
                               <VBox>
                                  <children>
-                                    <CheckBox fx:id="agentAuthentication" mnemonicParsing="false" selected="true" text="%agentAuthentication">
-                                       <tooltip>
-                                          <Tooltip text="%agentAuthentication.toolTip" />
-                                       </tooltip>
-                                    </CheckBox>
-                                    <CheckBox fx:id="passwordAuthentication" mnemonicParsing="false" selected="true" text="%passwordAuthentication">
-                                       <tooltip>
-                                          <Tooltip text="%passwordAuthentication.toolTip" />
-                                       </tooltip>
-                                    </CheckBox>
-                                    <CheckBox fx:id="defaultIdentities" mnemonicParsing="false" selected="true" text="%defaultIdentities">
-                                       <tooltip>
-                                          <Tooltip text="%defaultIdentities.toolTip" />
-                                       </tooltip>
-                                    </CheckBox>
+                                    <Label styleClass="h3" text="%authenticationTitle" />
+                                    <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%username" />
+                                          <TextField fx:id="username">
+                                             <tooltip>
+                                                <Tooltip text="%username.toolTip" />
+                                             </tooltip>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%privateKey" />
+                                          <TextField fx:id="privateKey" prefWidth="250.0">
+                                             <tooltip>
+                                                <Tooltip text="%privateKey.toolTip" />
+                                             </tooltip>
+                                          </TextField>
+                                          <Button mnemonicParsing="false" onAction="#browsePrivateKey" text="%browse" />
+                                       </children>
+                                    </HBox>
+                                    <VBox>
+                                       <children>
+                                          <CheckBox fx:id="agentAuthentication" mnemonicParsing="false" selected="true" text="%agentAuthentication">
+                                             <tooltip>
+                                                <Tooltip text="%agentAuthentication.toolTip" />
+                                             </tooltip>
+                                          </CheckBox>
+                                          <CheckBox fx:id="passwordAuthentication" mnemonicParsing="false" selected="true" text="%passwordAuthentication">
+                                             <tooltip>
+                                                <Tooltip text="%passwordAuthentication.toolTip" />
+                                             </tooltip>
+                                          </CheckBox>
+                                          <CheckBox fx:id="defaultIdentities" mnemonicParsing="false" selected="true" text="%defaultIdentities">
+                                             <tooltip>
+                                                <Tooltip text="%defaultIdentities.toolTip" />
+                                             </tooltip>
+                                          </CheckBox>
+                                       </children>
+                                       <styleClass>
+                                          <String fx:value="lpad" />
+                                          <String fx:value="tpad" />
+                                          <String fx:value="spaced" />
+                                       </styleClass>
+                                    </VBox>
                                  </children>
                                  <styleClass>
-                                    <String fx:value="lpad" />
-                                    <String fx:value="tpad" />
                                     <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
                                  </styleClass>
                               </VBox>
-                              <Label styleClass="h3" text="%transfer" />
-                              <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                              <VBox>
                                  <children>
-                                    <Label prefWidth="120.0" text="%mode" />
-                                    <ComboBox fx:id="mode" prefWidth="150.0">
-                                       <tooltip>
-                                          <Tooltip text="%mode.toolTip" />
-                                       </tooltip>
-                                    </ComboBox>
+                                    <Label styleClass="h3" text="%transfer" />
+                                    <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%mode" />
+                                          <ComboBox fx:id="mode" prefWidth="150.0">
+                                             <tooltip>
+                                                <Tooltip text="%mode.toolTip" />
+                                             </tooltip>
+                                          </ComboBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="26.0" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%chunks" />
+                                          <TextField fx:id="chunks" promptText="3">
+                                             <tooltip>
+                                                <Tooltip text="%chunks.toolTip" />
+                                             </tooltip>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
                                  </children>
-                              </HBox>
+                                 <styleClass>
+                                    <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
+                                 </styleClass>
+                              </VBox>
                            </children>
                         </VBox>
                      </children>
@@ -147,7 +173,12 @@
             </Hyperlink>
          </left>
          <right>
-            <Hyperlink onAction="#cancel" text="%cancel" BorderPane.alignment="CENTER" />
+            <HBox alignment="CENTER_RIGHT" styleClass="spaced" BorderPane.alignment="CENTER">
+               <children>
+                  <Hyperlink fx:id="delete" layoutX="10.0" layoutY="26.0" onAction="#delete" text="%delete" />
+                  <Hyperlink onAction="#cancel" text="%cancel" />
+               </children>
+            </HBox>
          </right>
       </BorderPane>
    </bottom>

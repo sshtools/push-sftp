@@ -3,17 +3,17 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.chooseFileAndRememeber;
 import static com.sshtools.jajafx.FXUtil.intTextfieldValue;
 import static com.sshtools.jajafx.FXUtil.makeIntegerTextField;
-import static com.sshtools.simjac.AttrBindBuilder.xboolean;
-import static com.sshtools.simjac.AttrBindBuilder.xinteger;
-import static com.sshtools.simjac.AttrBindBuilder.xstring;
-import static com.sshtools.simjac.AttrBindBuilder.xobject;
+import static com.sshtools.jajafx.FXUtil.optionalText;
+import static com.sshtools.jajafx.FXUtil.textOrPrompt;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import com.sshtools.jajafx.AbstractTile;
-import com.sshtools.simjac.ConfigurationStore;
-import com.sshtools.simjac.ConfigurationStoreBuilder;
+import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -32,6 +32,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	TextField port;
 	@FXML
+	TextField chunks;
+	@FXML
 	TextField privateKey;
 	@FXML
 	TextField remoteFolder;
@@ -44,11 +46,11 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	ComboBox<Mode> mode;
 
-	private ConfigurationStore store;
+	private Consumer<Target> onSave;
+	private Optional<Runnable> onDelete;
 
 	@Override
 	public void shown() {
-		store.retrieve();
 	}
 
 	@Override
@@ -57,12 +59,29 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	private void save() {
-		store.store();
+		onSave.accept(TargetBuilder.builder().
+				withUsername(textOrPrompt(username)).
+				withHostname(textOrPrompt(hostname)).
+				withPort(intTextfieldValue(port)).
+				withChunks(intTextfieldValue(chunks)).
+				withIdentityPath(optionalText(privateKey)).
+				withRemoteFolderPath(optionalText(remoteFolder)).
+				withPassword(passwordAuthentication.isSelected()).
+				withIdentities(defaultIdentities.isSelected()).
+				withMode(mode.getSelectionModel().getSelectedItem()).
+				withAgent(agentAuthentication.isSelected()).
+				build());
 		getTiles().remove(this);
 	}
 
 	@FXML
 	private void cancel() {
+		getTiles().remove(this);
+	}
+
+	@FXML
+	private void delete() {
+		onDelete.ifPresent(r -> r.run());
 		getTiles().remove(this);
 	}
 
@@ -72,22 +91,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		mode.getItems().addAll(Mode.values());
 		mode.getSelectionModel().select(Mode.CHUNKED);
 		makeIntegerTextField(0, 65535, port);
-		store = ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets")
-				.withoutFailOnMissingFile()
-				.withBinding(xstring("hostname", hostname::setText, hostname::getText).build(),
-						xstring("username", username::setText, username::getText).build(),
-						xstring("remoteFolder", remoteFolder::setText, remoteFolder::getText).build(),
-						xstring("privateKey", privateKey::setText, privateKey::getText).build(),
-						xinteger("port", v -> port.setText(String.valueOf(v)), () -> intTextfieldValue(port)).build(),
-						xboolean("agentAuthentication", agentAuthentication::setSelected,
-								agentAuthentication::isSelected).build(),
-						xboolean("defaultIdentities", defaultIdentities::setSelected, defaultIdentities::isSelected)
-								.build(),
-						xboolean("passwordAuthentication", passwordAuthentication::setSelected,
-								passwordAuthentication::isSelected).build(),
-						xobject(Mode.class, "mode", (m) -> mode.getSelectionModel().select(m), () -> mode.getSelectionModel().getSelectedItem()).build())
-				.build();
-		store.retrieve();
+		makeIntegerTextField(1, 99, chunks);
 	}
 
 	@FXML
@@ -102,7 +106,26 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	@Override
 	public void close() {
-		store.close();
 	}
 
+	public void setTarget(Target target, Consumer<Target> onSave, Optional<Consumer<Target>> onDelete) {
+		this.onSave = onSave;
+		this.onDelete = onDelete.map(r -> new Runnable() {
+			@Override
+			public void run() {
+				r.accept(target);
+			}
+		});
+		
+		username.setText(target.username());
+		hostname.setText(target.hostname());
+		port.setText(String.valueOf(target.port()));
+		chunks.setText(String.valueOf(target.chunks()));
+		privateKey.setText(target.identity().map(Path::toString).orElse(""));
+		remoteFolder.setText(target.remoteFolder().map(Path::toString).orElse(""));
+		agentAuthentication.setSelected(target.agent());
+		passwordAuthentication.setSelected(target.password());
+		defaultIdentities.setSelected(target.identities());
+		mode.getSelectionModel().select(target.mode());
+	}
 }

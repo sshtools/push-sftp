@@ -1,114 +1,64 @@
 package com.sshtools.pushsftp.jfx;
 
-
-import static com.sshtools.simjac.AttrBindBuilder.xboolean;
-import static com.sshtools.simjac.AttrBindBuilder.xinteger;
-import static com.sshtools.simjac.AttrBindBuilder.xstring;
-import static com.sshtools.simjac.AttrBindBuilder.xobject;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.AbstractTile;
-import com.sshtools.jajafx.FXUtil;
+import com.sshtools.jajafx.Carousel;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
-import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
-import com.sshtools.simjac.ConfigurationStoreBuilder;
 
-import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
-import javafx.animation.SequentialTransition;
-import javafx.animation.TranslateTransition;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
-import javafx.stage.FileChooser;
-import javafx.util.Duration;
 
 public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(DropPage.class.getName());
 
 	@FXML
-	private FontIcon folderIcon;
-	@FXML
-	private FontIcon fileIcon;
-
-	@FXML
 	private Label text;
-	@FXML
-	private Label folderText;
 
 	@FXML
 	private SequinsProgress progress;
 
-	private SequentialTransition anim;
-	private FileTransferService service;
-
-	private boolean dragHovering;
-	private boolean mouseHovering;
-
-	private FadeTransition fade;
+	@FXML
+	private Carousel carousel;
 
 	@Override
 	protected void onConfigure() {
-		folderText.setOpacity(0);
-		
-		service = getContext().getService();
-		service.busyProperty().addListener((c, o, n) -> {
-			if (n) {
-				fileIcon.setOpacity(1);
-				fileIcon.setVisible(true);
-				anim.play();
-			} else {
-				anim.stop();
-				fileIcon.setVisible(false);
+		var targets = getContext().getService().getTargets();
+		var carouselItems = carousel.getItems();
+		targets.forEach(t -> carouselItems.add(new DropTarget().setup(t, getContext(), progress)));
+		targets.addListener((ListChangeListener.Change<? extends Target> c) -> {
+			while (c.next()) {
+				if(c.wasReplaced()) {
+					// A bit brute force, look for better way
+					carouselItems.clear();
+					targets.forEach(t -> carouselItems.add(new DropTarget().setup(t, getContext(), progress)));
+				}
+				else {
+					for (var t : c.getAddedSubList()) {
+						carouselItems.add(new DropTarget().setup(t, getContext(), progress));
+					}
+					for(var t : c.getRemoved()) {
+						carouselItems.remove(findDropTarget(t));
+					}
+				}
 			}
-			updateFolderIcon();
 		});
-
-		var t1 = new TranslateTransition(Duration.seconds(3));
-		t1.setFromX(0);
-		t1.setToX(0);
-		t1.setFromY(-128);
-		t1.setToY(0);
-
-		var f1 = new FadeTransition(Duration.seconds(3));
-		f1.setFromValue(1.0);
-		f1.setToValue(0);
-
-		var tp = new ParallelTransition(t1, f1);
-
-		var t2 = new TranslateTransition();
-		t2.setToX(0);
-		t2.setToY(-128);
-
-		var f2 = new FadeTransition(Duration.seconds(0.25f));
-		f2.setFromValue(0);
-		f2.setToValue(1);
-
-		var tr = new SequentialTransition(tp, t2, f2);
-		tr.setInterpolator(Interpolator.EASE_BOTH);
-		tr.setNode(fileIcon);
-		tr.setCycleCount(Animation.INDEFINITE);
-		anim = tr;
+	}
+	
+	private DropTarget findDropTarget(Target target) {
+		for(var child : carousel.getItems()) {
+			if(target.equals(((DropTarget)child).getTarget())) {
+				return (DropTarget)child;
+			}
+		}
+		throw new IllegalArgumentException("No such panel for target. " + target);
 	}
 
 	@Override
@@ -126,7 +76,8 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	void addTarget(ActionEvent evt) {
-		getTiles().popup(EditTargetPage.class, PageTransition.FROM_RIGHT);
+		getTiles().popup(EditTargetPage.class, PageTransition.FROM_RIGHT).setTarget(TargetBuilder.builder().build(),
+				(newTarget) -> getContext().getService().getTargets().add(newTarget), Optional.empty());
 	}
 
 	@FXML
@@ -137,119 +88,6 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	void options(ActionEvent evt) {
 		getTiles().popup(OptionsPage.class);
-	}
-
-	@FXML
-	void click(MouseEvent evt) {
-
-		var keyChooser = new FileChooser();
-		keyChooser.setTitle(RESOURCES.getString("drop.choose.title"));
-		FXUtil.chooseFileAndRememeber(getContext().getContainer().getAppPreferences(), keyChooser,
-				Paths.get(System.getProperty("user.home"), "Desktop"), "dropFile", getScene().getWindow())
-				.ifPresent(f -> drop(Arrays.asList(f.toPath())));
-	}
-
-	@FXML
-	void dragEnter(DragEvent evt) {
-		dragHovering = true;
-		updateFolderIcon();
-	}
-
-	@FXML
-	void dragOver(DragEvent evt) {
-		if (evt.getDragboard().hasFiles()) {
-			evt.acceptTransferModes(TransferMode.COPY);
-		}
-		evt.consume();
-	}
-
-	@FXML
-	void mouseEnter(MouseEvent evt) {
-		mouseHovering = true;
-		updateFolderIcon();
-	}
-
-	@FXML
-	void dragExit(DragEvent evt) {
-		dragHovering = false;
-		updateFolderIcon();
-	}
-
-	@FXML
-	void mouseExit(MouseEvent evt) {
-		mouseHovering = false;
-		updateFolderIcon();
-	}
-
-	@FXML
-	void drop(DragEvent evt) {
-		var db = evt.getDragboard();
-		evt.setDropCompleted(db.hasFiles());
-		evt.consume();
-
-		if (db.hasFiles()) {
-			drop(db.getFiles().stream().map(File::toPath).collect(Collectors.toList()));
-		}
-	}
-
-	private void drop(List<Path> files) {
-		var bldr = TargetBuilder.builder();
-
-		ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets").withoutFailOnMissingFile()
-				.withBinding(xstring("hostname", bldr::withHostname).build(),
-						xstring("username", bldr::withUsername).build(),
-						xstring("remoteFolder", bldr::withRemoteFolder).build(),
-						xstring("privateKey", bldr::withIdentity).build(), xinteger("port", bldr::withPort).build(),
-						xboolean("agentAuthentication", bldr::withAgent).build(),
-						xboolean("defaultIdentities", bldr::withIdentities).build(),
-						xobject(Mode.class, "mode", bldr::withMode).build(),
-						xboolean("passwordAuthentication", bldr::withPassword).build()).build().retrieve();
-
-		var target = bldr.build();
-		var prefs = getContext().getContainer().getAppPreferences();
-		var agentSocket = prefs.get("agentSocket", "");
-
-		service.submit(PushJobBuilder.builder().withVerbose(prefs.getBoolean("verbose", false))
-				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
-				.withProgress(progress.createProgress(RESOURCES.getString("progressMessage"), files.size()))
-				.withPaths(files).withTarget(target).withPassphrasePrompt(getContext().createPassphrasePrompt(target))
-				.withPassword(getContext().createPasswordPrompt(target)).build());
-	}
-	
-	private void showFolderText(boolean show) {
-		if(fade != null) {
-			fade.stop();
-			fade.getOnFinished().handle(null);
-		}
-		if(show && folderText.getOpacity() == 0.0) {
-			fade = new FadeTransition(Duration.millis(125), folderText);
-			fade.setFromValue(0);
-			fade.setToValue(1);
-			fade.setOnFinished((e) -> fade = null);
-			fade.play();
-		}
-		else if(!show && folderText.getOpacity() != 0) {
-			fade = new FadeTransition(Duration.millis(125), folderText);
-			fade.setFromValue(1);
-			fade.setToValue(0);
-			fade.setOnFinished((e) -> fade = null);
-			fade.play();
-		}
-	}
-
-	private void updateFolderIcon() {
-		
-		if (mouseHovering || dragHovering || service.busyProperty().get()) {
-			folderIcon.setTranslateX(16);
-			folderIcon.setIconCode(FontAwesomeSolid.FOLDER_OPEN);
-			
-			showFolderText(mouseHovering && !dragHovering && !service.busyProperty().get());
-		}
-		else {			
-			showFolderText(false);
-			folderIcon.setTranslateX(0);
-			folderIcon.setIconCode(FontAwesomeSolid.FOLDER);
-		}
 	}
 
 }
