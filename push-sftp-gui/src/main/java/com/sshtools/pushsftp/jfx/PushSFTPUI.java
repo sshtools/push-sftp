@@ -24,7 +24,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 				synergyVersion = ArtifactVersion.getVersion("com.sshtools.hotfixes", "maverick-synergy-client");
 			}
 			return new String[] {
-					ArtifactVersion.getVersion("com.sshtools", "push-sftp-gui"),
+					ArtifactVersion.getVersion("filedrop", "com.sshtools", "push-sftp-gui"),
 					MessageFormat.format("using Maverick Synergy {0}",synergyVersion)
 					};
 		}

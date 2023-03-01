@@ -14,7 +14,12 @@
         <entry>install4j-*</entry>
       </macSearchedJars>
     </codeSigning>
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest">
+      <modules>
+        <defaultModules set="jre" />
+        <module name="jdk.unsupported" />
+      </modules>
+    </jreBundles>
   </application>
   <files>
     <mountPoints>

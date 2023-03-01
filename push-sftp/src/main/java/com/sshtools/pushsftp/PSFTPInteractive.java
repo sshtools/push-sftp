@@ -50,7 +50,7 @@ public class PSFTPInteractive extends CliCommand {
 
 		@Override
 		public String[] getVersion() throws Exception {
-			return new String[] { ArtifactVersion.getVersion("com.sshtools", "push-sftp") };
+			return new String[] { ArtifactVersion.getVersion("push-sftp", "com.sshtools", "push-sftp") };
 		}
 		
 	}
