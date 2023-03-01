@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.AdvancedEditTargetPage">
+   <center>
+      <AnchorPane>   <children>
+           <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <center>
+                  <AnchorPane>
+                     <children>
+                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="spaced" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <VBox prefWidth="300.0">
+                                 <children>
+                                    <Label styleClass="h2" text="%advanced" />
+                                 </children>
+                                 <styleClass>
+                                    <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
+                                 </styleClass>
+                              </VBox>
+                              <VBox>
+                                 <children>
+                                    <Label styleClass="h3" text="%authenticationTitle" />
+                                    <VBox>
+                                       <children>
+                                          <CheckBox fx:id="agentAuthentication" mnemonicParsing="false" selected="true" text="%agentAuthentication">
+                                             <tooltip>
+                                                <Tooltip text="%agentAuthentication.toolTip" />
+                                             </tooltip>
+                                          </CheckBox>
+                                          <CheckBox fx:id="passwordAuthentication" mnemonicParsing="false" selected="true" text="%passwordAuthentication">
+                                             <tooltip>
+                                                <Tooltip text="%passwordAuthentication.toolTip" />
+                                             </tooltip>
+                                          </CheckBox>
+                                          <CheckBox fx:id="defaultIdentities" mnemonicParsing="false" selected="true" text="%defaultIdentities">
+                                             <tooltip>
+                                                <Tooltip text="%defaultIdentities.toolTip" />
+                                             </tooltip>
+                                          </CheckBox>
+                                       </children>
+                                       <styleClass>
+                                          <String fx:value="lpad" />
+                                          <String fx:value="tpad" />
+                                          <String fx:value="spaced" />
+                                       </styleClass>
+                                    </VBox>
+                                 </children>
+                                 <styleClass>
+                                    <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
+                                 </styleClass>
+                              </VBox>
+                              <VBox>
+                                 <children>
+                                    <Label styleClass="h3" text="%transfer" />
+                                    <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%mode" />
+                                          <ComboBox fx:id="mode" prefWidth="150.0">
+                                             <tooltip>
+                                                <Tooltip text="%mode.toolTip" />
+                                             </tooltip>
+                                          </ComboBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="26.0" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%chunks" />
+                                          <TextField fx:id="chunks" prefWidth="40.0" promptText="3">
+                                             <tooltip>
+                                                <Tooltip text="%chunks.toolTip" />
+                                             </tooltip>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <CheckBox fx:id="copyDataExtension" mnemonicParsing="false" styleClass="indented" text="%copyDataExtension">
+                                       <tooltip>
+                                          <Tooltip text="%copyDataExtension.toolTip" />
+                                       </tooltip>
+                                    </CheckBox>
+                                    <CheckBox fx:id="preAllocate" layoutX="10.0" layoutY="74.0" mnemonicParsing="false" styleClass="indented" text="%preAllocate">
+                                       <tooltip>
+                                          <Tooltip text="%preAllocate.toolTip" />
+                                       </tooltip>
+                                    </CheckBox>
+                                 </children>
+                                 <styleClass>
+                                    <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
+                                 </styleClass>
+                              </VBox>
+                              <VBox>
+                                 <children>
+                                    <Label styleClass="h3" text="%verification" />
+                                    <CheckBox fx:id="verifyIntegrity" mnemonicParsing="false" text="%verifyIntegrity">
+                                       <tooltip>
+                                          <Tooltip text="%verifyIntegrity.toolTip" />
+                                       </tooltip>
+                                    </CheckBox>
+                                    <CheckBox fx:id="ignoreIntegrity" layoutX="10.0" layoutY="26.0" mnemonicParsing="false" text="%ignoreIntegrity">
+                                       <tooltip>
+                                          <Tooltip text="%ignoreIntegrity.toolTip" />
+                                       </tooltip>
+                                    </CheckBox>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%hash" />
+                                          <ComboBox fx:id="hash" prefWidth="150.0">
+                                             <tooltip>
+                                                <Tooltip text="%hash.toolTip" />
+                                             </tooltip>
+                                          </ComboBox>
+                                       </children>
+                                       <styleClass>
+                                          <String fx:value="spaced" />
+                                          <String fx:value="indented" />
+                                       </styleClass>
+                                    </HBox>
+                                 </children>
+                                 <styleClass>
+                                    <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
+                                 </styleClass>
+                              </VBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+               </center>
+               <top>
+                  <TextFlow prefWidth="400.0" styleClass="bpad" BorderPane.alignment="CENTER">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="muted" text="%info" />
+                     </children>
+                  </TextFlow>
+               </top>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <Hyperlink onAction="#back" text="%back">
+               <graphic>
+                  <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="48" styleClass="icon-accent" />
+               </graphic>
+            </Hyperlink>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

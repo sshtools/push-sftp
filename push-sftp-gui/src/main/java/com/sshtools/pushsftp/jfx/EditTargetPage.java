@@ -13,11 +13,10 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 import com.sshtools.jajafx.AbstractTile;
+import com.sshtools.jajafx.PageTransition;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
@@ -32,22 +31,16 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	TextField port;
 	@FXML
-	TextField chunks;
-	@FXML
 	TextField privateKey;
 	@FXML
 	TextField remoteFolder;
-	@FXML
-	CheckBox agentAuthentication;
-	@FXML
-	CheckBox passwordAuthentication;
-	@FXML
-	CheckBox defaultIdentities;
-	@FXML
-	ComboBox<Mode> mode;
 
 	private Consumer<Target> onSave;
 	private Optional<Runnable> onDelete;
+
+	private Target target;
+
+	private AdvancedEditTargetPage advanced;
 
 	@Override
 	public void shown() {
@@ -55,21 +48,20 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	@Override
 	public void hidden() {
+		advanced = null;
 	}
 
 	@FXML
 	private void save() {
-		onSave.accept(TargetBuilder.builder().
+		var bldr = TargetBuilder.builder().
 				withUsername(textOrPrompt(username)).
 				withHostname(textOrPrompt(hostname)).
 				withPort(intTextfieldValue(port)).
-				withChunks(intTextfieldValue(chunks)).
 				withIdentityPath(optionalText(privateKey)).
-				withRemoteFolderPath(optionalText(remoteFolder)).
-				withPassword(passwordAuthentication.isSelected()).
-				withIdentities(defaultIdentities.isSelected()).
-				withMode(mode.getSelectionModel().getSelectedItem()).
-				withAgent(agentAuthentication.isSelected()).
+				withRemoteFolderPath(optionalText(remoteFolder));
+		if(advanced != null)
+			advanced.save(bldr);
+		onSave.accept(bldr.
 				build());
 		getTiles().remove(this);
 	}
@@ -77,6 +69,12 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	private void cancel() {
 		getTiles().remove(this);
+	}
+
+	@FXML
+	private void advanced() {
+		advanced = getContext().getTiles().popup(AdvancedEditTargetPage.class, PageTransition.FROM_RIGHT);
+		advanced.setTarget(target);
 	}
 
 	@FXML
@@ -88,10 +86,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@Override
 	protected void onConfigure() {
 		username.setPromptText(System.getProperty("user.name"));
-		mode.getItems().addAll(Mode.values());
-		mode.getSelectionModel().select(Mode.CHUNKED);
 		makeIntegerTextField(0, 65535, port);
-		makeIntegerTextField(1, 99, chunks);
 	}
 
 	@FXML
@@ -110,6 +105,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	public void setTarget(Target target, Consumer<Target> onSave, Optional<Consumer<Target>> onDelete) {
 		this.onSave = onSave;
+		this.target = target;
 		this.onDelete = onDelete.map(r -> new Runnable() {
 			@Override
 			public void run() {
@@ -120,12 +116,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		username.setText(target.username());
 		hostname.setText(target.hostname());
 		port.setText(String.valueOf(target.port()));
-		chunks.setText(String.valueOf(target.chunks()));
 		privateKey.setText(target.identity().map(Path::toString).orElse(""));
 		remoteFolder.setText(target.remoteFolder().map(Path::toString).orElse(""));
-		agentAuthentication.setSelected(target.agent());
-		passwordAuthentication.setSelected(target.password());
-		defaultIdentities.setSelected(target.identities());
-		mode.getSelectionModel().select(target.mode());
 	}
 }
