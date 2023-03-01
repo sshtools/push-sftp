@@ -188,8 +188,15 @@ public final class PushJob implements Callable<Void> {
 			switch(target.mode()) {
 			case CHUNKED:
 			case CHUNKED_SFTP:
-				client.runTask(PushTaskBuilder.create().withClient(client).withChunks(chunks)
+				client.runTask(PushTaskBuilder.create()
+						.withClient(client)
+						.withChunks(chunks)
 						.withRemoteFolder(target.remoteFolder()).withPaths(files)
+						.withIntegrityVerification(target.verifyIntegrity())
+						.withIgnoreIntegrity(target.ignoreIntegrity())
+						.withIgnoreCopyDataExtension(!target.copyDataExtension())
+						.withPreAllocation(target.preAllocate())
+						.withDigest(target.hash())
 						.withSFTPForcing(target.mode() == Mode.CHUNKED_SFTP)
 						.withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args))
 						.withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
