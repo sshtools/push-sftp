@@ -193,6 +193,18 @@ return console.askOkCancel(message, true);
                   <property name="variableName" type="string">PATH</property>
                 </serializedBean>
               </action>
+              <action id="109" beanClass="com.install4j.runtime.beans.actions.desktop.CreateStartMenuEntryAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
+                <serializedBean>
+                  <property name="arguments" type="string">--prompt</property>
+                  <property name="entryName" type="string">Push SFTP Shell</property>
+                  <property name="file">
+                    <object class="java.io.File">
+                      <string>push-sftp</string>
+                    </object>
+                  </property>
+                </serializedBean>
+                <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
+              </action>
             </actions>
             <formComponents>
               <formComponent id="16" beanClass="com.install4j.runtime.beans.formcomponents.ProgressComponent">

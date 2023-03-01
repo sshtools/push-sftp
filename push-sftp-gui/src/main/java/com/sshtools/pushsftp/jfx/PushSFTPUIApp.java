@@ -34,7 +34,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	private Keyring keyring;
 
 	public PushSFTPUIApp() {
-		super(PushSFTPUIApp.class.getResource("icon.png"), (PushSFTPUI) PushSFTPUI.getInstance());
+		super(PushSFTPUIApp.class.getResource("icon.png"), RESOURCES.getString("title"), (PushSFTPUI) PushSFTPUI.getInstance());
 		service = new FileTransferService();
 		try {
 			keyring = Keyring.create();

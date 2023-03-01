@@ -66,6 +66,9 @@ public class PSFTPInteractive extends CliCommand {
 	@Option(names = { "-v", "--version" }, versionHelp = true)
     boolean version;
 
+	@Option(names = { "--prompt" }, description = "promt for the hostname and username if not supplied.")
+    boolean promptHostAndUser;
+
 	@Option(names = { "-p", "--port" }, paramLabel = "PORT", description = "the port of the SSH server")
     int port = 22;
 
@@ -74,6 +77,10 @@ public class PSFTPInteractive extends CliCommand {
 	
 	@Parameters(index = "0", arity = "0..1", description = "The remote server, with optional username.")
 	private Optional<String> destination;
+	
+	private Optional<String> cachedHostname = Optional.empty();
+	private Optional<String> cachedUsername = Optional.empty();
+	private Optional<Integer> cachedPort = Optional.empty();
 
 	public PSFTPInteractive() {
 		super(Optional.of("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${phase}/updates.xml"), 
@@ -95,13 +102,45 @@ public class PSFTPInteractive extends CliCommand {
 	}
 
 	@Override
+	public int getPort() {
+		return cachedPort.orElse(super.getPort());
+	}
+
+	@Override
 	public String getHost() {
 		if(destination.isPresent()) {
 			var dst = destination.get();
 			var idx = dst.lastIndexOf('@');
 			return idx == -1 ? dst : dst.substring(idx  +1);
 		}
-		return host.orElseThrow(() -> new IllegalArgumentException("Host must be supplied either as an option or as part of the destination."));
+		return host.orElseGet(() -> {
+			if(promptHostAndUser) {
+				if(cachedHostname.isEmpty()) {
+					var h = getTerminal().prompt("Hostname (Enter for {0}):", "localhost");
+					if(h == null) {
+						throw new IllegalArgumentException("Host must be supplied either as an option or as part of the destination.");					
+					}
+					else {
+						if(h.equals(""))
+							h = "localhost";
+						var idx = h.indexOf(':');
+						if(idx == -1) {
+							cachedHostname = Optional.of(h);
+							cachedPort = Optional.empty();
+						}
+						else {
+							cachedHostname = Optional.of(h.substring(0, idx));
+							cachedPort = Optional.of(Integer.parseInt(h.substring(idx  +1)));
+						}
+						return cachedHostname.get();
+					}
+				}
+				else 
+					return cachedHostname.get();
+			}
+			else
+				throw new IllegalArgumentException("Host must be supplied either as an option or as part of the destination.");
+		});
 	}
 
 	@Override
@@ -112,7 +151,26 @@ public class PSFTPInteractive extends CliCommand {
 			if(idx > -1)
 				return dst.substring(0, idx);
 		}
-		return username.orElseThrow(() -> new IllegalArgumentException("Username must be supplied either as an option or as part of the destination."));
+		return username.orElseGet(() -> {
+			if(promptHostAndUser) {
+				if(cachedUsername.isEmpty()) {
+					var u = getTerminal().prompt("Username (Enter for {0}):", System.getProperty("user.name"));
+					if(u == null) {
+						throw new IllegalArgumentException("Username must be supplied either as an option or as part of the destination.");					
+					}
+					else {
+						if(u.equals(""))
+							u = System.getProperty("user.name");
+						cachedUsername = Optional.of(u);
+						return cachedUsername.get();
+					}
+				}
+				else 
+					return cachedUsername.get();
+			}
+			else 
+				throw new IllegalArgumentException("Username must be supplied either as an option or as part of the destination.");
+		});
 	}
 
 	@Override
