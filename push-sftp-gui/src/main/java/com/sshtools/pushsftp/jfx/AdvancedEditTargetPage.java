@@ -3,18 +3,18 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.intTextfieldValue;
 import static com.sshtools.jajafx.FXUtil.makeIntegerTextField;
 
-import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 
 import com.sshtools.client.sftp.RemoteHash;
 import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
@@ -75,6 +75,28 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		hash.getItems().addAll(RemoteHash.values());
 		hash.getSelectionModel().select(RemoteHash.sha512);
 		makeIntegerTextField(1, 99, chunks);
+		
+		var standardMode = Bindings.or(Bindings.equal(mode.valueProperty(), Mode.SCP), Bindings.equal(mode.valueProperty(), Mode.SFTP));
+		
+		chunks.disableProperty().bind(standardMode);
+		copyDataExtension.disableProperty().bind(standardMode);
+		preAllocate.disableProperty().bind(standardMode);
+		verifyIntegrity.disableProperty().bind(standardMode);
+		ignoreIntegrity.disableProperty().bind(standardMode);
+		hash.disableProperty().bind(standardMode);
+
+		mode.setConverter(new StringConverter<Mode>() {
+			
+			@Override
+			public String toString(Mode object) {
+				return RESOURCES.getString("mode." + object.name());
+			}
+			
+			@Override
+			public Mode fromString(String string) {
+				return null;
+			}
+		});
 	}
 
 	@Override

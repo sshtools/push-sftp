@@ -72,7 +72,7 @@
                                     <HBox alignment="CENTER_LEFT" styleClass="spaced">
                                        <children>
                                           <Label prefWidth="120.0" text="%mode" />
-                                          <ComboBox fx:id="mode" prefWidth="150.0">
+                                          <ComboBox fx:id="mode" prefWidth="250.0">
                                              <tooltip>
                                                 <Tooltip text="%mode.toolTip" />
                                              </tooltip>
@@ -89,12 +89,12 @@
                                           </TextField>
                                        </children>
                                     </HBox>
-                                    <CheckBox fx:id="copyDataExtension" mnemonicParsing="false" styleClass="indented" text="%copyDataExtension">
+                                    <CheckBox fx:id="copyDataExtension" mnemonicParsing="false" styleClass="lpad" text="%copyDataExtension">
                                        <tooltip>
                                           <Tooltip text="%copyDataExtension.toolTip" />
                                        </tooltip>
                                     </CheckBox>
-                                    <CheckBox fx:id="preAllocate" layoutX="10.0" layoutY="74.0" mnemonicParsing="false" styleClass="indented" text="%preAllocate">
+                                    <CheckBox fx:id="preAllocate" layoutX="10.0" layoutY="74.0" mnemonicParsing="false" styleClass="lpad" text="%preAllocate">
                                        <tooltip>
                                           <Tooltip text="%preAllocate.toolTip" />
                                        </tooltip>
@@ -108,12 +108,12 @@
                               <VBox>
                                  <children>
                                     <Label styleClass="h3" text="%verification" />
-                                    <CheckBox fx:id="verifyIntegrity" mnemonicParsing="false" text="%verifyIntegrity">
+                                    <CheckBox fx:id="verifyIntegrity" mnemonicParsing="false" styleClass="lpad" text="%verifyIntegrity">
                                        <tooltip>
                                           <Tooltip text="%verifyIntegrity.toolTip" />
                                        </tooltip>
                                     </CheckBox>
-                                    <CheckBox fx:id="ignoreIntegrity" layoutX="10.0" layoutY="26.0" mnemonicParsing="false" text="%ignoreIntegrity">
+                                    <CheckBox fx:id="ignoreIntegrity" layoutX="10.0" layoutY="26.0" mnemonicParsing="false" styleClass="lpad" text="%ignoreIntegrity">
                                        <tooltip>
                                           <Tooltip text="%ignoreIntegrity.toolTip" />
                                        </tooltip>
@@ -129,7 +129,7 @@
                                        </children>
                                        <styleClass>
                                           <String fx:value="spaced" />
-                                          <String fx:value="indented" />
+                                          <String fx:value="lpad" />
                                        </styleClass>
                                     </HBox>
                                  </children>
