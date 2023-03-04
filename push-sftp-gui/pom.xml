@@ -310,7 +310,7 @@
 									<stripVersion>true</stripVersion>
 									<outputDirectory>${project.build.directory}/dependencies/common</outputDirectory>
 									<stripVersion>true</stripVersion>
-									<excludeClassifiers>linux,mac,win</excludeClassifiers>
+									<excludeClassifiers>linux,mac,win,jpms</excludeClassifiers>
 								</configuration>
 							</execution>
 							<execution>
