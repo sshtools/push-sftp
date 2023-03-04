@@ -16,6 +16,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.sshtools.jajafx.FXUtil;
+import com.sshtools.jajafx.Flinger;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
@@ -121,7 +122,10 @@ public class DropTarget extends StackPane implements Initializable {
 
 	@FXML
 	void click(MouseEvent evt) {
-
+		var flinger = (Flinger)getParent().getParent();
+		if(flinger.isWasDragged()) {
+			return;
+		}
 		var keyChooser = new FileChooser();
 		keyChooser.setTitle(resources.getString("drop.choose.title"));
 		FXUtil.chooseFileAndRememeber(context.getContainer().getAppPreferences(), keyChooser,

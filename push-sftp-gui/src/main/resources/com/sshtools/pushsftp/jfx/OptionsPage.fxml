@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
@@ -36,7 +37,11 @@
                         <Tooltip text="%verbose.toolTip" />
                      </tooltip>
                   </CheckBox>
-                  <Label styleClass="h2" text="%updates" />
+                  <Label text="%updates">
+                     <styleClass>
+                        <String fx:value="h3" />
+                        <String fx:value="tpad" />
+                     </styleClass></Label>
                   <CheckBox fx:id="automaticUpdates" mnemonicParsing="false" selected="true" text="%automaticUpdates">
                      <tooltip>
                         <Tooltip text="%verbose.toolTip" />
@@ -45,7 +50,19 @@
                   <HBox alignment="CENTER_LEFT" styleClass="spaced">
                      <children>
                         <Label prefWidth="120.0" text="%phase" />
-                        <ComboBox fx:id="phase" prefWidth="150.0" />
+                        <ComboBox fx:id="phase" prefWidth="250.0" />
+                     </children>
+                  </HBox>
+                  <Label text="%appearance">
+                     <styleClass>
+                        <String fx:value="h3" />
+                        <String fx:value="tpad" />
+                     </styleClass>
+                  </Label>
+                  <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                     <children>
+                        <Label prefWidth="120.0" text="%darkMode" />
+                        <ComboBox fx:id="darkMode" prefWidth="150.0" />
                      </children>
                   </HBox>
                </children>

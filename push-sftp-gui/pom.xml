@@ -7,13 +7,45 @@
 		<artifactId>push-sftp-group</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
+	<name>FileDrop</name>
+	<description>A simple, secure and fast file transfer tool.</description>
 	<properties>
 		<main.class>com.sshtools.pushsftp.jfx.PushSFTPUIApp</main.class>
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 		<gluonfx.maven.plugin.version>1.0.16</gluonfx.maven.plugin.version>
 		<javafx.version>19.0.2.1</javafx.version>
 	</properties>
+	<url>https://jadaptive.com</url>
+	<licenses>
+		<license>
+			<name>Commercial</name>
+		</license>
+	</licenses>
+	<organization>
+		<name>JADAPTIVE</name>
+		<url>https://jadaptive.com</url>
+	</organization>
+	<scm>
+		<url>https://github.com/sshtools/push-sftp</url>
+		<connection>scm:git:https://github.com/sshtools/push-sftp.git</connection>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/sshtools/push-sftp/issues</url>
+	</issueManagement>
+	<developers>
+		<developer>
+			<name>Brett Smith</name>
+			<email>brett@logonbox.com</email>
+		</developer>
+	</developers>
 	<dependencies>
+		<dependency>
+			<groupId>io.github.palexdev</groupId>
+			<artifactId>scenicview</artifactId>
+			<version>17.0.2</version>
+			<optional>true</optional>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.install4j</groupId>
 			<artifactId>install4j-runtime</artifactId>
@@ -141,7 +173,7 @@
 				<os>
 					<family>linux</family>
 				</os>
-			</activation> 
+			</activation>
 			<properties>
 				<javafx.os.family>linux</javafx.os.family>
 			</properties>
@@ -177,6 +209,53 @@
 								<goals>
 									<goal>build</goal>
 								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- Flatpak -->
+		<profile>
+			<id>flatpak</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>uk.co.bithatch</groupId>
+						<artifactId>maven-flatpak-plugin</artifactId>
+						<version>0.0.1-SNAPSHOT</version>
+						<executions>
+							<execution>
+								<id>pushsftp-jfx-native-image</id>
+								<phase>package</phase>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<configuration>
+									<modules>false</modules>
+									<manifest>
+										<sdkExtensions>
+											<sdkExtension>org.freedesktop.Sdk.Extension.openjdk17</sdkExtension>
+										</sdkExtensions>
+										<finishArgs>
+											<finishArg>--socket=session-bus</finishArg>
+											<finishArg>--socket=x11</finishArg>
+											<finishArg>--socket=ssh-auth</finishArg>
+											<finishArg>--device=dri</finishArg>
+											<finishArg>--share=network</finishArg>
+											<finishArg>--share=ipc</finishArg>
+											<finishArg>--filesystem=home</finishArg>
+										</finishArgs>
+									</manifest>
+									<launcherPreCommands>
+										<launcherPreCommand>/app/jre/bin/java -version</launcherPreCommand>
+									</launcherPreCommands>
+									<excludeArtifacts>
+										<excludeArtifact>com.install4j</excludeArtifact>
+									</excludeArtifacts>
+									<mainClass>com.sshtools.pushsftp.jfx.PushSFTPUI</mainClass>
+									<iconFile>src/main/svg/icon.svg</iconFile>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
