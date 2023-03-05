@@ -10,6 +10,7 @@ public final class Target {
 
 	public final static class TargetBuilder {
 
+		private Optional<String> displayName = Optional.empty();
 		private Optional<String> username = Optional.empty();
 		private Optional<String> hostname = Optional.empty();
 		private int port = 22;
@@ -20,44 +21,44 @@ public final class Target {
 		private Optional<Path> remoteFolder = Optional.empty();
 		private int authenticationTimeout = 120;
 		private Optional<Mode> mode = Optional.empty();
-		private Optional<Integer> chunks= Optional.empty();
+		private Optional<Integer> chunks = Optional.empty();
 		private boolean verifyIntegrity;
 		private boolean ignoreIntegrity;
 		private boolean copyDataExtension = true;
 		private boolean preAllocate = true;
 		private Optional<RemoteHash> hash = Optional.empty();
-		
+
 		public TargetBuilder withVerifyIntegrity(boolean verifyIntegrity) {
 			this.verifyIntegrity = verifyIntegrity;
 			return this;
 		}
-		
+
 		public TargetBuilder withVerifiedIntegrity() {
 			return withVerifyIntegrity(true);
 		}
-		
+
 		public TargetBuilder withIgnoredIntegrity() {
 			return withIgnoreIntegrity(true);
 		}
-		
+
 		public TargetBuilder withIgnoreIntegrity(boolean ignoreIntegrity) {
 			this.ignoreIntegrity = ignoreIntegrity;
 			return this;
 		}
-		
+
 		public TargetBuilder withoutCopyDataExtension() {
 			return withCopyDataExtension(false);
 		}
-		
+
 		public TargetBuilder withCopyDataExtension(boolean copyDataExtension) {
 			this.copyDataExtension = copyDataExtension;
 			return this;
 		}
-		
+
 		public TargetBuilder withoutPreAllocate() {
 			return withPreAllocate(false);
 		}
-		
+
 		public TargetBuilder withPreAllocate(boolean preAllocate) {
 			this.preAllocate = preAllocate;
 			return this;
@@ -66,7 +67,7 @@ public final class Target {
 		public TargetBuilder withHash(RemoteHash hash) {
 			return withHash(Optional.of(hash));
 		}
-		
+
 		public TargetBuilder withHash(Optional<RemoteHash> hash) {
 			this.hash = hash;
 			return this;
@@ -75,7 +76,7 @@ public final class Target {
 		public TargetBuilder withChunks(int chunks) {
 			return withChunks(Optional.of(chunks));
 		}
-		
+
 		public TargetBuilder withChunks(Optional<Integer> chunks) {
 			this.chunks = chunks;
 			return this;
@@ -108,6 +109,11 @@ public final class Target {
 			return this;
 		}
 
+		public TargetBuilder withDisplayName(Optional<String> displayName) {
+			this.displayName = displayName;
+			return this;
+		}
+
 		public TargetBuilder withHostname(String hostname) {
 			return withHostname(Optional.ofNullable(hostname));
 		}
@@ -118,7 +124,7 @@ public final class Target {
 		}
 
 		public TargetBuilder withMode(Mode mode) {
-			return withMode(Optional.ofNullable(mode)); 
+			return withMode(Optional.ofNullable(mode));
 		}
 
 		public TargetBuilder withMode(Optional<Mode> mode) {
@@ -159,7 +165,8 @@ public final class Target {
 		}
 
 		public TargetBuilder withIdentityPath(String identity) {
-			return withIdentity(identity == null || identity.equals("") ? Optional.empty() : Optional.of(Path.of(identity)));
+			return withIdentity(
+					identity == null || identity.equals("") ? Optional.empty() : Optional.of(Path.of(identity)));
 		}
 
 		public TargetBuilder withIdentityPath(Optional<String> identity) {
@@ -189,6 +196,7 @@ public final class Target {
 		}
 	}
 
+	private final Optional<String> displayName;
 	private final String username;
 	private final String hostname;
 	private final int port;
@@ -223,6 +231,7 @@ public final class Target {
 		this.copyDataExtension = builder.copyDataExtension;
 		this.preAllocate = builder.preAllocate;
 		this.hash = builder.hash.orElse(RemoteHash.sha512);
+		this.displayName = builder.displayName;
 	}
 
 	@Override
@@ -305,6 +314,15 @@ public final class Target {
 
 	public RemoteHash hash() {
 		return hash;
+	}
+
+	public Optional<String> displayName() {
+		return displayName;
+	}
+
+	public String getDefaultDisplayName() {
+		return String.format("%s@%s:%d/%s", this.username, this.hostname,
+				this.port, this.remoteFolder.map(p -> p.toString().startsWith("/") ? p.toString().substring(1) : ("~/" + p.toString())).orElse("~"));
 	}
 
 }

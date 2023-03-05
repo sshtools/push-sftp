@@ -1,5 +1,7 @@
 package com.sshtools.pushsftp.jfx;
 
+import static com.sshtools.jajafx.FXUtil.emptyPathIfBlankString;
+
 import java.io.Closeable;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -10,6 +12,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import com.sshtools.client.sftp.RemoteHash;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 import com.sshtools.simjac.ConfigurationStoreBuilder;
 
@@ -135,7 +138,18 @@ public class FileTransferService implements Closeable {
 				withUsername(obj.getString("username", "")).
 				withPort(obj.getInt("port", 22)).
 				withChunks(obj.getInt("chunks", 3)).
-				withChunks(obj.getInt("chunks", 3)).
+				withIdentity(emptyPathIfBlankString(obj.getString("privateKey", ""))).
+				withRemoteFolder(emptyPathIfBlankString(obj.getString("remoteFolder", ""))).
+				withAgent(obj.getBoolean("agentAuthentication", true)).
+				withPassword(obj.getBoolean("passwordAuthentication", true)).
+				withIdentities(obj.getBoolean("defaultIdentities", true)).
+				withMode(Mode.valueOf(obj.getString("mode", Mode.CHUNKED.name()))).
+				withVerifyIntegrity(obj.getBoolean("verifyIntegrity", false)).
+				withPreAllocate(obj.getBoolean("preAllocate", true)).
+				withIgnoreIntegrity(obj.getBoolean("ignoreIntegrity", false)).
+				withAuthenticationTimeout(obj.getInt("authenticationTimeout", 120)).
+				withCopyDataExtension(obj.getBoolean("copyDataExtension", false)).
+				withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name()))).
 				build();
 	}
 

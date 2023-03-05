@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 import com.sshtools.jajafx.AbstractTile;
+import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
@@ -28,6 +29,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	TextField username;
 	@FXML
 	TextField hostname;
+	@FXML
+	TextField displayName;
 	@FXML
 	TextField port;
 	@FXML
@@ -53,16 +56,12 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	private void save() {
-		var bldr = TargetBuilder.builder().
-				withUsername(textOrPrompt(username)).
-				withHostname(textOrPrompt(hostname)).
-				withPort(intTextfieldValue(port)).
-				withIdentityPath(optionalText(privateKey)).
-				withRemoteFolderPath(optionalText(remoteFolder));
-		if(advanced != null)
+		var bldr = TargetBuilder.builder().withUsername(textOrPrompt(username)).withHostname(textOrPrompt(hostname))
+				.withPort(intTextfieldValue(port)).withDisplayName(optionalText(displayName))
+				.withIdentityPath(optionalText(privateKey)).withRemoteFolderPath(optionalText(remoteFolder));
+		if (advanced != null)
 			advanced.save(bldr);
-		onSave.accept(bldr.
-				build());
+		onSave.accept(bldr.build());
 		getTiles().remove(this);
 	}
 
@@ -112,11 +111,23 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 				r.accept(target);
 			}
 		});
-		
+		displayName.setText(target.displayName().orElse(""));
 		username.setText(target.username());
+		username.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
 		hostname.setText(target.hostname());
+		hostname.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
 		port.setText(String.valueOf(target.port()));
+		port.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
 		privateKey.setText(target.identity().map(Path::toString).orElse(""));
 		remoteFolder.setText(target.remoteFolder().map(Path::toString).orElse(""));
+		remoteFolder.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
+	}
+
+	private void rebuildDisplayNamePrompt() {
+		displayName
+				.setPromptText(textOrPrompt(username) + "@" + textOrPrompt(hostname) + ":" + FXUtil.textOrPrompt(port)
+						+ ((remoteFolder.getText().equals("")) ? "/~"
+								: (remoteFolder.getText().startsWith("/") ? remoteFolder.getText()
+										: "/" + remoteFolder.getText())));
 	}
 }

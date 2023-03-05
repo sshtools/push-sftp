@@ -26,6 +26,16 @@
                               <VBox prefWidth="300.0">
                                  <children>
                                     <Label styleClass="h2" text="%target" />
+                                    <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="26.0" styleClass="spaced">
+                                       <children>
+                                          <Label prefWidth="120.0" text="%displayName" />
+                                          <TextField fx:id="displayName" prefWidth="250.0" promptText="user@localhost:22/~">
+                                             <tooltip>
+                                                <Tooltip text="%hostname.toolTip" />
+                                             </tooltip>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
                                     <HBox alignment="CENTER_LEFT" styleClass="spaced" VBox.vgrow="NEVER">
                                        <children>
                                           <Label prefWidth="120.0" text="%hostname" />

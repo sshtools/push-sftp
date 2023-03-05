@@ -46,6 +46,8 @@ public class DropTarget extends StackPane implements Initializable {
 	private FontIcon fileIcon;
 	@FXML
 	private Label folderText;
+	@FXML
+	private Label displayName;
 
 	private boolean dragHovering;
 	private boolean mouseHovering;
@@ -77,6 +79,7 @@ public class DropTarget extends StackPane implements Initializable {
 
 
 		folderText.setOpacity(0);
+		displayName.setText(target.displayName().orElse(target.getDefaultDisplayName()));
 		
 		service = context.getService();
 		service.busyProperty().addListener((c, o, n) -> {

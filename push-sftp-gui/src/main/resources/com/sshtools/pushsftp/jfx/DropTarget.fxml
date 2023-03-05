@@ -7,13 +7,17 @@
 
 <fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#drop" onDragEntered="#dragEnter" onDragExited="#dragExit" onDragOver="#dragOver" prefHeight="380.0" prefWidth="340.0" type="StackPane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
 	<children>
+      <Label fx:id="displayName" contentDisplay="RIGHT" layoutX="141.0" layoutY="192.0" styleClass="pill-accent" text="Display Name" translateY="-142.0">
+         <graphic>
+            <Hyperlink onAction="#edit">
+               <graphic>
+                  <FontIcon iconLiteral="fas-cog" iconSize="16" />
+               </graphic>
+            </Hyperlink>
+         </graphic>
+      </Label>
 		<Label fx:id="folderText" styleClass="pill-accent" text="%folderText" translateY="130.0" />
 		<FontIcon fx:id="fileIcon" iconLiteral="fas-file" iconSize="128" visible="false" />
 		<FontIcon fx:id="folderIcon" iconLiteral="fas-folder" iconSize="256" onMouseClicked="#click" onMouseEntered="#mouseEnter" onMouseExited="#mouseExit" opacity="0.5" />
-      <Hyperlink onAction="#edit" styleClass="circle-button-accent" translateX="-120.0" translateY="-92.0">
-         <graphic>
-            <FontIcon iconLiteral="fas-cog" iconSize="48" />
-         </graphic>
-      </Hyperlink>
 	</children>
 </fx:root>
