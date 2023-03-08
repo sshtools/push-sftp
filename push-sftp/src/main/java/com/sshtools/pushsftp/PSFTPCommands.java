@@ -1,9 +1,8 @@
 package com.sshtools.pushsftp;
 
+import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.InteractiveSshCommand;
 import com.sshtools.commands.SshCommand;
-import com.sshtools.commands.Update;
-import com.sshtools.commands.UpdateCheck;
 import com.sshtools.pushsftp.commands.Bye;
 import com.sshtools.pushsftp.commands.Cd;
 import com.sshtools.pushsftp.commands.Chgrp;
@@ -31,7 +30,7 @@ import picocli.CommandLine.Command;
 					Lpwd.class, Help.class, Rm.class, Rmdir.class,
 					Mkdir.class, Umask.class, Bye.class, Chgrp.class, 
 					Chown.class, Chmod.class, Push.class, Put.class, Get.class,
-					UpdateCheck.class, Update.class
+					ChildUpdateCommand.class
 					})
 public class PSFTPCommands implements InteractiveSshCommand {
 

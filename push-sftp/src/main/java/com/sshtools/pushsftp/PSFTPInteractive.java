@@ -5,10 +5,9 @@ import java.util.Optional;
 
 import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
+import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.CliCommand;
 import com.sshtools.commands.ExceptionHandler;
-import com.sshtools.commands.Update;
-import com.sshtools.commands.UpdateCheck;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
@@ -42,7 +41,7 @@ import picocli.CommandLine.Parameters;
 		Lpwd.class, Help.class, Rm.class, Rmdir.class,
 		Mkdir.class, Umask.class, Bye.class, Chgrp.class, 
 		Chown.class, Chmod.class, Push.class, Put.class, Get.class,
-		UpdateCheck.class, Update.class
+		ChildUpdateCommand.class
 		}, versionProvider = PSFTPInteractive.Version.class)
 public class PSFTPInteractive extends CliCommand {
 	
