@@ -6,14 +6,17 @@ import java.util.Optional;
 import com.sshtools.common.logger.Log;
 import com.sshtools.common.logger.Log.Level;
 import com.sshtools.jajafx.JajaApp;
-import com.sshtools.sequins.ArtifactVersion;
+import com.sshtools.jaul.AppCategory;
+import com.sshtools.jaul.ArtifactVersion;
+import com.sshtools.jaul.JaulApp;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 
-@Command(name = "push-sftp-gui", mixinStandardHelpOptions = true, description = "Simple graphical user interface for push files to an SFTP server as fast as possible.", versionProvider = PushSFTPUI.Version.class)
+@Command(name = "filedrop", mixinStandardHelpOptions = true, description = "Simple graphical user interface for push files to an SFTP server as fast as possible.", versionProvider = PushSFTPUI.Version.class)
+@JaulApp(id = "com.sshtools.FileDrop", category = AppCategory.GUI, updaterId = "54", updatesUrl = "https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml")
 public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 
 	public final static class Version implements IVersionProvider {
@@ -45,7 +48,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 		}
 	}
 	
-	@Option(names = { "-m", "--ssh-log" }, paramLabel = "PATH", description = "Enable Maverick API debugging (for SSH related output).")
+	@Option(names = { "-m", "--ssh-log" }, paramLabel = "LEVEL", description = "Enable Maverick API debugging (for SSH related output).")
 	Optional<Level> sshLog;
 
 	PushSFTPUI(PushSFTPUIBuilder builder) {
@@ -59,11 +62,9 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 
 	public static void main(String[] args) {
 		var bldr = PushSFTPUIBuilder.create().
-				withLauncherId("54").
 				withInceptionYear(2023).
 				withApp(PushSFTPUIApp.class).
-				withAppResources(PushSFTPUIApp.RESOURCES).
-				withUpdatesUrl("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml");
+				withAppResources(PushSFTPUIApp.RESOURCES);
 		System.exit(new CommandLine(bldr.build()).execute(args));
 	}
 }

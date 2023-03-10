@@ -11,6 +11,8 @@ import com.sshtools.commands.ExceptionHandler;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
+import com.sshtools.jaul.AppCategory;
+import com.sshtools.jaul.JaulApp;
 import com.sshtools.pushsftp.commands.Bye;
 import com.sshtools.pushsftp.commands.Cd;
 import com.sshtools.pushsftp.commands.Chgrp;
@@ -43,6 +45,7 @@ import picocli.CommandLine.Parameters;
 		Chown.class, Chmod.class, Push.class, Put.class, Get.class,
 		ChildUpdateCommand.class
 		}, versionProvider = PSFTPInteractive.Version.class)
+@JaulApp(id = "com.sshtools.PushSFTP", category = AppCategory.CLI, updaterId = "47", updatesUrl = "https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${phase}/updates.xml")
 public class PSFTPInteractive extends CliCommand {
 	
 	public final static class Version implements IVersionProvider {
@@ -82,8 +85,7 @@ public class PSFTPInteractive extends CliCommand {
 	private Optional<Integer> cachedPort = Optional.empty();
 
 	public PSFTPInteractive() {
-		super(Optional.of("https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${phase}/updates.xml"), 
-				Optional.of("47"), Optional.empty());
+		super(Optional.empty());
 	}
 
 	public SftpClient getSftpClient() {
