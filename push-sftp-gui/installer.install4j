@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.5" transformSequenceNumber="10">
-  <directoryPresets config="./target/push-sftp-gui.jar" />
+  <directoryPresets config="./src/main/resources/com/sshtools/pushsftp/jfx/icon.png" />
   <application name="FileDrop" applicationId="1464-8895-9044-3070" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="filedrop" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
       <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
@@ -27,6 +27,7 @@
       <mountPoint id="45" location="mac" />
       <mountPoint id="46" location="win" />
       <mountPoint id="47" location="linux" />
+      <mountPoint id="126" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="24" file="./target/push-sftp-gui.jar" />
@@ -34,6 +35,7 @@
       <dirEntry mountPoint="45" file="./target/dependencies/mac" subDirectory="mac" />
       <dirEntry mountPoint="46" file="./target/dependencies/win" subDirectory="win" />
       <dirEntry mountPoint="47" file="./target/dependencies/linux" subDirectory="linux" />
+      <fileEntry mountPoint="126" file="./src/main/resources/com/sshtools/pushsftp/jfx/icon.png" />
     </entries>
   </files>
   <launchers>
