@@ -7,7 +7,6 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.prefs.Preferences;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
@@ -27,7 +26,6 @@ import javafx.scene.Node;
 public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUI.class.getName());
-	final static Preferences PREFERENCES = Preferences.userNodeForPackage(PushSFTPUI.class);
 
 	private FileTransferService service;
 	private Tiles<PushSFTPUIApp> tiles;
