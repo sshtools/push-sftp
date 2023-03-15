@@ -215,6 +215,8 @@ return console.askOkCancel(message, true);
                       <string>push-sftp</string>
                     </object>
                   </property>
+                  <property name="timeout" type="int" value="20" />
+                  <property name="wait" type="boolean" value="true" />
                   <property name="workingDirectory">
                     <object class="java.io.File">
                       <string>.</string>
@@ -290,6 +292,8 @@ return console.askYesNo(message, true);
                       <string>push-sftp</string>
                     </object>
                   </property>
+                  <property name="timeout" type="int" value="20" />
+                  <property name="wait" type="boolean" value="true" />
                   <property name="workingDirectory">
                     <object class="java.io.File">
                       <string>.</string>
