@@ -1188,7 +1188,7 @@ return true;</property>
         <entry location="win" />
       </exclude>
     </linuxDeb>
-    <windows name="Windows" id="34" installDir="HPSFTP" architecture="64">
+    <windows name="Windows" id="34" installDir="FileDrop" architecture="64">
       <exclude>
         <entry location="mac" />
         <entry location="linux" />

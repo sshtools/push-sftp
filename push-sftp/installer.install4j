@@ -1157,7 +1157,7 @@ return true;</property>
   </installerGui>
   <mediaSets>
     <linuxDeb name="Linux Deb Archive" id="26" />
-    <windows name="Windows" id="34" installDir="HPSFTP" architecture="64">
+    <windows name="Windows" id="34" installDir="Push SFTP" architecture="64">
       <jreBundle usePack200="false" />
     </windows>
     <macosFolder name="macOS Folder" id="36" architecture="universal" signLaunchers="true">
