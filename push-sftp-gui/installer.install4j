@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.5" transformSequenceNumber="10">
-  <directoryPresets config="./src/main/resources/com/sshtools/pushsftp/jfx/icon.png" />
+  <directoryPresets config="./src/main/resources/com/sshtools/pushsftp/jfx" />
   <application name="FileDrop" applicationId="1464-8895-9044-3070" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="filedrop" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
       <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
@@ -50,6 +50,14 @@
         </modulePath>
       </java>
       <iconImageFiles>
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-16.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-24.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-32.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-48.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-64.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-96.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-128.png" />
+        <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon-256.png" />
         <file path="./src/main/resources/com/sshtools/pushsftp/jfx/icon.png" />
       </iconImageFiles>
     </launcher>
@@ -57,6 +65,51 @@
   <installerGui autoUpdateDescriptorUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${compiler:build.phase}/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${compiler:sys.version}/">
     <applications>
       <application id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication">
+        <serializedBean>
+          <property name="customIconImageFiles">
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-16.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-24.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-32.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-48.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-64.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-128.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon-256.png</string>
+              </object>
+            </add>
+            <add>
+              <object class="com.install4j.api.beans.ExternalFile">
+                <string>./src/main/resources/com/sshtools/pushsftp/jfx/icon.png</string>
+              </object>
+            </add>
+          </property>
+          <property name="useCustomIcon" type="boolean" value="true" />
+        </serializedBean>
         <startup>
           <screen id="1" beanClass="com.install4j.runtime.beans.screens.StartupScreen" rollbackBarrierExitCode="0">
             <actions>
