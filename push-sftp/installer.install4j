@@ -356,6 +356,7 @@ return console.askYesNo(message, true);
           <property name="splashMessage" type="string">Downloading Push SFTP</property>
           <property name="useCustomIcon" type="boolean" value="true" />
           <property name="windowTitle" type="string">${i18n:updater.WindowTitle("${compiler:sys.fullName}")}</property>
+          <property name="windowsConsoleExecutable" type="boolean" value="true" />
         </serializedBean>
         <startup>
           <screen id="48" beanClass="com.install4j.runtime.beans.screens.StartupScreen" rollbackBarrierExitCode="0" />
