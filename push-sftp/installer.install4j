@@ -34,7 +34,7 @@
   <launchers>
     <launcher name="push-sftp" id="25" excludeFromMenu="true">
       <executable name="push-sftp" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
+      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${launcher:sys.launcherDirectory}">
         <modulePath>
           <directory location="lib" failOnError="false" />
         </modulePath>
@@ -48,15 +48,14 @@
           <screen id="1" beanClass="com.install4j.runtime.beans.screens.StartupScreen" rollbackBarrierExitCode="0">
             <actions>
               <action id="22" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" actionElevationType="none" rollbackBarrierExitCode="0">
-                <condition>!"true".equals(context.getVariable("jaul.forceSystem"))</condition>
-              </action>
-              <action id="112" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" actionElevationType="none" rollbackBarrierExitCode="0">
                 <serializedBean>
+                  <property name="failIfNotObtainedMac" type="boolean" value="false" />
+                  <property name="failIfNotObtainedWin" type="boolean" value="false" />
                   <property name="linuxPrivilegeRequirement" type="enum" class="com.install4j.runtime.beans.actions.misc.PrivilegeRequirement" value="OBTAIN" />
+                  <property name="obtainIfAdminMac" type="boolean" value="true" />
                   <property name="obtainIfNormalMac" type="boolean" value="true" />
                   <property name="obtainIfNormalWin" type="boolean" value="true" />
                 </serializedBean>
-                <condition>"true".equals(context.getVariable("jaul.forceSystem"))</condition>
               </action>
             </actions>
           </screen>
