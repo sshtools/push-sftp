@@ -215,7 +215,7 @@ return console.askOkCancel(message, true);
                 </serializedBean>
                 <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
               </action>
-              <action id="110" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" rollbackBarrierExitCode="0">
+              <action id="110" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
                   <property name="arguments" type="array" elementType="string" length="1">
                     <element index="0">--jaul-register</element>
@@ -292,7 +292,7 @@ return console.askYesNo(message, true);
           <screen id="27" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" rollbackBarrierExitCode="0">
             <actions>
               <action id="29" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" actionElevationType="elevated" rollbackBarrierExitCode="0" />
-              <action id="111" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" rollbackBarrierExitCode="0">
+              <action id="111" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
                   <property name="arguments" type="array" elementType="string" length="1">
                     <element index="0">--jaul-deregister</element>
