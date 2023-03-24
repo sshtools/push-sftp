@@ -23,10 +23,13 @@ public class Put extends SftpCommand implements Callable<Integer> {
 	protected Integer onCall() throws Exception {
 
 		var sftp = getSftpClient();
+		sftp.setBlockSize(blocksize);
+		sftp.setMaxAsyncRequests(outstandingRequests);
+		
 		var target = Objects.nonNull(destination) ? destination : sftp.pwd();
 
 		try(var progress = getTerminal().progressBuilder().withInterruptable().withTiming(timing).withRateLimit().build()) {
-			sftp.putFiles(file, target, fileTransferProgress(progress, "Uploading {0}"));
+			sftp.put(file, target, fileTransferProgress(progress, "Uploading {0}"));
 		}
 
 		return 0;
