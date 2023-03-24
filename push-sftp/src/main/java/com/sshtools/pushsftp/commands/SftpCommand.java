@@ -25,8 +25,16 @@ import com.sshtools.sequins.Progress.Level;
 import com.sshtools.sequins.ProgressBar;
 import com.sshtools.sequins.Terminal;
 
+import picocli.CommandLine.Option;
+
 public abstract class SftpCommand extends ChildCommand {
 
+	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "64")
+	int outstandingRequests;
+	
+	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "32768")
+	int blocksize; 
+	
 	public interface FileOp {
 		void op(String path) throws Exception;
 	}
