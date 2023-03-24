@@ -20,7 +20,9 @@ public class Get extends SftpCommand implements Callable<Integer> {
 	@Override
 	protected Integer onCall() throws Exception {
 		SftpClient sftp = getSftpClient();
-
+		sftp.setBlockSize(blocksize);
+		sftp.setMaxAsyncRequests(outstandingRequests);
+		
 		try(var progress = getTerminal().progressBuilder().withRateLimit().withTiming(timing).withInterruptable().build()) {
 			sftp.getFiles(file, fileTransferProgress(progress, "Downloading {0}"));
 		}
