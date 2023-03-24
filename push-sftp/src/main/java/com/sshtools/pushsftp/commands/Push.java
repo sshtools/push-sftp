@@ -51,6 +51,12 @@ public class Push extends SftpCommand {
 			"--remote-dir" }, paramLabel = "PATH", description = "the directory on the remote host you want to transfer the files to")
 	Optional<Path> remoteFolder;
 
+	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "64")
+	int outstandingRequests;
+	
+	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "32768")
+	int blocksize; 
+	
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
 	
@@ -78,6 +84,8 @@ public class Push extends SftpCommand {
 				withIgnoreCopyDataExtension(ignoreCopyDataExtension).
 				withChunks(chunks).
 				withDigest(digest).
+				withBlocksize(blocksize).
+				withAsyncRequests(outstandingRequests).
 				withRemoteFolder(remoteFolder.orElse(Path.of(getSftpClient().pwd()))).
 				withIntegrityVerification(verifyIntegrity).
 				withIgnoreIntegrity(ignoreIntegrity).

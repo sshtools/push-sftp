@@ -17,6 +17,13 @@ public class Get extends SftpCommand implements Callable<Integer> {
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
 
+	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "64")
+	int outstandingRequests;
+	
+	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "32768")
+	int blocksize; 
+	
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		SftpClient sftp = getSftpClient();
