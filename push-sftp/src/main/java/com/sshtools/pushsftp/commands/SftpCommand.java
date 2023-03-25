@@ -25,8 +25,6 @@ import com.sshtools.sequins.Progress.Level;
 import com.sshtools.sequins.ProgressBar;
 import com.sshtools.sequins.Terminal;
 
-import picocli.CommandLine.Option;
-
 public abstract class SftpCommand extends ChildCommand {
 
 	public interface FileOp {

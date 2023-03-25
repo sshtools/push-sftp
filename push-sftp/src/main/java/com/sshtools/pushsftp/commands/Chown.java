@@ -1,7 +1,5 @@
 package com.sshtools.pushsftp.commands;
 
-import java.util.Objects;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

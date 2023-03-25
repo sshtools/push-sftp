@@ -51,10 +51,10 @@ public class Push extends SftpCommand {
 			"--remote-dir" }, paramLabel = "PATH", description = "the directory on the remote host you want to transfer the files to")
 	Optional<Path> remoteFolder;
 
-	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "64")
+	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "0")
 	int outstandingRequests;
 	
-	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "32768")
+	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "0")
 	int blocksize; 
 	
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")

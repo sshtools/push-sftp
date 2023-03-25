@@ -19,18 +19,22 @@ public class Put extends SftpCommand implements Callable<Integer> {
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
 
-	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "64")
+	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "0")
 	int outstandingRequests;
 	
-	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "32768")
+	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "0")
 	int blocksize; 
 	
 	@Override
 	protected Integer onCall() throws Exception {
 
 		var sftp = getSftpClient();
-		sftp.setBlockSize(blocksize);
-		sftp.setMaxAsyncRequests(outstandingRequests);
+		if(blocksize > 0) {
+			sftp.setBlockSize(blocksize);
+		}
+		if(outstandingRequests > 0) {
+			sftp.setMaxAsyncRequests(outstandingRequests);
+		}
 		
 		var target = Objects.nonNull(destination) ? destination : sftp.pwd();
 
