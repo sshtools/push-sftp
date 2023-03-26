@@ -20,6 +20,7 @@ import com.sshtools.pushsftp.commands.Chmod;
 import com.sshtools.pushsftp.commands.Chown;
 import com.sshtools.pushsftp.commands.Get;
 import com.sshtools.pushsftp.commands.Help;
+import com.sshtools.pushsftp.commands.Info;
 import com.sshtools.pushsftp.commands.Lcd;
 import com.sshtools.pushsftp.commands.Lls;
 import com.sshtools.pushsftp.commands.Lpwd;
@@ -43,7 +44,7 @@ import picocli.CommandLine.Parameters;
 		Lpwd.class, Help.class, Rm.class, Rmdir.class,
 		Mkdir.class, Umask.class, Bye.class, Chgrp.class, 
 		Chown.class, Chmod.class, Push.class, Put.class, Get.class,
-		ChildUpdateCommand.class
+		ChildUpdateCommand.class, Info.class
 		}, versionProvider = PSFTPInteractive.Version.class)
 @JaulApp(id = "com.sshtools.PushSFTP", category = AppCategory.CLI, updaterId = "47", updatesUrl = "https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${phase}/updates.xml")
 public class PSFTPInteractive extends CliCommand {
