@@ -15,6 +15,7 @@ public class Rmdir extends SftpCommand {
 	
 	@Override
 	protected Integer onCall() throws Exception {
+		getTerminal().message("Removing dir {0}", file);
 		getSftpClient().rm(file, force, true);
 		return 0;
 	}
