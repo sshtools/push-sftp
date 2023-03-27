@@ -24,7 +24,7 @@ public class Info extends SftpCommand {
 		getTerminal().messageln("-KEX------------------");
 		getTerminal().messageln("Host key type        : {0}", ssh.getConnection().getHostKeyAlgorithm());
 		getTerminal().messageln("Host key fingerprint : {0}", SshKeyUtils.getFingerprint(ssh.getHostKey()));
-		getTerminal().messageln("Key exchange         : {0}", SshKeyUtils.getFingerprint(ssh.getConnection().getKeyExchangeInUse()));
+		getTerminal().messageln("Key exchange         : {0}", ssh.getConnection().getKeyExchangeInUse());
 		getTerminal().messageln("Cipher (c->s)        : {0}", ssh.getConnection().getCipherInUseCS());
 		getTerminal().messageln("Cipher (s->c)        : {0}", ssh.getConnection().getCipherInUseSC());
 		getTerminal().messageln("Mac (c->s)           : {0}", ssh.getConnection().getMacInUseCS());
@@ -34,8 +34,8 @@ public class Info extends SftpCommand {
 		getTerminal().messageln("");
 		getTerminal().messageln("-SFTP-----------------");	
 		
-		if(showSFTPStatistic(      "Write blocksize      : {0}ms", "maverick.write.optimizedBlock")) {
-			showSFTPStatistic(      "Write roundtrip      : {0}ms", "maverick.write.blockRoundtrip");
+		if(showSFTPStatistic(      "Write blocksize      : {0} bytes", "maverick.write.optimizedBlock")) {
+			showSFTPStatistic(      "Write roundtrip      : {0} ", "maverick.write.blockRoundtrip");
 			showSFTPStatistic(      "Write max requests   : {0}", "maverick.write.minAsyncRequests"); 
 			showSFTPStatistic(      "Write min requests   : {0}", "maverick.write.maxAsyncRequests"); 
 		} else {
