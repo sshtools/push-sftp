@@ -36,7 +36,8 @@ public class Info extends SftpCommand {
 		
 		if(showSFTPStatistic(      "Write blocksize      : {0}ms", "maverick.write.optimizedBlock")) {
 			showSFTPStatistic(      "Write roundtrip      : {0}ms", "maverick.write.blockRoundtrip");
-			showSFTPStatistic(      "Write async requests : {0}", "maverick.write.asyncRequests"); 
+			showSFTPStatistic(      "Write max requests   : {0}", "maverick.write.minAsyncRequests"); 
+			showSFTPStatistic(      "Write min requests   : {0}", "maverick.write.maxAsyncRequests"); 
 		} else {
 			getTerminal().messageln("Perform a put or push operation to generate SFTP write operation statistics");
 		}
