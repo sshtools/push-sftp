@@ -1,6 +1,10 @@
 package com.sshtools.pushsftp;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.sshtools.client.SshClient;
@@ -78,6 +82,9 @@ public class PSFTPInteractive extends CliCommand {
 	@Option(names = { "-u", "--user" }, paramLabel = "USER", description = "the username to authenticate with. Either this must be supplied or the username can be supplied in the destination")
     Optional<String> username;
 	
+	@Option(names = { "-b", "--batch" }, paramLabel = "SCRIPT", description = "run a batch script")
+	Optional<File> batchFile;
+	
 	@Parameters(index = "0", arity = "0..1", description = "The remote server, with optional username.")
 	private Optional<String> destination;
 	
@@ -106,6 +113,22 @@ public class PSFTPInteractive extends CliCommand {
 	@Override
 	public int getPort() {
 		return cachedPort.orElse(super.getPort());
+	}
+	
+	protected boolean startCLI() throws IOException, InterruptedException {
+		if(batchFile.isEmpty()) {
+			return true;
+		}
+		File script = batchFile.get();
+		if(script.exists()) {
+			getTerminal().message("Executing batch script {0}", script.getName());
+			try(InputStream in = new FileInputStream(script)) {
+				source(in);
+			}
+		} else {
+			getTerminal().error("{0} not found!", script);
+		}
+		return false;
 	}
 
 	@Override
