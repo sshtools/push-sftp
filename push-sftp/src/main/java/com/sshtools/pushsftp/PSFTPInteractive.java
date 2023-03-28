@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.sshtools.client.SshClient;
@@ -16,6 +15,7 @@ import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.jaul.AppCategory;
+import com.sshtools.jaul.ArtifactVersion;
 import com.sshtools.jaul.JaulApp;
 import com.sshtools.pushsftp.commands.Bye;
 import com.sshtools.pushsftp.commands.Cd;
@@ -36,7 +36,6 @@ import com.sshtools.pushsftp.commands.Pwd;
 import com.sshtools.pushsftp.commands.Rm;
 import com.sshtools.pushsftp.commands.Rmdir;
 import com.sshtools.pushsftp.commands.Umask;
-import com.sshtools.sequins.ArtifactVersion;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;

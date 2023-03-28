@@ -19,10 +19,8 @@ public class Chown extends SftpCommand  {
 	@Override
 	protected Integer onCall() throws Exception {
 		
-		StringBuffer UID = new StringBuffer();
-		StringBuffer GID = new StringBuffer();
-		
-		boolean convert = getSftpClient().getSubsystemChannel().getVersion() <= 3;
+		var UID = new StringBuffer();
+		var GID = new StringBuffer();
 		
 		if(uid.contains(":")) {
 			String[] tmp = uid.split(":");

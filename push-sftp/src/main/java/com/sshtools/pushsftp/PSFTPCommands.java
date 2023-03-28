@@ -2,6 +2,7 @@ package com.sshtools.pushsftp;
 
 import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.InteractiveSshCommand;
+import com.sshtools.commands.JadaptiveCommand;
 import com.sshtools.commands.SshCommand;
 import com.sshtools.pushsftp.commands.Bye;
 import com.sshtools.pushsftp.commands.Cd;
@@ -41,8 +42,9 @@ public class PSFTPCommands implements InteractiveSshCommand {
 		this.root = root;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public SshCommand rootCommand() {
-		return root;
+	public <C extends JadaptiveCommand> C rootCommand() {
+		return (C) root;
 	}
 }

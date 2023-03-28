@@ -13,7 +13,7 @@
 		<main.class>com.sshtools.pushsftp.jfx.PushSFTPUIApp</main.class>
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 		<gluonfx.maven.plugin.version>1.0.16</gluonfx.maven.plugin.version>
-		<javafx.version>19.0.2.1</javafx.version>
+		<javafx.version>17.0.7-ea+1</javafx.version>
 	</properties>
 	<url>https://jadaptive.com</url>
 	<licenses>

@@ -162,11 +162,7 @@ public abstract class SftpCommand extends ChildCommand {
 					(int) (seconds > 60 ? seconds / 60 : 0),
 					(int) (seconds % 60),
 					state);
-
-			if(isDone)
-				progress.message(Level.NORMAL, output, Optional.of(percentage));
-			else
-				progress.progressed(Optional.of((int)percentage), Optional.of(output));
+			progress.progressed(Optional.of((int)percentage), Optional.of(output));
 		}
 		return isDone;
 	}

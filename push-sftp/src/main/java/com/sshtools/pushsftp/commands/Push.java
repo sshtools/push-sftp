@@ -60,6 +60,9 @@ public class Push extends SftpCommand {
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
 	
+	@Option(names = { "-O", "--verbose" }, description = "verbose progress output")
+	boolean verboseOutput;
+	
 	@Override
 	protected Integer onCall() throws Exception {
 
@@ -90,6 +93,7 @@ public class Push extends SftpCommand {
 				withIntegrityVerification(verifyIntegrity).
 				withIgnoreIntegrity(ignoreIntegrity).
 				withSFTPForcing(forceSFTP).
+				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
 				withProgress(fileTransferProgress(progress, "Uploading {0}")).build());
 		}
