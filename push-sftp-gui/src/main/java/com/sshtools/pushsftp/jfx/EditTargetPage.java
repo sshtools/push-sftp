@@ -56,13 +56,17 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	private void save() {
-		var bldr = TargetBuilder.builder().withUsername(textOrPrompt(username)).withHostname(textOrPrompt(hostname))
-				.withPort(intTextfieldValue(port)).withDisplayName(optionalText(displayName))
-				.withIdentityPath(optionalText(privateKey)).withRemoteFolderPath(optionalText(remoteFolder));
+		var bldr = createTarget();
 		if (advanced != null)
 			advanced.save(bldr);
 		onSave.accept(bldr.build());
 		getTiles().remove(this);
+	}
+
+	private TargetBuilder createTarget() {
+		return TargetBuilder.builder().withUsername(textOrPrompt(username)).withHostname(textOrPrompt(hostname))
+				.withPort(intTextfieldValue(port)).withDisplayName(optionalText(displayName))
+				.withIdentityPath(optionalText(privateKey)).withRemoteFolderPath(optionalText(remoteFolder));
 	}
 
 	@FXML
@@ -86,6 +90,12 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	protected void onConfigure() {
 		username.setPromptText(System.getProperty("user.name"));
 		makeIntegerTextField(0, 65535, port);
+	}
+
+	@FXML
+	private void browseRemoteFolder() throws Exception {
+		var browser = getContext().getTiles().popup(BrowsePage.class, PageTransition.FROM_RIGHT);
+		browser.setTarget(createTarget().build());
 	}
 
 	@FXML

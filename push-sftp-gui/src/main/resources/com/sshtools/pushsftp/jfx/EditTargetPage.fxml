@@ -64,6 +64,7 @@
                                                 <Tooltip text="%remoteFolder.toolTip" />
                                              </tooltip>
                                           </TextField>
+                                          <Button mnemonicParsing="false" onAction="#browseRemoteFolder" text="%browse" />
                                        </children>
                                     </HBox>
                                  </children>
