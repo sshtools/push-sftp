@@ -1,3 +1,4 @@
 /target/
 *.iso
 /.install4j
+/run.sh
