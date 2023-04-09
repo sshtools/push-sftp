@@ -83,8 +83,8 @@ public class Push extends SftpCommand {
 				}).
 				withPrimarySftpClient(getSftpClient()).
 				withPaths(files).
-				withPreAllocation(!noPreAllocation).
-				withIgnoreCopyDataExtension(ignoreCopyDataExtension).
+//				withPreAllocation(!noPreAllocation).
+//				withIgnoreCopyDataExtension(ignoreCopyDataExtension).
 				withChunks(chunks).
 				withDigest(digest).
 				withBlocksize(blocksize).
@@ -92,7 +92,7 @@ public class Push extends SftpCommand {
 				withRemoteFolder(remoteFolder.orElse(Path.of(getSftpClient().pwd()))).
 				withIntegrityVerification(verifyIntegrity).
 				withIgnoreIntegrity(ignoreIntegrity).
-				withSFTPForcing(forceSFTP).
+//				withSFTPForcing(forceSFTP).
 				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
 				withProgress(fileTransferProgress(progress, "Uploading {0}")).build());
