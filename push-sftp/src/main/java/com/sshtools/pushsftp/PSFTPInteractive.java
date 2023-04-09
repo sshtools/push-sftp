@@ -11,6 +11,9 @@ import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.CliCommand;
 import com.sshtools.commands.ExceptionHandler;
+import com.sshtools.common.events.Event;
+import com.sshtools.common.events.EventCodes;
+import com.sshtools.common.events.EventListener;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
@@ -83,6 +86,12 @@ public class PSFTPInteractive extends CliCommand {
 	
 	@Option(names = { "-b", "--batch" }, paramLabel = "SCRIPT", description = "run a batch script")
 	Optional<File> batchFile;
+
+	@Option(names = { "-d", "--local-dir" }, paramLabel = "PATH", description = "The local directory to start in")
+    Optional<File> localDirectory;
+	
+	@Option(names = { "-r", "--remote-dir" }, paramLabel = "PATH", description = "The remote directory to start in")
+	Optional<String> remoteDirectory ;
 	
 	@Parameters(index = "0", arity = "0..1", description = "The remote server, with optional username.")
 	private Optional<String> destination;
@@ -102,8 +111,23 @@ public class PSFTPInteractive extends CliCommand {
 	@Override
 	protected void onConnected(SshClient ssh) {
 		try {
+			
+			ssh.getConnection().addEventListener(new EventListener() {
+
+				@Override
+				public void processEvent(Event evt) {
+					if(evt.getId() == EventCodes.EVENT_DISCONNECTED) {
+						getTerminal().getWriter().write("Remote disconnected. " + evt.getAttribute(EventCodes.ATTRIBUTE_REASON));
+						System.exit(0);
+					}
+				}
+				
+			});
 			sftp = new SftpClient(ssh);
 			sftp.lcd(getLcwd().getAbsolutePath());
+			if(remoteDirectory.isPresent()) {
+				sftp.cd(remoteDirectory.get());
+			}
 		} catch (SshException | PermissionDeniedException | IOException | SftpStatusException e) {
 			throw new IllegalStateException(e.getMessage(), e);
 		}
@@ -111,10 +135,17 @@ public class PSFTPInteractive extends CliCommand {
 
 	@Override
 	public int getPort() {
-		return cachedPort.orElse(super.getPort());
+		return cachedPort.orElse(port);
 	}
 	
 	protected boolean startCLI() throws IOException, InterruptedException {
+		
+		if(localDirectory.isPresent()) {
+			if(!localDirectory.get().exists()) {
+				getTerminal().error("{0} not found!", localDirectory.get().getPath());
+				return false;
+			}
+		}
 		if(batchFile.isEmpty()) {
 			return true;
 		}
@@ -235,5 +266,13 @@ public class PSFTPInteractive extends CliCommand {
 	@Override
 	protected Object createInteractiveCommand() {
 		return new PSFTPCommands(this);
+	}
+
+	@Override
+	protected File getLcwd() {
+		if(localDirectory.isPresent()) {
+			return localDirectory.get();
+		}
+		return super.getLcwd();
 	}
 }
