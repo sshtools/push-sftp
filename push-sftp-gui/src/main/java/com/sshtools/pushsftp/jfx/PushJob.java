@@ -123,9 +123,9 @@ public final class PushJob extends SshConnectionJob<Void> {
 		case CHUNKED_SFTP:
 			client.runTask(PushTaskBuilder.create().withClient(client).withChunks(chunks).withVerboseOutput()
 					.withRemoteFolder(target.remoteFolder()).withPaths(files)
-					.withIntegrityVerification(target.verifyIntegrity()).withIgnoreIntegrity(target.ignoreIntegrity())
-					.withIgnoreCopyDataExtension(!target.copyDataExtension()).withPreAllocation(target.preAllocate())
-					.withDigest(target.hash()).withSFTPForcing(target.mode() == Mode.CHUNKED_SFTP)
+					.withIntegrityVerification(target.verifyIntegrity())
+					.withIgnoreIntegrity(target.ignoreIntegrity())
+					.withDigest(target.hash())
 					.withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args))
 					.withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
 					build());
