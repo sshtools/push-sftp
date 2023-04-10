@@ -53,7 +53,7 @@ public class Ls extends SftpCommand {
 		}
 		
 		int printingColumns = 1;
-		if(maximumFilenameLength < (columns / 2)) {
+		if(maximumFilenameLength < (columns / 2) && maximumFilenameLength > 0) {
 			printingColumns = columns / maximumFilenameLength;
 		}
 		
