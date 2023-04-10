@@ -30,19 +30,12 @@ public class Push extends SftpCommand {
 	@Option(names = { "-v", "--verify" }, description = "verify the integrity of the remote file")
 	boolean verifyIntegrity = false;
 
-	@Option(names = { "-P", "--no-pre-allocate" }, description = "do not attemp to pre-allocate space for chunked transfers")
-	boolean noPreAllocation = false;
-
 	@Option(names = { "-d", "--digest" }, paramLabel = "md5|sha1|sha256|sha512", description = "The digest to use")
 	RemoteHash digest = RemoteHash.md5;
 
 	@Option(names = {
 			"-G", "--ignore-integrity" }, description = "ignore integrity check if remote server does not support a suitable SFTP extension")
 	boolean ignoreIntegrity = false;
-
-	@Option(names = {
-			"-C", "--no-copy-data" }, description = "ignore the 'copy-data' extension if the server supports it")
-	boolean ignoreCopyDataExtension = false;
 
 	@Option(names = { "-F", "--force-sftp" }, description = "force the use of SFTP for all transfers (default is to use SCP)")
 	boolean forceSFTP;
@@ -60,7 +53,7 @@ public class Push extends SftpCommand {
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
 	
-	@Option(names = { "-O", "--verbose" }, description = "verbose progress output")
+	@Option(names = { "-V", "--verbose" }, description = "verbose progress output")
 	boolean verboseOutput;
 	
 	@Override
@@ -83,8 +76,6 @@ public class Push extends SftpCommand {
 				}).
 				withPrimarySftpClient(getSftpClient()).
 				withPaths(files).
-//				withPreAllocation(!noPreAllocation).
-//				withIgnoreCopyDataExtension(ignoreCopyDataExtension).
 				withChunks(chunks).
 				withDigest(digest).
 				withBlocksize(blocksize).
@@ -92,7 +83,6 @@ public class Push extends SftpCommand {
 				withRemoteFolder(remoteFolder.orElse(Path.of(getSftpClient().pwd()))).
 				withIntegrityVerification(verifyIntegrity).
 				withIgnoreIntegrity(ignoreIntegrity).
-//				withSFTPForcing(forceSFTP).
 				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
 				withProgress(fileTransferProgress(progress, "Uploading {0}")).build());
