@@ -53,7 +53,7 @@ public class Push extends SftpCommand {
 	@Option(names = { "-T", "--timing" }, description = "time the transfer operation")
 	boolean timing;
 	
-	@Option(names = { "-V", "--verbose" }, description = "verbose progress output")
+	@Option(names = { "-B", "--verbose" }, description = "verbose progress output")
 	boolean verboseOutput;
 	
 	@Override
