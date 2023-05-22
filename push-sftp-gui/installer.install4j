@@ -10,7 +10,7 @@
         <entry>jna-*</entry>
         <entry>swt-*</entry>
         <entry>javafx-*</entry>
-        <entry>jkeychain-*</entry>
+        <entry>jkeychain*</entry>
         <entry>install4j-*</entry>
       </macSearchedJars>
     </codeSigning>
