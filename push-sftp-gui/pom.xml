@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.javakeyring</groupId>
