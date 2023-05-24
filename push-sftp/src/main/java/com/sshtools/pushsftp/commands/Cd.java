@@ -1,5 +1,7 @@
 package com.sshtools.pushsftp.commands;
 
+import com.sshtools.pushsftp.PSFTPInteractive;
+
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -14,6 +16,8 @@ public class Cd extends SftpCommand {
 	protected Integer onCall() throws Exception {
 
 		getSftpClient().cd(path);
+		PSFTPInteractive cmd = getInteractiveCommand().rootCommand();
+		cmd.setRemoteDirectory(path);
 		return 0;
 	}
 }

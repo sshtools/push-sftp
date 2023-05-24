@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>push-sftp</artifactId>
 	<parent>
@@ -14,6 +16,7 @@
 		<psftp.args>-X</psftp.args>
 		<graalvm.version>21.2.0</graalvm.version>
 		<main.class>com.sshtools.pushsftp.PSFTPInteractive</main.class>
+		<synergy.version>3.1.0-SNAPSHOT</synergy.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -24,24 +27,29 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-synergy-client</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-bc</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent-named-pipes</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
@@ -84,7 +92,8 @@
 									<mainClass>${main.class}</mainClass>
 									<skip>false</skip>
 									<imageName>push-sftp</imageName>
-									<buildArgs>--allow-incomplete-classpath --report-unsupported-elements-at-runtime
+									<buildArgs>--allow-incomplete-classpath
+										--report-unsupported-elements-at-runtime
 									</buildArgs>
 								</configuration>
 							</execution>
@@ -115,7 +124,9 @@
 								<phase>package</phase>
 								<configuration>
 									<target>
-										<copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/${project.artifactId}.jar" />
+										<copy
+											file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
+											tofile="${project.build.directory}/${project.artifactId}.jar" />
 									</target>
 								</configuration>
 								<goals>
@@ -128,7 +139,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
-							<outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+							<outputDirectory>
+								${project.build.directory}/dependencies</outputDirectory>
 						</configuration>
 						<executions>
 							<execution>
@@ -139,7 +151,8 @@
 								</goals>
 								<configuration>
 									<stripVersion>true</stripVersion>
-									<outputDirectory>${project.build.directory}/dependencies/common</outputDirectory>
+									<outputDirectory>
+										${project.build.directory}/dependencies/common</outputDirectory>
 									<stripVersion>true</stripVersion>
 								</configuration>
 							</execution>
@@ -162,7 +175,8 @@
 									</variables>
 									<release>${product.version}-${build.number}</release>
 									<mediaTypes>${build.mediaTypes}</mediaTypes>
-									<projectFile>${project.basedir}/installer.install4j</projectFile>
+									<projectFile>
+										${project.basedir}/installer.install4j</projectFile>
 								</configuration>
 							</execution>
 						</executions>
@@ -204,4 +218,14 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>oss-snapshots</id>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
 </project>

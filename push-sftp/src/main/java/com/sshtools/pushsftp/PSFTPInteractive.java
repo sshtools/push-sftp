@@ -275,4 +275,12 @@ public class PSFTPInteractive extends CliCommand {
 		}
 		return super.getLcwd();
 	}
+
+	public void setRemoteDirectory(String path) {
+		remoteDirectory = Optional.of(path);
+	}
+	
+	public void setLocalDirectory(File path) {
+		localDirectory = Optional.of(path);
+	}
 }
