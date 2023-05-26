@@ -2,3 +2,4 @@
 *.iso
 /.install4j
 /run.sh
+/logging.properties
