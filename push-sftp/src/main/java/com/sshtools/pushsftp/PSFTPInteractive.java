@@ -39,6 +39,7 @@ import com.sshtools.pushsftp.commands.Pwd;
 import com.sshtools.pushsftp.commands.Rm;
 import com.sshtools.pushsftp.commands.Rmdir;
 import com.sshtools.pushsftp.commands.Umask;
+import com.sshtools.synergy.nio.SshEngine;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -117,13 +118,19 @@ public class PSFTPInteractive extends CliCommand {
 				@Override
 				public void processEvent(Event evt) {
 					if(evt.getId() == EventCodes.EVENT_DISCONNECTED) {
-						getTerminal().getWriter().write("Remote disconnected. " + evt.getAttribute(EventCodes.ATTRIBUTE_REASON));
+						getTerminal().getWriter().write("Remote disconnected.");
+						getTerminal().getWriter().flush();
+						try {
+							SshEngine.getDefaultInstance().shutdownAndExit();
+						} catch (IOException e) {
+						}
 						System.exit(0);
 					}
 				}
 				
 			});
 			sftp = new SftpClient(ssh);
+			
 			sftp.lcd(getLcwd().getAbsolutePath());
 			if(remoteDirectory.isPresent()) {
 				sftp.cd(remoteDirectory.get());
