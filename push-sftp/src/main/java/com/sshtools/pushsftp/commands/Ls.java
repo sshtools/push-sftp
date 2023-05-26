@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpFile;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
@@ -93,7 +94,7 @@ public class Ls extends SftpCommand {
 		Collections.sort(results, (o1, o2) -> o1.getFilename().compareTo(o2.getFilename()));
 		
 		for(var result : results) {
-			System.out.println(result.getLongname());
+			System.out.println(SftpClient.formatLongname(result));
 		}
 	}
 
