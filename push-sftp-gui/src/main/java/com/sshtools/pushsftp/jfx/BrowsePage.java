@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
+import com.sshtools.client.sftp.SftpClient.SftpClientBuilder;
 import com.sshtools.jajafx.AbstractTile;
 
 import javafx.event.ActionEvent;
@@ -65,7 +66,7 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 		context.getContainer().getScheduler().execute(() -> {
 			try {
 				connection = job.call();
-				sftp = new SftpClient(connection);
+				sftp = SftpClientBuilder.create().withClient(connection).build();
 
 				var rootPath = Path.of(sftp.pwd());
 				var rootItem = new TreeItem<>(rootPath);

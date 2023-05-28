@@ -28,37 +28,75 @@
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
-			<artifactId>maverick-synergy-client</artifactId>
-			<version>${synergy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sshtools</groupId>
-			<artifactId>maverick-bc</artifactId>
-			<version>${synergy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sshtools</groupId>
-			<artifactId>maverick-sshagent</artifactId>
-			<version>${synergy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sshtools</groupId>
-			<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
-			<version>${synergy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sshtools</groupId>
-			<artifactId>maverick-sshagent-named-pipes</artifactId>
-			<version>${synergy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sshtools</groupId>
 			<artifactId>command-utils</artifactId>
 			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement></dependencyManagement>
 	<profiles>
+		<profile>
+			<id>maverick-synergy-hotfixes</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.sshtools.hotfixes</groupId>
+					<artifactId>maverick-synergy-client</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools.hotfixes</groupId>
+					<artifactId>maverick-bc</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools.hotfixes</groupId>
+					<artifactId>maverick-sshagent</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools.hotfixes</groupId>
+					<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools.hotfixes</groupId>
+					<artifactId>maverick-sshagent-named-pipes</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>maverick-synergy-os</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.sshtools</groupId>
+					<artifactId>maverick-synergy-client</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools</groupId>
+					<artifactId>maverick-bc</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools</groupId>
+					<artifactId>maverick-sshagent</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools</groupId>
+					<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sshtools</groupId>
+					<artifactId>maverick-sshagent-named-pipes</artifactId>
+					<version>${synergy.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
 		<!-- Graal Native Image -->
 		<profile>
 			<id>native-image</id>
@@ -161,7 +199,6 @@
 					<plugin>
 						<groupId>com.install4j</groupId>
 						<artifactId>install4j-maven</artifactId>
-						<version>9.0.5</version>
 						<executions>
 							<execution>
 								<id>compile-installers</id>

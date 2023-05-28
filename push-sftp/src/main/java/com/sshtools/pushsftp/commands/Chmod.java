@@ -1,6 +1,6 @@
 package com.sshtools.pushsftp.commands;
 
-import java.io.IOException;
+import com.sshtools.common.sftp.PosixPermissions.PosixPermissionsBuilder;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -20,22 +20,9 @@ public class Chmod extends SftpCommand  {
 
 	@Override
 	protected Integer onCall() throws Exception {
-		
-		int actualPermissions = parsePermissions(perms);
-		
-		expand(path, (fp) -> {
-			getSftpClient().chmod(actualPermissions, fp);
-		}, false);
+		expand(path, (fp) -> getSftpClient().chmod(PosixPermissionsBuilder.create().
+					withChmodArgumentString(perms).build(), fp), false);
 		return 0;
 	}
 
-	private int parsePermissions(String perms) throws IOException {
-		
-		if(perms.matches("\\d+")) {
-			return Integer.parseInt(perms, 8);
-		}
-		else {
-			throw new IOException("chmod only supports octal permissions");
-		}
-	}
 }

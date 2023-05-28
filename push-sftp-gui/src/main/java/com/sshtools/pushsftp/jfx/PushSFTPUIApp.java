@@ -18,7 +18,7 @@ import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
 import com.sshtools.jajafx.Tiles;
-import com.sshtools.jajafx.UpdatePage;
+import com.sshtools.jajafx.UpdatePage; 
 
 import javafx.application.Platform;
 import javafx.scene.Node;

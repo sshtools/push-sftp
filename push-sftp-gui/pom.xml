@@ -83,12 +83,12 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jaul</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>info.picocli</groupId>
@@ -219,53 +219,6 @@
 								<goals>
 									<goal>build</goal>
 								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<!-- Flatpak -->
-		<profile>
-			<id>flatpak</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>uk.co.bithatch</groupId>
-						<artifactId>maven-flatpak-plugin</artifactId>
-						<version>0.0.1-SNAPSHOT</version>
-						<executions>
-							<execution>
-								<id>pushsftp-jfx-native-image</id>
-								<phase>package</phase>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<configuration>
-									<modules>false</modules>
-									<manifest>
-										<sdkExtensions>
-											<sdkExtension>org.freedesktop.Sdk.Extension.openjdk17</sdkExtension>
-										</sdkExtensions>
-										<finishArgs>
-											<finishArg>--socket=session-bus</finishArg>
-											<finishArg>--socket=x11</finishArg>
-											<finishArg>--socket=ssh-auth</finishArg>
-											<finishArg>--device=dri</finishArg>
-											<finishArg>--share=network</finishArg>
-											<finishArg>--share=ipc</finishArg>
-											<finishArg>--filesystem=home</finishArg>
-										</finishArgs>
-									</manifest>
-									<launcherPreCommands>
-										<launcherPreCommand>/app/jre/bin/java -version</launcherPreCommand>
-									</launcherPreCommands>
-									<excludeArtifacts>
-										<excludeArtifact>com.install4j</excludeArtifact>
-									</excludeArtifacts>
-									<mainClass>com.sshtools.pushsftp.jfx.PushSFTPUI</mainClass>
-									<iconFile>src/main/svg/icon.svg</iconFile>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -439,7 +392,6 @@
 					<plugin>
 						<groupId>com.install4j</groupId>
 						<artifactId>install4j-maven</artifactId>
-						<version>10.0.4</version>
 						<executions>
 							<execution>
 								<id>compile-installers</id>

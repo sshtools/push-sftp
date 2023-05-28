@@ -199,7 +199,9 @@ public class DropTarget extends StackPane implements Initializable {
 				.withVerbose(prefs.getBoolean("verbose", false))
 				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
 				.withProgress(progress.createProgress(resources.getString("progressMessage"), files.size()))
-				.withPaths(files).withTarget(target).withPassphrasePrompt(context.createPassphrasePrompt(target))
+				.withPaths(files)
+				.withTarget(target)
+				.withPassphrasePrompt(context.createPassphrasePrompt(target))
 				.withPassword(context.createPasswordPrompt(target))
 				.build());
 	}

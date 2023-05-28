@@ -67,7 +67,7 @@ public class OptionsPage extends AbstractTile<PushSFTPUIApp> {
 		prefBind = new PrefBind(getContext().getContainer().getAppPreferences());
 		prefBind.bind(verbose, automaticUpdates);
 		prefBind.bind(agentSocket);
-		prefBind.bind(Phase.class, phase);
+		prefBind.bind(Phase.class, phase); 
 		prefBind.bind(DarkMode.class, darkMode);
 		agentSocket.setPromptText(System.getenv("SSH_AUTH_SOCK"));
 		

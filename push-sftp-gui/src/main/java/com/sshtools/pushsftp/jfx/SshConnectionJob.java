@@ -17,6 +17,7 @@ import com.sshtools.client.PasswordAuthenticator;
 import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
 import com.sshtools.client.PrivateKeyFileAuthenticator;
 import com.sshtools.client.SshClient;
+import com.sshtools.client.SshClient.SshClientBuilder;
 import com.sshtools.client.sftp.TransferCancelledException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.sequins.Progress;
@@ -169,7 +170,7 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 
 		try (var innerProgress = this.progress.newJob(RESOURCES.getString("progress.connection"), target.username(), //$NON-NLS-1$
 				target.hostname(), target.port())) {
-			var ssh = new SshClient(target.hostname(), target.port(), target.username());
+			var ssh = SshClientBuilder.create().withTarget(target.hostname(), target.port()).withUsername(target.username()).build();
 
 			if (target.agent()) {
 				try {
