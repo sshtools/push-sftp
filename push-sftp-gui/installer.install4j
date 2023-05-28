@@ -5,7 +5,7 @@
     <variables>
       <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
     </variables>
-    <codeSigning macEnabled="true" macPkcs12File="../jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="../jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com">
+    <codeSigning macEnabled="true" macPkcs12File="${compiler:env.HOME}/.jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="${compiler:env.HOME}/.jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com">
       <macSearchedJars>
         <entry>jna-*</entry>
         <entry>swt-*</entry>
