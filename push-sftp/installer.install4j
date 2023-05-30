@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.5" transformSequenceNumber="10">
+<install4j version="10.0.3" transformSequenceNumber="10">
   <directoryPresets config="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
@@ -1177,5 +1177,7 @@ return true;</property>
     </macosFolder>
     <linuxRPM name="Linux RPM" id="37" />
     <unixInstaller name="Unix Installer" id="46" />
+    <unixArchive name="Unix Archive" id="112" />
+    <windowsArchive name="Windows Archive" id="113" architecture="64" />
   </mediaSets>
 </install4j>
