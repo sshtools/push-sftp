@@ -37,8 +37,8 @@ public class Push extends SftpCommand {
 			"-G", "--ignore-integrity" }, description = "ignore integrity check if remote server does not support a suitable SFTP extension")
 	boolean ignoreIntegrity = false;
 
-	@Option(names = { "-F", "--force-sftp" }, description = "force the use of SFTP for all transfers (default is to use SCP)")
-	boolean forceSFTP;
+	//@Option(names = { "-F", "--force-sftp" }, description = "force the use of SFTP for all transfers (default is to use SCP)")
+	//boolean forceSFTP;
 
 	@Option(names = { "-r",
 			"--remote-dir" }, paramLabel = "PATH", description = "the directory on the remote host you want to transfer the files to")
