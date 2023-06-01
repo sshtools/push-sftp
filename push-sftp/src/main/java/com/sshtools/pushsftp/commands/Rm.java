@@ -11,7 +11,7 @@ public class Rm extends SftpCommand {
 	
 	@Override
 	protected Integer onCall() throws Exception {
-		getTerminal().message("Removing {0}", file);
+		getTerminal().messageln("Removing {0}", file);
 		getSftpClient().rm(file);
 		return 0;
 	}

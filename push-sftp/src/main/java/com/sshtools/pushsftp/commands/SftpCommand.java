@@ -136,7 +136,7 @@ public abstract class SftpCommand extends ChildCommand {
 
 			var remaining = (length - totalSoFar);
 			var perSecond = (long) (megabytesPerSecond * 1024);
-			var seconds = (remaining / perSecond) / 1000l;
+			var seconds = (remaining / Math.max(1, perSecond)) / 1000l;
 
 			var available = cols - 41;
 
