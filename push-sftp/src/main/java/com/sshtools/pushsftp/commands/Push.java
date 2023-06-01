@@ -3,7 +3,9 @@ package com.sshtools.pushsftp.commands;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.sshtools.client.sftp.RemoteHash;
 import com.sshtools.client.tasks.PushTask.PushTaskBuilder;
@@ -75,7 +77,7 @@ public class Push extends SftpCommand {
 					}
 				}).
 				withPrimarySftpClient(getSftpClient()).
-				withPaths(files).
+				withPaths(Arrays.asList(files).stream().map(this::resolveLocalPath).collect(Collectors.toList())).
 				withChunks(chunks).
 				withDigest(digest).
 				withBlocksize(blocksize).

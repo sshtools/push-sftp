@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.3" transformSequenceNumber="10">
+<install4j version="10.0.5" transformSequenceNumber="10">
   <directoryPresets config="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
@@ -35,6 +35,14 @@
     <launcher name="push-sftp" id="25" excludeFromMenu="true">
       <executable name="push-sftp" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
       <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${launcher:sys.launcherDirectory}">
+        <modulePath>
+          <directory location="lib" failOnError="false" />
+        </modulePath>
+      </java>
+    </launcher>
+    <launcher name="push-sftp-prompt" id="116" excludeFromMenu="true">
+      <executable name="push-sftp-prompt" redirectStderr="false" executableMode="console" changeWorkingDirectory="false" />
+      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${launcher:sys.launcherDirectory}" arguments="--prompt">
         <modulePath>
           <directory location="lib" failOnError="false" />
         </modulePath>
@@ -205,17 +213,16 @@ return console.askOkCancel(message, true);
               </action>
               <action id="109" beanClass="com.install4j.runtime.beans.actions.desktop.CreateStartMenuEntryAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
-                  <property name="arguments" type="string">--prompt</property>
                   <property name="entryName" type="string">Push SFTP Shell</property>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>push-sftp</string>
+                      <string>push-sftp-prompt</string>
                     </object>
                   </property>
                 </serializedBean>
                 <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
               </action>
-              <action id="110" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
+              <action id="110" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0" failureStrategy="askRetryQuit">
                 <serializedBean>
                   <property name="arguments" type="array" elementType="string" length="1">
                     <element index="0">--jaul-register</element>
@@ -225,6 +232,9 @@ return console.askOkCancel(message, true);
                       <string>push-sftp</string>
                     </object>
                   </property>
+                  <property name="stderrRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.OutputRedirectionMode" value="INHERIT" />
+                  <property name="stdinRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.InputRedirectionMode" value="INHERIT" />
+                  <property name="stdoutRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.OutputRedirectionMode" value="INHERIT" />
                   <property name="timeout" type="int" value="20" />
                   <property name="wait" type="boolean" value="true" />
                   <property name="workingDirectory">
@@ -292,7 +302,6 @@ return console.askYesNo(message, true);
           </screen>
           <screen id="27" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" rollbackBarrierExitCode="0">
             <actions>
-              <action id="29" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" actionElevationType="elevated" rollbackBarrierExitCode="0" />
               <action id="111" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
                   <property name="arguments" type="array" elementType="string" length="1">
@@ -312,6 +321,7 @@ return console.askYesNo(message, true);
                   </property>
                 </serializedBean>
               </action>
+              <action id="29" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" actionElevationType="elevated" rollbackBarrierExitCode="0" />
             </actions>
             <formComponents>
               <formComponent id="28" beanClass="com.install4j.runtime.beans.formcomponents.ProgressComponent">

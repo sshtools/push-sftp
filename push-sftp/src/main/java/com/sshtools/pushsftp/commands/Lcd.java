@@ -1,6 +1,6 @@
 package com.sshtools.pushsftp.commands;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import com.sshtools.pushsftp.PSFTPInteractive;
 
@@ -11,14 +11,14 @@ import picocli.CommandLine.Parameters;
 public class Lcd extends SftpCommand {
 
 	@Parameters(index = "0", paramLabel="PATH", description = "change directory to PATH", defaultValue = ".")
-	String path;
+	Path path;
 	
 	@Override
 	protected Integer onCall() throws Exception {
-
-		getSftpClient().lcd(path);
+		var resolvedPath = resolveLocalPath(path);
+		getSftpClient().lcd(resolvedPath.toString());
 		PSFTPInteractive cmd = getInteractiveCommand().rootCommand();
-		cmd.setLocalDirectory(new File(path));
+		cmd.setLocalDirectory(resolvedPath);
 		return 0;
 	}
 }

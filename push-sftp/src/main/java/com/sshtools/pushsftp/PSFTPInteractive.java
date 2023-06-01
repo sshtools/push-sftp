@@ -4,16 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
+import com.sshtools.client.sftp.SftpClient.SftpClientBuilder;
 import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.CliCommand;
 import com.sshtools.commands.ExceptionHandler;
-import com.sshtools.common.events.Event;
-import com.sshtools.common.events.EventCodes;
-import com.sshtools.common.events.EventListener;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
@@ -39,7 +39,6 @@ import com.sshtools.pushsftp.commands.Pwd;
 import com.sshtools.pushsftp.commands.Rm;
 import com.sshtools.pushsftp.commands.Rmdir;
 import com.sshtools.pushsftp.commands.Umask;
-import com.sshtools.synergy.nio.SshEngine;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -89,7 +88,7 @@ public class PSFTPInteractive extends CliCommand {
 	Optional<File> batchFile;
 
 	@Option(names = { "-d", "--local-dir" }, paramLabel = "PATH", description = "The local directory to start in")
-    Optional<File> localDirectory;
+    Optional<Path> localDirectory;
 	
 	@Option(names = { "-r", "--remote-dir" }, paramLabel = "PATH", description = "The remote directory to start in")
 	Optional<String> remoteDirectory ;
@@ -112,26 +111,9 @@ public class PSFTPInteractive extends CliCommand {
 	@Override
 	protected void onConnected(SshClient ssh) {
 		try {
+			sftp = SftpClientBuilder.create().withClient(ssh).build();
 			
-			ssh.getConnection().addEventListener(new EventListener() {
-
-				@Override
-				public void processEvent(Event evt) {
-					if(evt.getId() == EventCodes.EVENT_DISCONNECTED) {
-						getTerminal().getWriter().write("Remote disconnected.");
-						getTerminal().getWriter().flush();
-						try {
-							SshEngine.getDefaultInstance().shutdownAndExit();
-						} catch (IOException e) {
-						}
-						System.exit(0);
-					}
-				}
-				
-			});
-			sftp = new SftpClient(ssh);
-			
-			sftp.lcd(getLcwd().getAbsolutePath());
+			sftp.lcd(getLcwd().toAbsolutePath().toString());
 			if(remoteDirectory.isPresent()) {
 				sftp.cd(remoteDirectory.get());
 			}
@@ -148,8 +130,8 @@ public class PSFTPInteractive extends CliCommand {
 	protected boolean startCLI() throws IOException, InterruptedException {
 		
 		if(localDirectory.isPresent()) {
-			if(!localDirectory.get().exists()) {
-				getTerminal().error("{0} not found!", localDirectory.get().getPath());
+			if(!Files.exists(localDirectory.get())) {
+				getTerminal().error("{0} not found!", localDirectory.get());
 				return false;
 			}
 		}
@@ -276,18 +258,15 @@ public class PSFTPInteractive extends CliCommand {
 	}
 
 	@Override
-	protected File getLcwd() {
-		if(localDirectory.isPresent()) {
-			return localDirectory.get();
-		}
-		return super.getLcwd();
+	protected Path getLcwd() {
+		return localDirectory.orElse(super.getLcwd());
 	}
 
 	public void setRemoteDirectory(String path) {
 		remoteDirectory = Optional.of(path);
 	}
 	
-	public void setLocalDirectory(File path) {
+	public void setLocalDirectory(Path path) {
 		localDirectory = Optional.of(path);
 	}
 }

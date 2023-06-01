@@ -3,6 +3,7 @@ package com.sshtools.pushsftp.commands;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -14,6 +15,7 @@ import com.sshtools.client.sftp.SftpFile;
 import com.sshtools.client.sftp.SftpFileVisitor;
 import com.sshtools.client.tasks.FileTransferProgress;
 import com.sshtools.commands.ChildCommand;
+import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.FileUtils;
@@ -191,5 +193,25 @@ public abstract class SftpCommand extends ChildCommand {
 				report(progress, file, bytesSoFar, bytesTotal, started);
 			}
 		};
+	}
+
+	
+	protected Path resolveLocalPath(Path p) {
+		var expanded = expandPath(p);
+		Path resolved;
+		try {
+			resolved = Paths.get(getSftpClient().lpwd());
+		} catch (IOException | PermissionDeniedException e) {
+			throw new IllegalArgumentException("Could not expand path.");
+		}
+		return resolved.resolve(expanded);
+	}
+	
+	protected static Path expandPath(Path path) {
+		if(path.toString().startsWith("~/") || path.toString().startsWith("~\\")) {
+			return Paths.get(System.getProperty("user.home") + path.toString().substring(1));
+		}
+		else
+			return path;
 	}
 }
