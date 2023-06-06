@@ -12,8 +12,7 @@ module com.sshtools.pushsftp.jfx {
 	requires transitive com.sshtools.agent;
 	requires com.sshtools.simjac;
 	requires com.sshtools.twoslices;
-	//requires java.keyring;
-	requires com.github.javakeyring;
+	requires java.keyring;
 	opens com.sshtools.pushsftp.jfx;
 	exports com.sshtools.pushsftp.jfx;
 	requires org.freedesktop.dbus;
