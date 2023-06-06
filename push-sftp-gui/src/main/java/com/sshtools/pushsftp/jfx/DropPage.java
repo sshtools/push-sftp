@@ -84,7 +84,6 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	void about(ActionEvent evt) {
-		Toast.toast(ToastType.ERROR, getClass().getResource("error.png").toExternalForm(),  "Some title!", "Some content!");
 		getTiles().popup(AboutPage.class);
 	}
 
