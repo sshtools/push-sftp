@@ -2,6 +2,6 @@ package com.sshtools.pushsftp.jfx;
 
 public enum Mode {
 
-	SCP, SFTP, CHUNKED, CHUNKED_SFTP
+	SCP, SFTP, CHUNKED
 	
 }

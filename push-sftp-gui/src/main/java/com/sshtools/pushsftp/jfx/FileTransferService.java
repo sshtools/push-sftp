@@ -145,10 +145,9 @@ public class FileTransferService implements Closeable {
 				withIdentities(obj.getBoolean("defaultIdentities", true)).
 				withMode(Mode.valueOf(obj.getString("mode", Mode.CHUNKED.name()))).
 				withVerifyIntegrity(obj.getBoolean("verifyIntegrity", false)).
-				withPreAllocate(obj.getBoolean("preAllocate", true)).
+				withMultiplex(obj.getBoolean("multiplex", false)).
 				withIgnoreIntegrity(obj.getBoolean("ignoreIntegrity", false)).
 				withAuthenticationTimeout(obj.getInt("authenticationTimeout", 120)).
-				withCopyDataExtension(obj.getBoolean("copyDataExtension", false)).
 				withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name()))).
 				build();
 	}
@@ -166,10 +165,9 @@ public class FileTransferService implements Closeable {
 		bldr.add("defaultIdentities", target.identities());
 		bldr.add("mode", target.mode().name());
 		bldr.add("verifyIntegrity", target.verifyIntegrity());
-		bldr.add("preAllocate", target.preAllocate());
+		bldr.add("multiplex", target.multiplex());
 		bldr.add("ignoreIntegrity", target.ignoreIntegrity());
 		bldr.add("authenticationTimeout", target.authenticationTimeout());
-		bldr.add("copyDataExtension", target.copyDataExtension());
 		bldr.add("hash", target.hash().name());
 		return bldr.build();
 	}

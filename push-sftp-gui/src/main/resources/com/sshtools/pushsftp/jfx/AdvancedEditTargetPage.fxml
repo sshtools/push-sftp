@@ -15,7 +15,7 @@
 <?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.AdvancedEditTargetPage">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.AdvancedEditTargetPage">
    <center>
       <AnchorPane>   <children>
            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -89,14 +89,9 @@
                                           </TextField>
                                        </children>
                                     </HBox>
-                                    <CheckBox fx:id="copyDataExtension" mnemonicParsing="false" styleClass="lpad" text="%copyDataExtension">
+                                    <CheckBox fx:id="multiplex" mnemonicParsing="false" styleClass="lpad" text="%multiplex">
                                        <tooltip>
-                                          <Tooltip text="%copyDataExtension.toolTip" />
-                                       </tooltip>
-                                    </CheckBox>
-                                    <CheckBox fx:id="preAllocate" layoutX="10.0" layoutY="74.0" mnemonicParsing="false" styleClass="lpad" text="%preAllocate">
-                                       <tooltip>
-                                          <Tooltip text="%preAllocate.toolTip" />
+                                          <Tooltip text="%multiplex.toolTip" />
                                        </tooltip>
                                     </CheckBox>
                                  </children>

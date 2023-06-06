@@ -35,11 +35,9 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	CheckBox verifyIntegrity;
 	@FXML
+	CheckBox multiplex;
+	@FXML
 	CheckBox ignoreIntegrity;
-	@FXML
-	CheckBox preAllocate;
-	@FXML
-	CheckBox copyDataExtension;
 
 
 	@Override
@@ -56,9 +54,8 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 				withPassword(passwordAuthentication.isSelected()).
 				withIdentities(defaultIdentities.isSelected()).
 				withMode(mode.getSelectionModel().getSelectedItem()).
+				withMultiplex(multiplex.isSelected()).
 				withAgent(agentAuthentication.isSelected()).
-				withCopyDataExtension(copyDataExtension.isSelected()).
-				withPreAllocate(preAllocate.isSelected()).
 				withVerifyIntegrity(verifyIntegrity.isSelected()).
 				withIgnoreIntegrity(ignoreIntegrity.isSelected());
 	}
@@ -79,8 +76,6 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		var standardMode = Bindings.or(Bindings.equal(mode.valueProperty(), Mode.SCP), Bindings.equal(mode.valueProperty(), Mode.SFTP));
 		
 		chunks.disableProperty().bind(standardMode);
-		copyDataExtension.disableProperty().bind(standardMode);
-		preAllocate.disableProperty().bind(standardMode);
 		verifyIntegrity.disableProperty().bind(standardMode);
 		ignoreIntegrity.disableProperty().bind(standardMode);
 		hash.disableProperty().bind(standardMode);
@@ -107,10 +102,9 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		chunks.setText(String.valueOf(target.chunks()));
 		agentAuthentication.setSelected(target.agent());
 		passwordAuthentication.setSelected(target.password());
+		multiplex.setSelected(target.multiplex());
 		defaultIdentities.setSelected(target.identities());
 		mode.getSelectionModel().select(target.mode());
-		copyDataExtension.setSelected(target.copyDataExtension());
-		preAllocate.setSelected(target.preAllocate());
 		verifyIntegrity.setSelected(target.verifyIntegrity());
 		ignoreIntegrity.setSelected(target.ignoreIntegrity());
 		hash.getSelectionModel().select(target.hash());

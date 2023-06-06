@@ -24,8 +24,7 @@ public final class Target {
 		private Optional<Integer> chunks = Optional.empty();
 		private boolean verifyIntegrity;
 		private boolean ignoreIntegrity;
-		private boolean copyDataExtension = true;
-		private boolean preAllocate = true;
+		private boolean multiplex = false;
 		private Optional<RemoteHash> hash = Optional.empty();
 
 		public TargetBuilder withVerifyIntegrity(boolean verifyIntegrity) {
@@ -46,23 +45,15 @@ public final class Target {
 			return this;
 		}
 
-		public TargetBuilder withoutCopyDataExtension() {
-			return withCopyDataExtension(false);
+		public TargetBuilder withMultiplex() {
+			return withMultiplex(true);
 		}
 
-		public TargetBuilder withCopyDataExtension(boolean copyDataExtension) {
-			this.copyDataExtension = copyDataExtension;
+		public TargetBuilder withMultiplex(boolean multiplex) {
+			this.multiplex= multiplex;
 			return this;
 		}
 
-		public TargetBuilder withoutPreAllocate() {
-			return withPreAllocate(false);
-		}
-
-		public TargetBuilder withPreAllocate(boolean preAllocate) {
-			this.preAllocate = preAllocate;
-			return this;
-		}
 
 		public TargetBuilder withHash(RemoteHash hash) {
 			return withHash(Optional.of(hash));
@@ -210,8 +201,7 @@ public final class Target {
 	private final int chunks;
 	private final boolean verifyIntegrity;
 	private final boolean ignoreIntegrity;
-	private final boolean copyDataExtension;
-	private final boolean preAllocate;
+	private final boolean multiplex;
 	private final RemoteHash hash;
 
 	private Target(TargetBuilder builder) {
@@ -228,8 +218,7 @@ public final class Target {
 		this.chunks = builder.chunks.orElse(3);
 		this.verifyIntegrity = builder.verifyIntegrity;
 		this.ignoreIntegrity = builder.ignoreIntegrity;
-		this.copyDataExtension = builder.copyDataExtension;
-		this.preAllocate = builder.preAllocate;
+		this.multiplex = builder.multiplex;
 		this.hash = builder.hash.orElse(RemoteHash.sha512);
 		this.displayName = builder.displayName;
 	}
@@ -300,16 +289,12 @@ public final class Target {
 		return verifyIntegrity;
 	}
 
+	public boolean multiplex() {
+		return multiplex;
+	}
+
 	public boolean ignoreIntegrity() {
 		return ignoreIntegrity;
-	}
-
-	public boolean copyDataExtension() {
-		return copyDataExtension;
-	}
-
-	public boolean preAllocate() {
-		return preAllocate;
 	}
 
 	public RemoteHash hash() {

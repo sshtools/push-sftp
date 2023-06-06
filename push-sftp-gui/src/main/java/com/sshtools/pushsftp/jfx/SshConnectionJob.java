@@ -61,10 +61,15 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 		private Optional<String> agentName = Optional.empty();
 		private Optional<PassphrasePrompt> passphrasePrompt = Optional.empty();
 		private Optional<PasswordPrompt> password = Optional.empty();
+		private boolean closeProgressWhenDone = true;
+
+		public B withPassphrasePrompt(PassphrasePrompt passphrasePrompt) {
+			return withPassphrasePrompt(Optional.of(passphrasePrompt));
+		}
 
 		@SuppressWarnings("unchecked")
-		public B withPassphrasePrompt(PassphrasePrompt passphrasePrompt) {
-			this.passphrasePrompt = Optional.of(passphrasePrompt);
+		public B withPassphrasePrompt(Optional<PassphrasePrompt> passphrasePrompt) {
+			this.passphrasePrompt = passphrasePrompt;
 			return (B) this;
 		}
 
@@ -74,6 +79,12 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 
 		public B withPassword(PasswordPrompt password) {
 			return withPassword(Optional.of(password));
+		}
+
+		@SuppressWarnings("unchecked")
+		public B withoutCloseProgressWhenDone() {
+			closeProgressWhenDone = false;
+			return (B) this;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -134,6 +145,7 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 	protected final boolean verbose;
 	protected final Optional<PassphrasePrompt> passphrasePrompt;
 	protected final Optional<PasswordPrompt> password;
+	private final boolean closeProgressWhenDone;
 
 	protected SshConnectionJob(AbstractSshConnectionJobBuilder<?, ?> builder) {
 		this.target = builder.target.orElseThrow(() -> new IllegalStateException("Target must be provided.")); //$NON-NLS-1$
@@ -143,6 +155,7 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 		this.agentName = builder.agentName.orElse("PSFTP"); //$NON-NLS-1$
 		this.passphrasePrompt = builder.passphrasePrompt;
 		this.password = builder.password;
+		this.closeProgressWhenDone = builder.closeProgressWhenDone;
 	}
 
 	@Override
@@ -158,7 +171,8 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 			}
 			throw e;
 		} finally {
-			progress.close();
+			if(closeProgressWhenDone)
+				progress.close();
 		}
 	}
 

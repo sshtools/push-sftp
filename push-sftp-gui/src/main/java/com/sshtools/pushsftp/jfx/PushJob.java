@@ -120,9 +120,12 @@ public final class PushJob extends SshConnectionJob<Void> {
 	protected Void onConnected(SshClient client) throws Exception {
 		switch (target.mode()) {
 		case CHUNKED:
-		case CHUNKED_SFTP:
-			client.runTask(PushTaskBuilder.create().withClient(client).withChunks(chunks).withVerboseOutput()
-					.withRemoteFolder(target.remoteFolder()).withPaths(files)
+			client.runTask(PushTaskBuilder.create()
+					.withClients((idx) -> acquireClient(idx, client))
+					.withChunks(chunks)
+					.withVerboseOutput()
+					.withRemoteFolder(target.remoteFolder())
+					.withPaths(files)
 					.withIntegrityVerification(target.verifyIntegrity())
 					.withIgnoreIntegrity(target.ignoreIntegrity())
 					.withDigest(target.hash())
@@ -154,6 +157,29 @@ public final class PushJob extends SshConnectionJob<Void> {
 				MessageFormat.format(RESOURCES.getString("toast.completed.text"), files.size(), target.username(),
 						target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
 		return null;
+	}
+	
+	SshClient acquireClient(int index, SshClient defaultClient) {
+		if (index == 0 || target.multiplex())
+			return defaultClient;
+		else {
+			try {
+				return SshConnectionJob.forConnection().
+						withTarget(target).
+						withVerbose(verbose).
+						withAgentSocket(agentSocket).
+						withPassword(password).
+						withPassphrasePrompt(passphrasePrompt).
+						withProgress(progress).
+						withoutCloseProgressWhenDone().
+						build().
+						call();
+			} catch (RuntimeException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
 	}
 
 	private boolean report(Progress progress, String name, long totalSoFar, long length, long started) {
@@ -188,7 +214,7 @@ public final class PushJob extends SshConnectionJob<Void> {
 			var transferRate = String.format("%.1fMB/s", megabytesPerSecond); //$NON-NLS-1$
 			var perSecond = (long) (megabytesPerSecond * 1024);
 			var remaining = (length - totalSoFar);
-			var seconds = (remaining / perSecond) / 1000l;
+			var seconds = (remaining / Math.max(1, perSecond)) / 1000l;
 
 			var output = String.format("%s %4s %8s %10s %5d:%02d %-4s", name, percentageStr, humanBytes, transferRate, //$NON-NLS-1$
 					(int) (seconds > 60 ? seconds / 60 : 0), (int) (seconds % 60), state);

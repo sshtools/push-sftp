@@ -7,6 +7,10 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
@@ -18,14 +22,20 @@ import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
 import com.sshtools.jajafx.Tiles;
-import com.sshtools.jajafx.UpdatePage; 
+import com.sshtools.jajafx.UpdatePage;
+import com.sshtools.twoslices.ToastType;
+import com.sshtools.twoslices.ToasterFactory;
+import com.sshtools.twoslices.ToasterSettings.SystemTrayIconMode;
+import com.sshtools.twoslices.impl.JavaFXToaster;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
-	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUI.class.getName());
+	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUIApp.class.getName());
 
 	private FileTransferService service;
 	private Tiles<PushSFTPUIApp> tiles;
@@ -39,6 +49,57 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		} catch (BackendNotSupportedException e) {
 			e.printStackTrace();
 		}
+		
+
+
+		configureToaster();
+	}
+
+	private void configureToaster() {
+		var settings = ToasterFactory.getSettings();
+		var properties = settings.getProperties();
+		settings.setAppName(RESOURCES.getString("title")); 
+		settings.setSystemTrayIconMode(SystemTrayIconMode.HIDDEN);
+//		if(SystemUt) {
+			settings.setPreferredToasterClassName(JavaFXToaster.class.getName());
+//		}
+		properties.put(JavaFXToaster.DARK, isDarkMode());
+		ObservableList<String> l = FXCollections.observableArrayList();
+		addCommonStylesheets(l);
+		properties.put(JavaFXToaster.STYLESHEETS, l);
+		properties.put(JavaFXToaster.COLLAPSE_MESSAGE, RESOURCES.getString("collapse"));
+		properties.put(JavaFXToaster.THRESHOLD, 6);
+		properties.put(JavaFXToaster.TYPE_ICON_GENERATOR, new Function<ToastType, Node>() {
+			@Override
+			public Node apply(ToastType t) {
+				Node node = createNode(t);
+				if(node != null)
+					node.getStyleClass().addAll("icon-" + toTextName(t), "padded");
+				return node;
+			}
+			
+			private String toTextName(ToastType t) {
+				switch(t) {
+				case ERROR:
+					return "danger";
+				default:
+					return t.name().toLowerCase();
+				}
+			}
+
+			private Node createNode(ToastType t) {
+				switch(t) {
+				case ERROR:
+					return FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE, 48);
+				case WARNING:
+					return FontIcon.of(FontAwesomeSolid.EXCLAMATION_TRIANGLE, 48);
+				case INFO:
+					return FontIcon.of(FontAwesomeSolid.INFO_CIRCLE, 48);
+				default:
+					return null;
+				}
+			}
+		});
 	}
 
 	public final Tiles<PushSFTPUIApp> getTiles() {

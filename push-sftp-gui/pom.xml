@@ -73,7 +73,7 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>sequins</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
@@ -116,23 +116,23 @@
 			<version>1.8.1-jdk17</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-synergy-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-bc</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.sshtools.hotfixes</groupId>
+			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent-named-pipes</artifactId>
 		</dependency>
 	</dependencies>

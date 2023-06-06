@@ -9,6 +9,8 @@ import com.sshtools.jajafx.Carousel;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
+import com.sshtools.twoslices.Toast;
+import com.sshtools.twoslices.ToastType;
 
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -82,6 +84,7 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	void about(ActionEvent evt) {
+		Toast.toast(ToastType.ERROR, getClass().getResource("error.png").toExternalForm(),  "Some title!", "Some content!");
 		getTiles().popup(AboutPage.class);
 	}
 

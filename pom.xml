@@ -25,27 +25,27 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.sshtools.hotfixes</groupId>
+				<groupId>com.sshtools</groupId>
 				<artifactId>maverick-synergy-client</artifactId>
 				<version>${maverick.synergy.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sshtools.hotfixes</groupId>
+				<groupId>com.sshtools</groupId>
 				<artifactId>maverick-bc</artifactId>
 				<version>${maverick.synergy.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sshtools.hotfixes</groupId>
+				<groupId>com.sshtools</groupId>
 				<artifactId>maverick-sshagent</artifactId>
 				<version>${maverick.synergy.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sshtools.hotfixes</groupId>
+				<groupId>com.sshtools</groupId>
 				<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
 				<version>${maverick.synergy.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sshtools.hotfixes</groupId>
+				<groupId>com.sshtools</groupId>
 				<artifactId>maverick-sshagent-named-pipes</artifactId>
 				<version>${maverick.synergy.version}</version>
 			</dependency>
