@@ -60,7 +60,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		var properties = settings.getProperties();
 		settings.setAppName(RESOURCES.getString("title")); 
 		settings.setSystemTrayIconMode(SystemTrayIconMode.HIDDEN);
-		if( System.getProperty("os.name").toLowerCase().contains("mac os")) {
+		if( System.getProperty("os.name").toLowerCase().contains("mac os") || System.getProperty("os.name").toLowerCase().contains("windows")) {
 			settings.setPreferredToasterClassName(JavaFXToaster.class.getName());
 		}
 		properties.put(JavaFXToaster.DARK, isDarkMode());
