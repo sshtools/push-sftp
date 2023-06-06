@@ -202,12 +202,12 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 						}
 					} catch (IOException e) {
 						if (agentSocket.isPresent() && verbose) {
-							innerProgress.error(RESOURCES.getString("result.failedToConnectToAgent"), e); //$NON-NLS-1$
+							innerProgress.error(RESOURCES.getString("error.failedToConnectToAgent"), e); //$NON-NLS-1$
 						}
 					}
 				} catch (AgentNotAvailableException e) {
 					if (verbose)
-						innerProgress.error(RESOURCES.getString("result.noAgent")); //$NON-NLS-1$
+						innerProgress.error(RESOURCES.getString("error.noAgent")); //$NON-NLS-1$
 				}
 			} else {
 				if (verbose)
@@ -258,14 +258,14 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 									@Override
 									public String get() {
 										return password.orElseThrow(() -> new IllegalStateException(
-												RESOURCES.getString("result.passwordImpossible"))).get(); //$NON-NLS-1$
+												RESOURCES.getString("error.passwordImpossible"))).get(); //$NON-NLS-1$
 									}
 
 									@Override
 									public void completed(boolean success, String value,
 											ClientAuthenticator authenticator) {
 										password.orElseThrow(() -> new IllegalStateException(
-												RESOURCES.getString("result.passwordImpossible"))) //$NON-NLS-1$
+												RESOURCES.getString("error.passwordImpossible"))) //$NON-NLS-1$
 												.completed(success, value, authenticator);
 									}
 
@@ -285,11 +285,11 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 			}
 
 			if (!ssh.isConnected()) {
-				throw new IOException(RESOURCES.getString("result.noConnection")); //$NON-NLS-1$
+				throw new IOException(RESOURCES.getString("error.noConnection")); //$NON-NLS-1$
 			}
 
 			if (!ssh.isAuthenticated()) {
-				throw new IOException(RESOURCES.getString("result.failedAuthentication")); //$NON-NLS-1$
+				throw new IOException(RESOURCES.getString("error.failedAuthentication")); //$NON-NLS-1$
 			}
 
 			if (verbose)
@@ -304,13 +304,13 @@ public abstract class SshConnectionJob<V> implements Callable<V> {
 			@Override
 			public String getPasshrase(String keyinfo) {
 				return passphrasePrompt
-						.orElseThrow(() -> new IllegalStateException(RESOURCES.getString("result.noProgress"))) //$NON-NLS-1$
+						.orElseThrow(() -> new IllegalStateException(RESOURCES.getString("error.noProgress"))) //$NON-NLS-1$
 						.getPasshrase(keyinfo);
 			}
 
 			@Override
 			public void completed(boolean success, String value, ClientAuthenticator authenticator) {
-				passphrasePrompt.orElseThrow(() -> new IllegalStateException(RESOURCES.getString("result.noProgress"))) //$NON-NLS-1$
+				passphrasePrompt.orElseThrow(() -> new IllegalStateException(RESOURCES.getString("error.noProgress"))) //$NON-NLS-1$
 						.completed(success, value, authenticator);
 			}
 

@@ -4,6 +4,8 @@ import static com.sshtools.jajafx.FXUtil.emptyPathIfBlankString;
 
 import java.io.Closeable;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,48 +15,85 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import com.sshtools.client.sftp.RemoteHash;
+import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
+import com.sshtools.sequins.Progress;
 import com.sshtools.simjac.ConfigurationStoreBuilder;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class FileTransferService implements Closeable {
 
-	private ObservableList<Callable<Void>> jobs = FXCollections.observableArrayList();
-	private ScheduledExecutorService service;
-	private BooleanProperty busy = new SimpleBooleanProperty();
-	private ObservableList<Target> targets = loadTargets();
-	
-	public FileTransferService() {
+	private final ObservableList<Callable<Void>> jobs = FXCollections.observableArrayList();
+	private final ScheduledExecutorService service;
+	private final ObservableList<Target> targets = loadTargets();
+	private final ObservableList<Target> activeTargets = FXCollections.observableArrayList();
+	private final PushSFTPUIApp context;
+	private final BooleanProperty busy;
+	private final IntegerProperty active;
+
+	public FileTransferService(PushSFTPUIApp context) {
 		service = Executors.newSingleThreadScheduledExecutor();
+		this.context = context;
+		busy = new SimpleBooleanProperty();
+		busy.bind(Bindings.isNotEmpty(activeTargets));
+		active = new SimpleIntegerProperty();
+		active.bind(Bindings.size(activeTargets));
 	}
-	
+
 	public ReadOnlyBooleanProperty busyProperty() {
 		return busy;
 	}
-	
-	
+
+	public ReadOnlyIntegerProperty activeProperty() {
+		return active;
+	}
+
 	public final ObservableList<Target> getTargets() {
 		return targets;
 	}
 
-	public void submit(Callable<Void> task) {
+	public void drop(Progress progress, Target target, List<Path> files) {
+
+		var prefs = context.getContainer().getAppPreferences();
+		var agentSocket = prefs.get("agentSocket", "");
+
+		submit(target, PushJobBuilder.builder().withVerbose(prefs.getBoolean("verbose", false))
+				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
+				.withProgress(progress).withPaths(files).withTarget(target)
+				.withPassphrasePrompt(context.createPassphrasePrompt(target))
+				.withPassword(context.createPasswordPrompt(target)).build());
+	}
+	
+	public boolean isActive(Target target) {
+		return activeTargets.contains(target);
+	}
+
+	private void submit(Target target, Callable<Void> task) {
 		jobs.add(task);
 		service.submit(() -> {
 			try {
-				Platform.runLater(() -> busy.set(true));
+				Platform.runLater(() -> {
+					activeTargets.add(target);
+				});
 				task.call();
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				Platform.runLater(() -> busy.set(false));
+				Platform.runLater(() -> {
+					activeTargets.remove(target);
+					jobs.remove(task);
+				});
 			}
 		});
 	}
@@ -63,11 +102,10 @@ public class FileTransferService implements Closeable {
 	public void close() {
 		service.shutdown();
 	}
-	
-	
+
 	private static ObservableList<Target> loadTargets() {
 		ObservableList<Target> targets = FXCollections.observableArrayList();
-		
+
 //		var bldr = ConfigurationStoreBuilder.builder().
 //			withApp(PushSFTPUI.class).
 //			withName("targets").
@@ -96,60 +134,51 @@ public class FileTransferService implements Closeable {
 //		
 //		var store = bldr.build();
 //		store.retrieve();
-		
-		
-		
-		var bldr = ConfigurationStoreBuilder.builder().
-				withApp(PushSFTPUI.class).
-				withName("targets").
-				withoutFailOnMissingFile().
-				withDeserializer((j) -> {
+
+		var bldr = ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets")
+				.withoutFailOnMissingFile().withDeserializer((j) -> {
 					targets.clear();
 					var arr = j.asJsonArray();
-					for(var el : arr) {
+					for (var el : arr) {
 						targets.add(fromJsonObject(el.asJsonObject()));
 					}
-				}).
-				withSerializer(() -> {
+				}).withSerializer(() -> {
 					var ob = Json.createArrayBuilder();
-					for(var target : targets) {
+					for (var target : targets) {
 						ob.add(toJsonObject(target));
 					}
 					return ob.build();
 				});
-			
+
 		var store = bldr.build();
 		store.retrieve();
-		
-		if(targets.isEmpty()) {
+
+		if (targets.isEmpty()) {
 			targets.add(TargetBuilder.builder().build());
 		}
-		
+
 		targets.addListener((ListChangeListener.Change<? extends Target> c) -> {
 			store.store();
 		});
-		
+
 		return targets;
 	}
 
 	private static Target fromJsonObject(JsonObject obj) {
-		return TargetBuilder.builder().
-				withHostname(obj.getString("hostname", "")).
-				withUsername(obj.getString("username", "")).
-				withPort(obj.getInt("port", 22)).
-				withChunks(obj.getInt("chunks", 3)).
-				withIdentity(emptyPathIfBlankString(obj.getString("privateKey", ""))).
-				withRemoteFolder(emptyPathIfBlankString(obj.getString("remoteFolder", ""))).
-				withAgent(obj.getBoolean("agentAuthentication", true)).
-				withPassword(obj.getBoolean("passwordAuthentication", true)).
-				withIdentities(obj.getBoolean("defaultIdentities", true)).
-				withMode(Mode.valueOf(obj.getString("mode", Mode.CHUNKED.name()))).
-				withVerifyIntegrity(obj.getBoolean("verifyIntegrity", false)).
-				withMultiplex(obj.getBoolean("multiplex", false)).
-				withIgnoreIntegrity(obj.getBoolean("ignoreIntegrity", false)).
-				withAuthenticationTimeout(obj.getInt("authenticationTimeout", 120)).
-				withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name()))).
-				build();
+		return TargetBuilder.builder().withHostname(obj.getString("hostname", ""))
+				.withUsername(obj.getString("username", "")).withPort(obj.getInt("port", 22))
+				.withChunks(obj.getInt("chunks", 3))
+				.withIdentity(emptyPathIfBlankString(obj.getString("privateKey", "")))
+				.withRemoteFolder(emptyPathIfBlankString(obj.getString("remoteFolder", "")))
+				.withAgent(obj.getBoolean("agentAuthentication", true))
+				.withPassword(obj.getBoolean("passwordAuthentication", true))
+				.withIdentities(obj.getBoolean("defaultIdentities", true))
+				.withMode(Mode.valueOf(obj.getString("mode", Mode.CHUNKED.name())))
+				.withVerifyIntegrity(obj.getBoolean("verifyIntegrity", false))
+				.withMultiplex(obj.getBoolean("multiplex", false))
+				.withIgnoreIntegrity(obj.getBoolean("ignoreIntegrity", false))
+				.withAuthenticationTimeout(obj.getInt("authenticationTimeout", 120))
+				.withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name()))).build();
 	}
 
 	private static JsonValue toJsonObject(Target target) {

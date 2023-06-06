@@ -11,6 +11,8 @@ import java.util.function.Function;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
@@ -19,6 +21,7 @@ import com.sshtools.client.ClientAuthenticator;
 import com.sshtools.client.PassphrasePrompt;
 import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
 import com.sshtools.jajafx.AboutPage;
+import com.sshtools.jajafx.JajaApp;
 import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
 import com.sshtools.jajafx.Tiles;
@@ -36,6 +39,7 @@ import javafx.scene.Node;
 public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUIApp.class.getName());
+	final static Logger LOG = LoggerFactory.getLogger(JajaApp.class);
 
 	private FileTransferService service;
 	private Tiles<PushSFTPUIApp> tiles;
@@ -43,15 +47,12 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	public PushSFTPUIApp() {
 		super(PushSFTPUIApp.class.getResource("icon.png"), RESOURCES.getString("title"), (PushSFTPUI) PushSFTPUI.getInstance());
-		service = new FileTransferService();
+		service = new FileTransferService(this);
 		try {
 			keyring = Keyring.create();
 		} catch (BackendNotSupportedException e) {
-			e.printStackTrace();
+			LOG.warn("No keyrings supported.", e);
 		}
-		
-
-
 		configureToaster();
 	}
 

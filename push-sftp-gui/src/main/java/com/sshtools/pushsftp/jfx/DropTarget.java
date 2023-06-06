@@ -19,7 +19,6 @@ import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.Flinger;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
-import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -83,11 +82,11 @@ public class DropTarget extends StackPane implements Initializable {
 		
 		service = context.getService();
 		service.busyProperty().addListener((c, o, n) -> {
-			if (n) {
+			if (!fileIcon.isVisible() && n && service.isActive(target)) {
 				fileIcon.setOpacity(1);
 				fileIcon.setVisible(true);
 				anim.play();
-			} else {
+			} else if(fileIcon.isVisible() && !service.isActive(target)) {
 				anim.stop();
 				fileIcon.setVisible(false);
 			}
@@ -191,19 +190,7 @@ public class DropTarget extends StackPane implements Initializable {
 	}
 
 	private void drop(List<Path> files) {
-
-		var prefs = context.getContainer().getAppPreferences();
-		var agentSocket = prefs.get("agentSocket", "");
-
-		service.submit(PushJobBuilder.builder()
-				.withVerbose(prefs.getBoolean("verbose", false))
-				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
-				.withProgress(progress.createProgress(resources.getString("progressMessage"), files.size()))
-				.withPaths(files)
-				.withTarget(target)
-				.withPassphrasePrompt(context.createPassphrasePrompt(target))
-				.withPassword(context.createPasswordPrompt(target))
-				.build());
+		service.drop(progress.createProgress(resources.getString("progressMessage"), files.size()), target, files);
 	}
 	
 	private void showFolderText(boolean show) {
@@ -229,11 +216,11 @@ public class DropTarget extends StackPane implements Initializable {
 
 	private void updateFolderIcon() {
 		
-		if (mouseHovering || dragHovering || service.busyProperty().get()) {
+		if (mouseHovering || dragHovering || service.isActive(target)) {
 			folderIcon.setTranslateX(16);
 			folderIcon.setIconCode(FontAwesomeSolid.FOLDER_OPEN);
 			
-			showFolderText(mouseHovering && !dragHovering && !service.busyProperty().get());
+			showFolderText(mouseHovering && !dragHovering && !service.isActive(target));
 		}
 		else {			
 			showFolderText(false);

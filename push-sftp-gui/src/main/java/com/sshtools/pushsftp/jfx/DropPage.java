@@ -9,8 +9,6 @@ import com.sshtools.jajafx.Carousel;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.SequinsProgress;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
-import com.sshtools.twoslices.Toast;
-import com.sshtools.twoslices.ToastType;
 
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -61,19 +59,6 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 			}
 		}
 		throw new IllegalArgumentException("No such panel for target. " + target);
-	}
-
-	@Override
-	public void shown() {
-//		getTiles().getAccessories().getChildren().addAll(addTarget, about, options);
-//		getTiles().nextVisibleProperty().set(false);
-
-	}
-
-	@Override
-	public void hidden() {
-//		getTiles().getAccessories().getChildren().removeAll(addTarget, about, options);
-//		getTiles().nextVisibleProperty().set(true);
 	}
 
 	@FXML
