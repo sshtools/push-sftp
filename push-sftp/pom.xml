@@ -34,22 +34,27 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-synergy-client</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-bc</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent-jdk16-sockets</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>maverick-sshagent-named-pipes</artifactId>
+			<version>${synergy.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement></dependencyManagement>
