@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -148,6 +150,59 @@ public final class PushJob extends SshConnectionJob<Void> {
 		updateMessage(MessageFormat.format(RESOURCES.getString("error.failedToPush"), e, files.size(), //$NON-NLS-1$
 				e.getMessage() == null ? "" : e.getMessage())); //$NON-NLS-1$
 	}
+
+	@Deprecated
+    public Void resultNow() {
+		/* NOTE: This is a patch to get some methods available in Java 19 (we 
+		 * build with 17 currently). Will be removed when built and deployed with
+		 * Java 19+
+		 */
+        if (!isDone())
+            throw new IllegalStateException("Task has not completed");
+        boolean interrupted = false;
+        try {
+            while (true) {
+                try {
+                    return get();
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                } catch (ExecutionException e) {
+                    throw new IllegalStateException("Task completed with exception");
+                } catch (CancellationException e) {
+                    throw new IllegalStateException("Task was cancelled");
+                }
+            }
+        } finally {
+            if (interrupted) Thread.currentThread().interrupt();
+        }
+    }
+
+	@Deprecated
+    public Throwable exceptionNow() {
+		/* NOTE: This is a patch to get some methods available in Java 19 (we 
+		 * build with 17 currently). Will be removed when built and deployed with
+		 * Java 19+
+		 */
+        if (!isDone())
+            throw new IllegalStateException("Task has not completed");
+        if (isCancelled())
+            throw new IllegalStateException("Task was cancelled");
+        boolean interrupted = false;
+        try {
+            while (true) {
+                try {
+                    get();
+                    throw new IllegalStateException("Task completed with a result");
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                } catch (ExecutionException e) {
+                    return e.getCause();
+                }
+            }
+        } finally {
+            if (interrupted) Thread.currentThread().interrupt();
+        }
+    }
 
 	@Override
 	protected void cancelled() {

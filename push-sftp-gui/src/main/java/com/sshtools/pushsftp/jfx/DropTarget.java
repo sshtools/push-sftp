@@ -16,7 +16,6 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.sshtools.jajafx.FXUtil;
-import com.sshtools.jajafx.Flinger;
 import com.sshtools.jajafx.PageTransition;
 
 import javafx.animation.Animation;
