@@ -39,8 +39,8 @@
     </entries>
   </files>
   <launchers>
-    <launcher name="push-sftp-gui" id="52" menuName="FileDrop">
-      <executable name="push-sftp-gui" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
+    <launcher name="file-drop" id="52" menuName="FileDrop">
+      <executable name="file-drop" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
       <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
           <directory location="lib" failOnError="false" />
@@ -248,12 +248,12 @@ return true;</property>
                 <serializedBean>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>push-sftp-gui</string>
+                      <string>file-drop</string>
                     </object>
                   </property>
                   <property name="linkFile">
                     <object class="java.io.File">
-                      <string>/usr/local/bin/push-sftp-gui</string>
+                      <string>/usr/local/bin/file-drop</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -271,7 +271,7 @@ return true;</property>
                   <property name="entryName" type="string">FileDrop</property>
                   <property name="file">
                     <object class="java.io.File">
-                      <string>push-sftp-gui</string>
+                      <string>file-drop</string>
                     </object>
                   </property>
                 </serializedBean>
@@ -284,7 +284,7 @@ return true;</property>
                   </property>
                   <property name="executable">
                     <object class="java.io.File">
-                      <string>push-sftp-gui</string>
+                      <string>file-drop</string>
                     </object>
                   </property>
                   <property name="timeout" type="int" value="20" />
@@ -376,7 +376,7 @@ return console.askYesNo(message, true);
                   </property>
                   <property name="executable">
                     <object class="java.io.File">
-                      <string>push-sftp-gui</string>
+                      <string>file-drop</string>
                     </object>
                   </property>
                   <property name="timeout" type="int" value="20" />
