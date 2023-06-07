@@ -4,11 +4,13 @@ import static com.sshtools.jajafx.FXUtil.maybeQueue;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import org.controlsfx.control.NotificationPane;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
 import com.sshtools.jajafx.Tiles;
 import com.sshtools.jajafx.UpdatePage;
+import com.sshtools.twoslices.Toast;
 import com.sshtools.twoslices.ToastType;
 import com.sshtools.twoslices.ToasterFactory;
 import com.sshtools.twoslices.ToasterSettings.SystemTrayIconMode;
@@ -41,18 +44,24 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUIApp.class.getName());
 	final static Logger LOG = LoggerFactory.getLogger(JajaApp.class);
 
-	private FileTransferService service;
+	private final FileTransferService service;
+	private final Optional<Keyring> keyring;
+
 	private Tiles<PushSFTPUIApp> tiles;
-	private Keyring keyring;
 
 	public PushSFTPUIApp() {
 		super(PushSFTPUIApp.class.getResource("icon.png"), RESOURCES.getString("title"), (PushSFTPUI) PushSFTPUI.getInstance());
 		service = new FileTransferService(this);
+		
+		Optional<Keyring> k;
 		try {
-			keyring = Keyring.create();
+			k = Optional.of(Keyring.create());
 		} catch (BackendNotSupportedException e) {
 			LOG.warn("No keyrings supported.", e);
+			k = Optional.empty();
 		}
+		keyring = k;
+		
 		configureToaster();
 	}
 
@@ -116,7 +125,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	}
 
 	public boolean isKeyringAvailable() {
-		return keyring != null;
+		return keyring.isPresent();
 	}
 
 	@Override
@@ -135,9 +144,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			@Override
 			public String getPasshrase(String keyinfo) {
 				try {
-					if (keyring == null)
+					if (keyring.isEmpty())
 						throw new PasswordAccessException("No keyring.");
-					return keyring.getPassword(keyinfo, target.username());
+					return keyring.get().getPassword(keyinfo, target.username());
 				} catch (PasswordAccessException pae) {
 					return password(save, target.username(), RESOURCES.getString("passphraseDialog.title"));
 				}
@@ -173,9 +182,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			@Override
 			public String get() {
 				try {
-					if (keyring == null)
+					if (keyring.isEmpty())
 						throw new PasswordAccessException("No keyring.");
-					return keyring.getPassword(serviceName, target.username());
+					return keyring.get().getPassword(serviceName, target.username());
 				} catch (PasswordAccessException pae) {
 					return password(save, target.username(), RESOURCES.getString("passwordDialog.title"));
 				}
@@ -183,17 +192,17 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 			@Override
 			public void completed(boolean success, String value, ClientAuthenticator authenticator) {
-				if (keyring != null) {
+				keyring.ifPresent(k -> {
 					try {
 						if (success) {
 							if (save.get())
-								keyring.setPassword(serviceName, target.username(), value);
+								k.setPassword(serviceName, target.username(), value);
 						} else {
-							keyring.deletePassword(serviceName, target.username());
+							k.deletePassword(serviceName, target.username());
 						}
 					} catch (PasswordAccessException pae) {
 					}
-				}
+				});
 			}
 		};
 	}
@@ -236,5 +245,34 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		tiles.add(DropPage.class);
 		tiles.getStyleClass().add("padded");
 		return tiles;
+	}
+
+	public void notification(ToastType level, String title, String content) {
+		Toast.toast(level, title, content);
+		var dropPage = getTiles().getPage(DropPage.class);
+		var notificationPane = dropPage.notificationPane;
+
+		notificationPane.getStyleClass().removeAll("btn-warning", "btn-danger", "btn-info");
+		switch(level) {
+		case ERROR:
+			FontIcon gr = FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE);
+			notificationPane.setGraphic(gr);
+			notificationPane.getStyleClass().add("notification-danger");
+			break;
+		case WARNING:
+			gr = FontIcon.of(FontAwesomeSolid.EXCLAMATION_TRIANGLE);
+			notificationPane.setGraphic(gr);
+			notificationPane.getStyleClass().add("notification-warning");
+			break;
+		case INFO:
+			gr = FontIcon.of(FontAwesomeSolid.INFO_CIRCLE);
+			notificationPane.setGraphic(gr);
+			notificationPane.getStyleClass().add("notification-info");
+			break;
+		default:
+			notificationPane.setGraphic(null);
+			break;
+		}
+		notificationPane.show(title + ". " + content);
 	}
 }

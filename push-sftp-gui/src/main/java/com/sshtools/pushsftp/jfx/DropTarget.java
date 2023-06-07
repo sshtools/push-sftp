@@ -18,7 +18,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.Flinger;
 import com.sshtools.jajafx.PageTransition;
-import com.sshtools.jajafx.SequinsProgress;
 
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -55,7 +54,6 @@ public class DropTarget extends StackPane implements Initializable {
 	private FadeTransition fade;
 	private ResourceBundle resources;
 	private PushSFTPUIApp context;
-	private SequinsProgress progress;
 	private Target target;
 
 	public DropTarget() {
@@ -71,9 +69,8 @@ public class DropTarget extends StackPane implements Initializable {
 		return target;
 	}
 	
-	public DropTarget setup(Target target, PushSFTPUIApp context, SequinsProgress progress) {
+	public DropTarget setup(Target target, PushSFTPUIApp context) {
 		this.context = context;
-		this.progress = progress;
 		this.target = target;
 
 
@@ -124,10 +121,10 @@ public class DropTarget extends StackPane implements Initializable {
 
 	@FXML
 	void click(MouseEvent evt) {
-		var flinger = (Flinger)getParent().getParent();
-		if(flinger.isWasDragged()) {
-			return;
-		}
+//		var flinger = (Flinger)getParent().getParent();
+//		if(flinger.isWasDragged()) {
+//			return;
+//		}
 		var keyChooser = new FileChooser();
 		keyChooser.setTitle(resources.getString("drop.choose.title"));
 		FXUtil.chooseFileAndRememeber(context.getContainer().getAppPreferences(), keyChooser,
@@ -190,7 +187,7 @@ public class DropTarget extends StackPane implements Initializable {
 	}
 
 	private void drop(List<Path> files) {
-		service.drop(progress.createProgress(resources.getString("progressMessage"), files.size()), target, files);
+		service.drop(target, files);
 	}
 	
 	private void showFolderText(boolean show) {

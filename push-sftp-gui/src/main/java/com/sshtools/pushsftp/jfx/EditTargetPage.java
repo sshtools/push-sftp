@@ -18,7 +18,9 @@ import com.sshtools.jajafx.PageTransition;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
 public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
@@ -27,6 +29,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	TextField username;
+	@FXML
+	PasswordField unsafePassword;
 	@FXML
 	TextField hostname;
 	@FXML
@@ -37,6 +41,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	TextField privateKey;
 	@FXML
 	TextField remoteFolder;
+	@FXML
+	HBox unsafePasswordContainer;
 
 	private Consumer<Target> onSave;
 	private Optional<Runnable> onDelete;
@@ -64,9 +70,14 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	}
 
 	private TargetBuilder createTarget() {
-		return TargetBuilder.builder().withUsername(textOrPrompt(username)).withHostname(textOrPrompt(hostname))
-				.withPort(intTextfieldValue(port)).withDisplayName(optionalText(displayName))
-				.withIdentityPath(optionalText(privateKey)).withRemoteFolderPath(optionalText(remoteFolder));
+		return TargetBuilder.builder().
+				withUsername(textOrPrompt(username)).
+				withUnsafePassword(FXUtil.optionalText(unsafePassword.getText())).
+				withHostname(textOrPrompt(hostname)).
+				withPort(intTextfieldValue(port)).
+				withDisplayName(optionalText(displayName)).
+				withIdentityPath(optionalText(privateKey)).
+				withRemoteFolderPath(optionalText(remoteFolder));
 	}
 
 	@FXML
@@ -90,6 +101,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	protected void onConfigure() {
 		username.setPromptText(System.getProperty("user.name"));
 		makeIntegerTextField(0, 65535, port);
+		unsafePasswordContainer.managedProperty().bind(unsafePasswordContainer.visibleProperty());
 	}
 
 	@FXML
@@ -131,6 +143,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		privateKey.setText(target.identity().map(Path::toString).orElse(""));
 		remoteFolder.setText(target.remoteFolder().map(Path::toString).orElse(""));
 		remoteFolder.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
+		unsafePassword.setText(target.unsafePassword().orElse(""));
+		unsafePasswordContainer.setVisible(!getContext().isKeyringAvailable());
 	}
 
 	private void rebuildDisplayNamePrompt() {

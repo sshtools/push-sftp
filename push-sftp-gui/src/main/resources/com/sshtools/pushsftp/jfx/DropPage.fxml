@@ -1,39 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.sshtools.jajafx.Carousel?>
-<?import com.sshtools.jajafx.SequinsProgress?>
+<?import com.sshtools.jajafx.ScrollStack?>
+<?import eu.hansolo.medusa.Gauge?>
+<?import java.lang.String?>
 <?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.DropPage">
+<AnchorPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.DropPage">
    <children>
-      <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <center>
-            <AnchorPane BorderPane.alignment="CENTER">
-               <children>
-                  <BorderPane prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <center>
-                        <BorderPane>
-                           <center>
-                              <StackPane fx:id="dropAnimation" prefHeight="380.0">
-                                 <children>
-                        			<SequinsProgress fx:id="progress" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
-                        			<Carousel fx:id="carousel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
-                                 </children>
-                              </StackPane>
-                           </center>
-                        </BorderPane>
-                     </center>
-                     <bottom>
-                     </bottom>
-                  </BorderPane>
-               </children>
-            </AnchorPane>
-         </center>
+      <BorderPane fx:id="dropTop" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
             <BorderPane BorderPane.alignment="CENTER">
                <left>
@@ -48,11 +27,81 @@
                      <children>
                         <Hyperlink onAction="#about" text="%about" />
                         <Hyperlink onAction="#options" text="%options" />
+                        <Hyperlink layoutX="68.0" layoutY="26.0" onAction="#queue" text="%queue" />
                      </children>
                   </HBox>
                </right>
             </BorderPane>
          </bottom>
+         <center>
+            <BorderPane BorderPane.alignment="CENTER">
+               <bottom>
+                  <HBox fx:id="progressContainer" alignment="CENTER" styleClass="large-spaced" BorderPane.alignment="CENTER">
+                     <children>
+                        <BorderPane>
+                           <center>
+                              <Gauge fx:id="progressGauge" decimals="0" prefHeight="160.0" prefWidth="160.0" skinType="SIMPLE_SECTION" unit="\%" />
+                           </center>
+                           <top>
+                              <Label text="%progress" BorderPane.alignment="CENTER">
+                                 <styleClass>
+                                    <String fx:value="h3" />
+                                    <String fx:value="bpad" />
+                                 </styleClass>
+                              </Label>
+                           </top>
+                        </BorderPane>
+                        <BorderPane>
+                           <center>
+                              <Gauge fx:id="speedGauge" lcdDesign="BEIGE" prefHeight="160.0" prefWidth="160.0" skinType="SIMPLE_SECTION" unit="%mbitsSec" />
+                           </center>
+                           <top>
+                              <Label text="%throughput" BorderPane.alignment="CENTER">
+                                 <styleClass>
+                                    <String fx:value="h3" />
+                                    <String fx:value="bpad" />
+                                 </styleClass>
+                              </Label>
+                           </top>
+                        </BorderPane>
+                     </children>
+                  </HBox>
+               </bottom>
+               <center>
+                  <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="400.0" BorderPane.alignment="CENTER">
+                     <left>
+                        <Hyperlink fx:id="scrollPrevious" onAction="#previous" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-caret-left">
+                                 <styleClass>
+                                    <String fx:value="navigation-icon" />
+                                    <String fx:value="large-icon" />
+                                    <String fx:value="icon-accent" />
+                                 </styleClass>
+                              </FontIcon>
+                           </graphic>
+                        </Hyperlink>
+                     </left>
+                     <right>
+                        <Hyperlink fx:id="scrollNext" onAction="#next" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-caret-right">
+                                 <styleClass>
+                                    <String fx:value="navigation-icon" />
+                                    <String fx:value="large-icon" />
+                                    <String fx:value="icon-accent" />
+                                 </styleClass>
+                              </FontIcon>
+                           </graphic>
+                        </Hyperlink>
+                     </right>
+                     <center>
+                        <ScrollStack fx:id="scrollStack" BorderPane.alignment="CENTER" />
+                     </center>
+                  </BorderPane>
+               </center>
+            </BorderPane>
+         </center>
       </BorderPane>
    </children>
 </AnchorPane>

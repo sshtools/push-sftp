@@ -26,6 +26,15 @@ public final class Target {
 		private boolean ignoreIntegrity;
 		private boolean multiplex = false;
 		private Optional<RemoteHash> hash = Optional.empty();
+		private Optional<String> unsafePassword = Optional.empty();
+
+		public TargetBuilder withUnsafePassword(String unsafePassword) {
+			return withUnsafePassword(Optional.ofNullable(unsafePassword));
+		}
+		public TargetBuilder withUnsafePassword(Optional<String> unsafePassword) {
+			this.unsafePassword = unsafePassword;
+			return this;
+		}
 
 		public TargetBuilder withVerifyIntegrity(boolean verifyIntegrity) {
 			this.verifyIntegrity = verifyIntegrity;
@@ -98,6 +107,10 @@ public final class Target {
 		public TargetBuilder withUsername(Optional<String> username) {
 			this.username = username;
 			return this;
+		}
+
+		public TargetBuilder withDisplayName(String displayName) {
+			return withDisplayName(Optional.ofNullable(displayName));
 		}
 
 		public TargetBuilder withDisplayName(Optional<String> displayName) {
@@ -203,6 +216,7 @@ public final class Target {
 	private final boolean ignoreIntegrity;
 	private final boolean multiplex;
 	private final RemoteHash hash;
+	private final Optional<String> unsafePassword;
 
 	private Target(TargetBuilder builder) {
 		this.username = builder.username.orElse(System.getProperty("user.name"));
@@ -221,6 +235,7 @@ public final class Target {
 		this.multiplex = builder.multiplex;
 		this.hash = builder.hash.orElse(RemoteHash.sha512);
 		this.displayName = builder.displayName;
+		this.unsafePassword = builder.unsafePassword;
 	}
 
 	@Override
@@ -303,6 +318,10 @@ public final class Target {
 
 	public Optional<String> displayName() {
 		return displayName;
+	}
+
+	public Optional<String> unsafePassword() {
+		return unsafePassword;
 	}
 
 	public String getDefaultDisplayName() {

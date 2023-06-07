@@ -1,6 +1,8 @@
 package com.sshtools.pushsftp.jfx;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.sshtools.client.SshClient;
@@ -17,19 +20,13 @@ import com.sshtools.client.scp.ScpClientIO;
 import com.sshtools.client.tasks.FileTransferProgress;
 import com.sshtools.client.tasks.PushTask.PushTaskBuilder;
 import com.sshtools.client.tasks.UploadFileTask.UploadFileTaskBuilder;
-import com.sshtools.common.util.FileUtils;
-import com.sshtools.common.util.IOUtils;
-import com.sshtools.sequins.Progress;
-import com.sshtools.sequins.Progress.Level;
-import com.sshtools.twoslices.Toast;
-import com.sshtools.twoslices.ToastType;
 
 public final class PushJob extends SshConnectionJob<Void> {
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushJob.class.getName());
 
 	@FunctionalInterface
 	public interface Reporter {
-		void report(String name, double percentage, long length, long totalSoFar, long time);
+		void report(PushJob job, long length, long totalSoFar, long time);
 	}
 
 	public final static class PushJobBuilder extends AbstractSshConnectionJobBuilder<PushJob, PushJobBuilder> {
@@ -102,18 +99,7 @@ public final class PushJob extends SshConnectionJob<Void> {
 		this.chunks = builder.chunks;
 		this.reporter = builder.reporter;
 
-	}
-
-	@Override
-	protected void onFailed(Exception e) {
-
-		progress.error(RESOURCES.getString("result.failedToPush"), e, files.size(), //$NON-NLS-1$
-				e.getMessage() == null ? "" : e.getMessage()); //$NON-NLS-1$
-
-		Toast.toast(ToastType.ERROR, RESOURCES.getString("toast.error.title"), //$NON-NLS-1$ //$NON-NLS-2$
-				MessageFormat.format(RESOURCES.getString("toast.error.text"), files.size(), target.username(),
-						target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
-
+		updateMessage(RESOURCES.getString("waiting"));
 	}
 
 	@Override
@@ -129,8 +115,8 @@ public final class PushJob extends SshConnectionJob<Void> {
 					.withIntegrityVerification(target.verifyIntegrity())
 					.withIgnoreIntegrity(target.ignoreIntegrity())
 					.withDigest(target.hash())
-					.withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args))
-					.withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
+					.withProgressMessages((fmt, args) -> updateMessage(MessageFormat.format(fmt, args)))
+					.withProgress(fileTransferProgress(RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
 					build());
 			break;
 		case SCP:
@@ -139,7 +125,7 @@ public final class PushJob extends SshConnectionJob<Void> {
 				try (var in = Files.newInputStream(file)) {
 					scp.put(in, Files.size(file), file.toString(),
 							target.remoteFolder().map(r -> r.toString()).orElse(""), true, //$NON-NLS-1$
-							fileTransferProgress(progress, RESOURCES.getString("progress.uploading")));
+							fileTransferProgress(RESOURCES.getString("progress.uploading")));
 				}
 			}
 			break;
@@ -147,20 +133,29 @@ public final class PushJob extends SshConnectionJob<Void> {
 			for (var file : files) {
 				client.runTask(UploadFileTaskBuilder.create().withClient(client).withLocalFile(file.toFile())
 						.withRemote(target.remoteFolder())
-						.withProgress(fileTransferProgress(progress, RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
+						.withProgress(fileTransferProgress(RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
 						build());
 			}
 			break;
 		}
-		progress.message(Level.VERBOSE, RESOURCES.getString("completed")); //$NON-NLS-1$
-		Toast.toast(ToastType.INFO, RESOURCES.getString("toast.completed.title"), //$NON-NLS-1$ //$NON-NLS-2$
-				MessageFormat.format(RESOURCES.getString("toast.completed.text"), files.size(), target.username(),
-						target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
+		updateMessage(RESOURCES.getString("completed")); //$NON-NLS-1$
 		return null;
 	}
 	
+	@Override
+	protected void failed() {
+		var e = exceptionNow();
+		updateMessage(MessageFormat.format(RESOURCES.getString("error.failedToPush"), e, files.size(), //$NON-NLS-1$
+				e.getMessage() == null ? "" : e.getMessage())); //$NON-NLS-1$
+	}
+
+	@Override
+	protected void cancelled() {
+		updateMessage(RESOURCES.getString("cancelled")); //$NON-NLS-1$
+	}
+
 	SshClient acquireClient(int index, SshClient defaultClient) {
-		if (index == 0 || target.multiplex())
+		if (index == 0 || target.multiplex() || target.chunks() < 2)
 			return defaultClient;
 		else {
 			try {
@@ -170,8 +165,6 @@ public final class PushJob extends SshConnectionJob<Void> {
 						withAgentSocket(agentSocket).
 						withPassword(password).
 						withPassphrasePrompt(passphrasePrompt).
-						withProgress(progress).
-						withoutCloseProgressWhenDone().
 						build().
 						call();
 			} catch (RuntimeException e) {
@@ -182,71 +175,56 @@ public final class PushJob extends SshConnectionJob<Void> {
 		}
 	}
 
-	private boolean report(Progress progress, String name, long totalSoFar, long length, long started) {
+	private boolean report(String name, long totalSoFar, long length, long started) {
 
 		if (totalSoFar > 0) {
-			var percentage = ((double) totalSoFar / (double) length) * 100;
 			var time = (System.currentTimeMillis() - started);
-
-			reporter.orElse(new ProgressReporter(progress)).report(name, percentage, length, totalSoFar, time);
+			updateProgress(totalSoFar, length);
+			reporter.ifPresent(r -> r.report(this, length, totalSoFar, time));
 		}
 		return totalSoFar >= length;
 	}
 
-	public static class ProgressReporter implements Reporter {
-
-		private Progress progress;
-
-		public ProgressReporter(Progress progress) {
-			this.progress = progress;
-		}
-
-		@Override
-		public void report(String name, double percentage, long length, long totalSoFar, long time) {
-			var state = RESOURCES.getString("eta"); //$NON-NLS-1$
-			if (totalSoFar >= length) {
-				state = RESOURCES.getString("done"); //$NON-NLS-1$
+	private FileTransferProgress fileTransferProgress(String messagePattern) {
+		var allFilesTotal = files.stream().map(f -> {
+			try {
+				return Files.size(f);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
-			var percentageStr = String.format("%.0f%%", percentage); //$NON-NLS-1$
-			var humanBytes = IOUtils.toByteSize(totalSoFar);
-
-			var megabytesPerSecond = (totalSoFar / time) / 1024D;
-			var transferRate = String.format("%.1fMB/s", megabytesPerSecond); //$NON-NLS-1$
-			var perSecond = (long) (megabytesPerSecond * 1024);
-			var remaining = (length - totalSoFar);
-			var seconds = (remaining / Math.max(1, perSecond)) / 1000l;
-
-			var output = String.format("%s %4s %8s %10s %5d:%02d %-4s", name, percentageStr, humanBytes, transferRate, //$NON-NLS-1$
-					(int) (seconds > 60 ? seconds / 60 : 0), (int) (seconds % 60), state);
-			progress.progressed(Optional.of((int) percentage), Optional.of(output));
-
-		}
-
-	}
-
-	private FileTransferProgress fileTransferProgress(Progress progress, String messagePattern) {
-		return new FileTransferProgress() {
-			private long bytesTotal;
-			private long started;
-			private String file;
+		}).collect(Collectors.summarizingLong(Long::longValue)).getSum();
+		var total = new AtomicLong();
+		var started = new AtomicLong(-1);
+		
+		return new RateLimitedFileTransferProgress(new FileTransferProgress() {
+			private long bytesSoFar;
+			private String message;
 
 			@Override
 			public void started(long bytesTotal, String file) {
-				this.started = System.currentTimeMillis();
-				this.bytesTotal = bytesTotal;
-				this.file = FileUtils.getFilename(file);
-				progress.message(Level.NORMAL, messagePattern, this.file);
+				this.bytesSoFar = 0;
+				if(started.get() == -1) {
+					started.set(System.currentTimeMillis());
+					if(files.size() == 1)
+						message = file;
+					else
+						message = MessageFormat.format(RESOURCES.getString("fileCount"), files.size());
+					updateMessage(MessageFormat.format(messagePattern, message));
+				}
 			}
 
 			@Override
 			public boolean isCancelled() {
-				return progress.isCancelled();
+				return PushJob.this.isCancelled();
 			}
 
 			@Override
 			public void progressed(long bytesSoFar) {
-				report(progress, file, bytesSoFar, bytesTotal, started);
+				var add = bytesSoFar - this.bytesSoFar;
+				var t = total.addAndGet(add);
+				this.bytesSoFar = bytesSoFar;
+				report(message, t, allFilesTotal, started.get());
 			}
-		};
+		}, 50);
 	}
 }

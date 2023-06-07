@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -14,7 +15,7 @@
 <?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.EditTargetPage">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.EditTargetPage">
    <center>
       <AnchorPane>   <children>
            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -86,6 +87,24 @@
                                                       <Tooltip text="%username.toolTip" />
                                                    </tooltip>
                                                 </TextField>
+                                             </children>
+                                          </HBox>
+                                          <HBox fx:id="unsafePasswordContainer" alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" styleClass="spaced">
+                                             <children>
+                                                <Label prefWidth="120.0" text="%unsafePassword" />
+                                                <PasswordField fx:id="unsafePassword">
+                                                   <tooltip>
+                                                      <Tooltip text="%unsafePassword.toolTip" />
+                                                   </tooltip>
+                                                </PasswordField>
+                                                <Label>
+                                                   <graphic>
+                                                      <FontIcon iconLiteral="fas-exclamation-triangle" styleClass="icon-warning" />
+                                                   </graphic>
+                                                   <tooltip>
+                                                      <Tooltip text="%unsafePassword.toolTip" />
+                                                   </tooltip>
+                                                </Label>
                                              </children>
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" styleClass="spaced">

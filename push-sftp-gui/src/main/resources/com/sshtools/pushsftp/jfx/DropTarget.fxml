@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#drop" onDragEntered="#dragEnter" onDragExited="#dragExit" onDragOver="#dragOver" prefHeight="380.0" prefWidth="340.0" type="StackPane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onDragDropped="#drop" onDragEntered="#dragEnter" onDragExited="#dragExit" onDragOver="#dragOver" prefHeight="340.0" prefWidth="340.0" type="StackPane" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
 	<children>
       <Label fx:id="displayName" contentDisplay="RIGHT" layoutX="141.0" layoutY="192.0" styleClass="pill-accent" text="Display Name" translateY="-142.0">
          <graphic>

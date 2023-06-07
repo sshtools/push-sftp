@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>push-sftp-gui</artifactId>
 	<parent>
@@ -39,6 +41,12 @@
 		</developer>
 	</developers>
 	<dependencies>
+		<dependency>
+			<groupId>eu.hansolo</groupId>
+			<artifactId>medusa</artifactId>
+			<version>16.0.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.github.palexdev</groupId>
 			<artifactId>scenicview</artifactId>
@@ -90,16 +98,16 @@
 			<artifactId>jaul</artifactId>
 			<version>0.0.4-SNAPSHOT</version>
 		</dependency>
-        <dependency>
-            <groupId>pt.davidafsilva.apple</groupId>
-            <artifactId>jkeychain</artifactId>
-               <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>4.6.1</version>
-        </dependency>
+		<dependency>
+			<groupId>pt.davidafsilva.apple</groupId>
+			<artifactId>jkeychain</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.6.1</version>
+		</dependency>
 		<dependency>
 			<groupId>com.github.javakeyring</groupId>
 			<artifactId>java-keyring</artifactId>
@@ -252,7 +260,9 @@
 								<phase>package</phase>
 								<configuration>
 									<target>
-										<copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/${project.artifactId}.jar" />
+										<copy
+											file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
+											tofile="${project.build.directory}/${project.artifactId}.jar" />
 									</target>
 								</configuration>
 								<goals>
@@ -265,7 +275,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<configuration>
-							<outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+							<outputDirectory>
+								${project.build.directory}/dependencies</outputDirectory>
 						</configuration>
 						<executions>
 							<execution>
@@ -276,7 +287,8 @@
 								</goals>
 								<configuration>
 									<stripVersion>true</stripVersion>
-									<outputDirectory>${project.build.directory}/dependencies/common</outputDirectory>
+									<outputDirectory>
+										${project.build.directory}/dependencies/common</outputDirectory>
 									<stripVersion>true</stripVersion>
 									<excludeClassifiers>linux,mac,win,jpms</excludeClassifiers>
 								</configuration>
@@ -289,7 +301,8 @@
 								</goals>
 								<configuration>
 									<stripVersion>true</stripVersion>
-									<outputDirectory>${project.build.directory}/dependencies/win</outputDirectory>
+									<outputDirectory>
+										${project.build.directory}/dependencies/win</outputDirectory>
 									<artifactItems>
 										<artifactItem>
 											<groupId>org.openjfx</groupId>
@@ -326,7 +339,8 @@
 								</goals>
 								<configuration>
 									<stripVersion>true</stripVersion>
-									<outputDirectory>${project.build.directory}/dependencies/mac</outputDirectory>
+									<outputDirectory>
+										${project.build.directory}/dependencies/mac</outputDirectory>
 									<artifactItems>
 										<artifactItem>
 											<groupId>org.openjfx</groupId>
@@ -363,7 +377,8 @@
 								</goals>
 								<configuration>
 									<stripVersion>true</stripVersion>
-									<outputDirectory>${project.build.directory}/dependencies/linux</outputDirectory>
+									<outputDirectory>
+										${project.build.directory}/dependencies/linux</outputDirectory>
 									<artifactItems>
 										<artifactItem>
 											<groupId>org.openjfx</groupId>
@@ -410,7 +425,8 @@
 									</variables>
 									<release>${product.version}-${build.number}</release>
 									<mediaTypes>${build.mediaTypes}</mediaTypes>
-									<projectFile>${project.basedir}/installer.install4j</projectFile>
+									<projectFile>
+										${project.basedir}/installer.install4j</projectFile>
 								</configuration>
 							</execution>
 						</executions>
@@ -419,7 +435,7 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 	<repositories>
 		<repository>
 			<id>jitpack.io</id>

@@ -39,7 +39,7 @@
     </entries>
   </files>
   <launchers>
-    <launcher name="push-sftp-gui" id="52" menuName="Push SFTP GUI">
+    <launcher name="push-sftp-gui" id="52" menuName="FileDrop">
       <executable name="push-sftp-gui" iconSet="true" executableMode="gui" changeWorkingDirectory="false" />
       <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
@@ -1278,5 +1278,6 @@ return true;</property>
         <entry location="win" />
       </exclude>
     </unixInstaller>
+    <macos name="macOS Single Bundle" id="135" launcherId="52" />
   </mediaSets>
 </install4j>

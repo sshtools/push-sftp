@@ -4,6 +4,7 @@ module com.sshtools.pushsftp.jfx {
 	requires transitive com.sshtools.jajafx;
 	requires org.kordamp.ikonli.fontawesome5;
 	requires com.sshtools.sequins;
+	requires org.controlsfx.controls;
 	requires info.picocli;
 	requires org.kordamp.ikonli.javafx;
 	requires com.sshtools.common.logger;
@@ -11,8 +12,9 @@ module com.sshtools.pushsftp.jfx {
 	requires transitive com.sshtools.synergy.client;
 	requires transitive com.sshtools.agent;
 	requires com.sshtools.simjac;
-	requires com.sshtools.twoslices;
+	requires transitive com.sshtools.twoslices;
 	requires java.keyring;
+	requires eu.hansolo.medusa;
 	opens com.sshtools.pushsftp.jfx;
 	exports com.sshtools.pushsftp.jfx;
 	requires org.freedesktop.dbus;
