@@ -3,6 +3,7 @@ package com.sshtools.pushsftp.jfx;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
@@ -153,8 +154,11 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 
 		updateMessage(MessageFormat.format(RESOURCES.getString("progress.connection"), target.username(), //$NON-NLS-1$
 				target.hostname(), target.port()));
-		var ssh = SshClientBuilder.create().withTarget(target.hostname(), target.port()).withUsername(target.username())
-				.build();
+		var ssh = SshClientBuilder.create().
+				withTarget(target.hostname(), target.port()).
+				withUsername(target.username()).
+				withConnectTimeout(Duration.ofSeconds(10)).
+				build();
 
 		if (target.agent()) {
 			try {

@@ -26,6 +26,48 @@ import com.sshtools.client.tasks.UploadFileTask.UploadFileTaskBuilder;
 public final class PushJob extends SshConnectionJob<Void> {
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushJob.class.getName());
 
+	private final class PushProgress implements FileTransferProgress {
+		private final AtomicLong started;
+		private final AtomicLong total;
+		private final long allFilesTotal;
+		private final String messagePattern;
+		private long bytesSoFar;
+		private String message;
+
+		private PushProgress(AtomicLong started, AtomicLong total, long allFilesTotal, String messagePattern) {
+			this.started = started;
+			this.total = total;
+			this.allFilesTotal = allFilesTotal;
+			this.messagePattern = messagePattern;
+		}
+
+		@Override
+		public void started(long bytesTotal, String file) {
+			this.bytesSoFar = 0;
+			if(started.get() == -1) {
+				started.set(System.currentTimeMillis());
+				if(files.size() == 1)
+					message = file;
+				else
+					message = MessageFormat.format(RESOURCES.getString("fileCount"), files.size());
+				updateMessage(MessageFormat.format(messagePattern, message));
+			}
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return PushJob.this.isCancelled();
+		}
+
+		@Override
+		public void progressed(long bytesSoFar) {
+			var add = bytesSoFar - this.bytesSoFar;
+			var t = total.addAndGet(add);
+			this.bytesSoFar = bytesSoFar;
+			report(message, t, allFilesTotal, started.get());
+		}
+	}
+
 	@FunctionalInterface
 	public interface Reporter {
 		void report(PushJob job, long length, long totalSoFar, long time);
@@ -251,35 +293,6 @@ public final class PushJob extends SshConnectionJob<Void> {
 		var total = new AtomicLong();
 		var started = new AtomicLong(-1);
 		
-		return new RateLimitedFileTransferProgress(new FileTransferProgress() {
-			private long bytesSoFar;
-			private String message;
-
-			@Override
-			public void started(long bytesTotal, String file) {
-				this.bytesSoFar = 0;
-				if(started.get() == -1) {
-					started.set(System.currentTimeMillis());
-					if(files.size() == 1)
-						message = file;
-					else
-						message = MessageFormat.format(RESOURCES.getString("fileCount"), files.size());
-					updateMessage(MessageFormat.format(messagePattern, message));
-				}
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return PushJob.this.isCancelled();
-			}
-
-			@Override
-			public void progressed(long bytesSoFar) {
-				var add = bytesSoFar - this.bytesSoFar;
-				var t = total.addAndGet(add);
-				this.bytesSoFar = bytesSoFar;
-				report(message, t, allFilesTotal, started.get());
-			}
-		}, 50);
+		return new RateLimitedFileTransferProgress(new PushProgress(started, total, allFilesTotal, messagePattern), 50);
 	}
 }
