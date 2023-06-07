@@ -82,9 +82,10 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 		
 		progressGauge.setMaxValue(100);
 		service.busyProperty().addListener((c,o,n) ->{
-			if(n)
-				notificationPane.hide();
-			resetGauges(); 
+			if(n) {
+				notificationPane.hide();			
+				resetGauges(); 
+			}
 		});
 		service.summaryProperty().addListener((c,o,n) -> updateGauges());
 		
@@ -107,9 +108,9 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 	}
 
 	private void resetGauges() {
-		speedGauge.setBarColor(null);
+		speedGauge.setBarColor(Color.valueOf("#0078d7"));
 		progressGauge.setTitle("");
-		progressGauge.setBarColor(null);
+		progressGauge.setBarColor( Color.valueOf("#0078d7"));
 		speedGauge.setMaxValue(100);
 		speedGauge.setValue(0);
 		progressGauge.setValue(0);

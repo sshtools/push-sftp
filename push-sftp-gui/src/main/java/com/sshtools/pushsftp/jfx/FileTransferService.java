@@ -25,9 +25,9 @@ import com.sshtools.client.sftp.RemoteHash;
 import com.sshtools.common.util.IOUtils;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.PushJob.Reporter;
+import com.sshtools.pushsftp.jfx.PushSFTPUIApp.NotificationType;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 import com.sshtools.simjac.ConfigurationStoreBuilder;
-import com.sshtools.twoslices.ToastType;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -168,12 +168,12 @@ public class FileTransferService implements Closeable, Reporter {
 		task.setOnFailed(evt -> {
 			var e = task.exceptionNow();
 			LOG.error("Failed.", e);
-			context.notification(ToastType.ERROR, RESOURCES.getString("toast.error.title"), //$NON-NLS-1$ //$NON-NLS-2$
+			context.notification(NotificationType.ERROR, RESOURCES.getString("toast.error.title"), //$NON-NLS-1$ //$NON-NLS-2$
 					MessageFormat.format(RESOURCES.getString("toast.error.text"), files.size(), target.username(),
 							target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
 		});
 		task.setOnSucceeded(evt -> {
-			context.notification(ToastType.INFO, RESOURCES.getString("toast.completed.title"), //$NON-NLS-1$ //$NON-NLS-2$
+			context.notification(NotificationType.SUCCESS, RESOURCES.getString("toast.completed.title"), //$NON-NLS-1$ //$NON-NLS-2$
 					MessageFormat.format(RESOURCES.getString("toast.completed.text"), files.size(), target.username(),
 							target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
 		});

@@ -159,7 +159,10 @@ public final class PushJob extends SshConnectionJob<Void> {
 					.withIntegrityVerification(target.verifyIntegrity())
 					.withIgnoreIntegrity(target.ignoreIntegrity())
 					.withDigest(target.hash())
-					.withProgressMessages((fmt, args) -> updateMessage(MessageFormat.format(fmt, args)))
+					.withProgressMessages((fmt, args) -> { 
+						updateMessage(MessageFormat.format(fmt, args));
+						LOG.info(MessageFormat.format(fmt, args));
+					})
 					.withProgress(fileTransferProgress(RESOURCES.getString("progress.uploading"))). //$NON-NLS-1$
 					build());
 			break;

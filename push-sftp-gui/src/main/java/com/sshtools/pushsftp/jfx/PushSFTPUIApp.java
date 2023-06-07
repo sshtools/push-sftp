@@ -39,6 +39,14 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
 public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
+	
+	public enum NotificationType {
+		ERROR,
+		INFO,
+		NONE,
+		WARNING,
+		SUCCESS;
+	}
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(PushSFTPUIApp.class.getName());
 	final static Logger LOG = LoggerFactory.getLogger(JajaApp.class);
@@ -247,29 +255,42 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	}
 
 	public void notification(ToastType level, String title, String content) {
-		Toast.toast(level, title, content);
+		notification(NotificationType.valueOf(level.name()), title, content);
+	}
+
+	public void notification(NotificationType level, String title, String content) {
 		var dropPage = getTiles().getPage(DropPage.class);
 		var notificationPane = dropPage.notificationPane;
 
-		notificationPane.getStyleClass().removeAll("btn-warning", "btn-danger", "btn-info");
+		notificationPane.getStyleClass().removeAll("notification-danger", "notification-warning", "notification-info", "notification-success");
 		switch(level) {
 		case ERROR:
 			FontIcon gr = FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE);
 			notificationPane.setGraphic(gr);
 			notificationPane.getStyleClass().add("notification-danger");
+			Toast.toast(ToastType.ERROR, title, content);
 			break;
 		case WARNING:
 			gr = FontIcon.of(FontAwesomeSolid.EXCLAMATION_TRIANGLE);
 			notificationPane.setGraphic(gr);
 			notificationPane.getStyleClass().add("notification-warning");
+			Toast.toast(ToastType.WARNING, title, content);
 			break;
 		case INFO:
 			gr = FontIcon.of(FontAwesomeSolid.INFO_CIRCLE);
 			notificationPane.setGraphic(gr);
 			notificationPane.getStyleClass().add("notification-info");
+			Toast.toast(ToastType.INFO, title, content);
+			break;
+		case SUCCESS:
+			gr = FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE);
+			notificationPane.setGraphic(gr);
+			notificationPane.getStyleClass().add("notification-success");
+			Toast.toast(ToastType.INFO, title, content);
 			break;
 		default:
 			notificationPane.setGraphic(null);
+			Toast.toast(ToastType.NONE, title, content);
 			break;
 		}
 		notificationPane.show(title + ". " + content);
