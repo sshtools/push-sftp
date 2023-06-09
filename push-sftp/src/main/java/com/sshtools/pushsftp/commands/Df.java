@@ -11,7 +11,7 @@ import picocli.CommandLine.Parameters;
 @Command(name = "df", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "Display current remote directory")
 public class Df extends SftpCommand {
 	
-	@Option(names = "-h", description = "human readable sizes")
+	@Option(names = "-H", description = "human readable sizes")
 	private boolean humanReadable;
 	
 	@Option(names = "-i", description = "show inodes instead of space.")
@@ -32,7 +32,7 @@ public class Df extends SftpCommand {
 		if(inodes) {
 			getTerminal().messageln(String.format("%11d %11d %11d %11d %10d%%", 
 						stat.getINodes(), stat.getINodes() - stat.getFreeINodes(), 
-						stat.getAvailINodes(), 99, 99));
+						stat.getAvailINodes(), 0, 0));
 		}
 		else {
 			if(humanReadable) {
