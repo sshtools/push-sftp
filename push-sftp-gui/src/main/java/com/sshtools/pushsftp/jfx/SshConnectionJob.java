@@ -23,6 +23,8 @@ import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
 import com.sshtools.client.PrivateKeyFileAuthenticator;
 import com.sshtools.client.SshClient;
 import com.sshtools.client.SshClient.SshClientBuilder;
+import com.sshtools.client.SshClientContext;
+import com.sshtools.common.knownhosts.HostKeyVerification;
 import com.sshtools.common.ssh.SshException;
 
 import javafx.concurrent.Task;
@@ -62,6 +64,17 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		private Optional<String> agentName = Optional.empty();
 		private Optional<PassphrasePrompt> passphrasePrompt = Optional.empty();
 		private Optional<PasswordPrompt> password = Optional.empty();
+		private Optional<HostKeyVerification> hostKeyVerification = Optional.empty();
+
+		public B withHostKeyVerification(HostKeyVerification hostKeyVerification) {
+			return withHostKeyVerification(Optional.of(hostKeyVerification));
+		}
+		
+		@SuppressWarnings("unchecked")
+		public B withHostKeyVerification(Optional<HostKeyVerification> hostKeyVerification) {
+			this.hostKeyVerification = hostKeyVerification;;
+			return (B)this;
+		}
 
 		public B withPassphrasePrompt(PassphrasePrompt passphrasePrompt) {
 			return withPassphrasePrompt(Optional.of(passphrasePrompt));
@@ -132,6 +145,7 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 	protected final boolean verbose;
 	protected final Optional<PassphrasePrompt> passphrasePrompt;
 	protected final Optional<PasswordPrompt> password;
+	protected final Optional<HostKeyVerification> hostKeyVerification;
 
 	protected SshConnectionJob(AbstractSshConnectionJobBuilder<?, ?> builder) {
 		this.target = builder.target.orElseThrow(() -> new IllegalStateException("Target must be provided.")); //$NON-NLS-1$
@@ -140,6 +154,7 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		this.agentName = builder.agentName.orElse("PSFTP"); //$NON-NLS-1$
 		this.passphrasePrompt = builder.passphrasePrompt;
 		this.password = builder.password;
+		this.hostKeyVerification = builder.hostKeyVerification;
 	}
 
 	@Override
@@ -154,11 +169,17 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 
 		updateMessage(MessageFormat.format(RESOURCES.getString("progress.connection"), target.username(), //$NON-NLS-1$
 				target.hostname(), target.port()));
-		var ssh = SshClientBuilder.create().
+		
+		var ctx = new SshClientContext();
+		hostKeyVerification.ifPresent(hkv -> ctx.setHostKeyVerification(hkv));
+		
+		var bldr = SshClientBuilder.create().
 				withTarget(target.hostname(), target.port()).
 				withUsername(target.username()).
-				withConnectTimeout(Duration.ofSeconds(10)).
-				build();
+				withSshContext(ctx).
+				withConnectTimeout(Duration.ofSeconds(120));
+		
+		var ssh = bldr.build();
 
 		if (target.agent()) {
 			try {
@@ -189,6 +210,10 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 
 		if (!ssh.isAuthenticated()) {
 			if (target.identities()) {
+				if(!ssh.isConnected()) {
+					ssh = bldr.build();
+				}
+				
 				if (ssh.authenticate(new IdentityFileAuthenticator(createPassphrasePrompt()),
 						TimeUnit.SECONDS.toMillis(target.authenticationTimeout()))) {
 					//
@@ -202,6 +227,10 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		var identity = target.identity();
 		if (!ssh.isAuthenticated()) {
 			if (identity.isPresent()) {
+
+				if(!ssh.isConnected()) {
+					ssh = bldr.build();
+				}
 
 				if (!Files.exists(identity.get())) {
 					if (verbose)
@@ -223,6 +252,11 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 
 		if (!ssh.isAuthenticated()) {
 			if (target.password()) {
+
+				if(!ssh.isConnected()) {
+					ssh = bldr.build();
+				}
+				
 				if (ssh.getAuthenticationMethods().contains("password") //$NON-NLS-1$
 						|| ssh.getAuthenticationMethods().contains("keyboard-interactive")) { //$NON-NLS-1$
 					

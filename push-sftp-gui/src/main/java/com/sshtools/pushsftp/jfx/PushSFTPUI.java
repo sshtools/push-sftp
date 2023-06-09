@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.sshtools.common.logger.Log;
 import com.sshtools.common.logger.Log.Level;
+import com.sshtools.common.ssh.components.jce.JCEProvider;
 import com.sshtools.jajafx.JajaApp;
 import com.sshtools.jaul.AppCategory;
 import com.sshtools.jaul.ArtifactVersion;
@@ -31,6 +32,10 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 					MessageFormat.format("using Maverick Synergy {0}",synergyVersion)
 					};
 		}
+	}
+	
+	static {
+		JCEProvider.enableBouncyCastle(true);
 	}
 	
 	public final static class PushSFTPUIBuilder extends JajaAppBuilder<PushSFTPUI, PushSFTPUIBuilder, PushSFTPUIApp> {

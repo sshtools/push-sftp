@@ -20,8 +20,8 @@ public class Chmod extends SftpCommand  {
 
 	@Override
 	protected Integer onCall() throws Exception {
-		expand(path, (fp) -> getSftpClient().chmod(PosixPermissionsBuilder.create().
-					withChmodArgumentString(perms).build(), fp), false);
+		expandRemoteAndDo((fp) -> getSftpClient().chmod(PosixPermissionsBuilder.create().
+					withChmodArgumentString(perms).build(), fp), false, path);
 		return 0;
 	}
 

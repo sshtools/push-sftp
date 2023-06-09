@@ -13,9 +13,8 @@ public class Mkdir extends SftpCommand {
 	
 	@Override
 	protected Integer onCall() throws Exception {
-		
 		SftpClient sftp = getSftpClient();
-		sftp.mkdir(directory);
+		sftp.mkdir(expandRemoteSingle(directory));
 		return 0;
 	}
 

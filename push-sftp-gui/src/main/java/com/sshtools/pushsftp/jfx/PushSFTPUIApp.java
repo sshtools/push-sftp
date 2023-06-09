@@ -2,13 +2,19 @@ package com.sshtools.pushsftp.jfx;
 
 import static com.sshtools.jajafx.FXUtil.maybeQueue;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -21,12 +27,17 @@ import com.github.javakeyring.PasswordAccessException;
 import com.sshtools.client.ClientAuthenticator;
 import com.sshtools.client.PassphrasePrompt;
 import com.sshtools.client.PasswordAuthenticator.PasswordPrompt;
+import com.sshtools.common.knownhosts.HostKeyVerification;
+import com.sshtools.common.knownhosts.KnownHostsFile;
+import com.sshtools.common.ssh.SshException;
+import com.sshtools.common.ssh.components.SshPublicKey;
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaApp;
 import com.sshtools.jajafx.JajaFXApp;
 import com.sshtools.jajafx.PasswordPage;
 import com.sshtools.jajafx.Tiles;
 import com.sshtools.jajafx.UpdatePage;
+import com.sshtools.jajafx.YesNoPage;
 import com.sshtools.twoslices.Toast;
 import com.sshtools.twoslices.ToastType;
 import com.sshtools.twoslices.ToasterFactory;
@@ -37,6 +48,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 
 public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	
@@ -145,6 +157,55 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		});
 	}
 
+
+	public HostKeyVerification createHostKeyVerificationPrompt(Target target) throws SshException, IOException {
+		var file = KnownHostsFile.defaultKnownHostsFile();
+		if(!Files.exists(file))
+			Files.createFile(file);
+		return new KnownHostsFile() {
+			{
+				setHashHosts(true);
+				setUseCanonicalHostnames(true);
+				setUseReverseDNS(false);
+			}
+			
+			@Override
+			protected void onUnknownHost(String host, SshPublicKey key) throws SshException {
+				try {
+					unknownHost(target, host, key).ifPresent(always -> {
+						try {
+							allowHost(host, key, always);
+						} catch (SshException e) {
+							throw new IllegalStateException("Failed to save known host.");
+						}
+					});
+				} catch (UnknownHostException e) {
+					throw new SshException(e);
+				} 
+			}
+
+			@Override
+			protected void onHostKeyMismatch(String host, List<SshPublicKey> allowedHostKey, SshPublicKey actualHostKey)
+					throws SshException {
+				try {
+					if(mismatchedHost(target, host, allowedHostKey, actualHostKey)) {
+						try {
+							for(var key : allowedHostKey) {
+								removeEntries(key);
+							}
+							allowHost(host, actualHostKey, true);
+						} catch (SshException e) {
+							throw new IllegalStateException("Failed to save known host.");
+						}
+					}
+				} catch (UnknownHostException e) {
+					throw new SshException(e);
+				} 
+			}
+			
+		};
+	}
+
 	public PassphrasePrompt createPassphrasePrompt(Target target) {
 		var save = new AtomicBoolean();
 		return new PassphrasePrompt() {
@@ -214,6 +275,96 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		};
 	}
 
+	private boolean mismatchedHost(Target target, String host, List<SshPublicKey> allowedHostKey, SshPublicKey actualHostKey) throws SshException, UnknownHostException {
+		var sem = new Semaphore(1);
+		var result = new AtomicBoolean();
+		var addr = InetAddress.getByName(host);
+		var others = String.join("\n", allowedHostKey.stream().map(t -> {
+			try {
+				return t.getFingerprint();
+			} catch (SshException e) {
+				throw new IllegalStateException(e);
+			}
+		}).collect(Collectors.toList()));
+		var txt = MessageFormat.format(RESOURCES.getString("mismatchedHost.content"), 
+				target.bestDisplayName(), addr.getHostName(), addr.getHostAddress(), 
+				actualHostKey.getJCEPublicKey().getAlgorithm(), actualHostKey.getFingerprint(),
+				others);
+		
+		try {
+			sem.acquire();
+			Platform.runLater(() -> {
+				@SuppressWarnings("unchecked")
+				var confirmPage = (YesNoPage<PushSFTPUIApp>) tiles.popup(YesNoPage.class);
+				confirmPage.preferNo();
+				confirmPage.titleText().set(RESOURCES.getString("mismatchedHost"));
+				confirmPage.textText().set(txt);
+				confirmPage.onYes((e) -> {
+					tiles.remove(confirmPage);
+					result.set(true);
+					sem.release();
+				});
+				confirmPage.onNo((e) -> {
+					tiles.remove(confirmPage);
+					result.set(false);
+					sem.release();
+				});
+			});
+			sem.acquire();
+		} catch (InterruptedException ie) {
+			throw new IllegalStateException("Interrupted.", ie);
+		} finally {
+			sem.release();
+		}
+		return result.get();
+	}
+
+	private Optional<Boolean> unknownHost(Target target, String host, SshPublicKey key) throws SshException, UnknownHostException {
+		var sem = new Semaphore(1);
+		var remember = new AtomicBoolean(false);
+		var result = new AtomicBoolean();
+		var addr = InetAddress.getByName(host);
+		var txt = MessageFormat.format(RESOURCES.getString("unknownHost.content"), 
+				target.bestDisplayName(), addr.getHostName(), addr.getHostAddress(), 
+				key.getJCEPublicKey().getAlgorithm(), key.getFingerprint());
+		try {
+			sem.acquire();
+			Platform.runLater(() -> {
+				@SuppressWarnings("unchecked")
+				var confirmPage = (YesNoPage<PushSFTPUIApp>) tiles.popup(YesNoPage.class);
+				confirmPage.titleText().set(RESOURCES.getString("unknownHost"));
+				
+				var always = new Button(RESOURCES.getString("always"));
+				always.getStyleClass().add("btn-success");
+				always.setOnAction(evt -> {
+					tiles.remove(confirmPage);
+					result.set(true);
+					remember.set(true);
+					sem.release();
+				});
+				confirmPage.accessories().add(always);
+				
+				confirmPage.textText().set(txt);
+				confirmPage.onYes((e) -> {
+					tiles.remove(confirmPage);
+					result.set(true);
+					sem.release();
+				});
+				confirmPage.onNo((e) -> {
+					tiles.remove(confirmPage);
+					result.set(false);
+					sem.release();
+				});
+			});
+			sem.acquire();
+		} catch (InterruptedException ie) {
+			throw new IllegalStateException("Interrupted.", ie);
+		} finally {
+			sem.release();
+		}
+		return result.get() ? Optional.of(remember.get()) : Optional.empty();
+	}
+
 	private String password(AtomicBoolean save, String username, String fmt, Object... args) {
 		var sem = new Semaphore(1);
 		var buf = new StringBuilder();
@@ -226,13 +377,13 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 				passwordPage.titleText().set(txt);
 				passwordPage.textText()
 						.set(MessageFormat.format(RESOURCES.getString("passwordDialog.prompt"), username));
-				passwordPage.setConfirm((e) -> {
+				passwordPage.onConfirm((e) -> {
 					save.set(passwordPage.isSave());
 					buf.append(passwordPage.password().get());
 					tiles.remove(passwordPage);
 					sem.release();
 				});
-				passwordPage.setCancel((e) -> {
+				passwordPage.onCancel((e) -> {
 					tiles.remove(passwordPage);
 					sem.release();
 				});

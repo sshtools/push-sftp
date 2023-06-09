@@ -77,12 +77,12 @@ public class Pull extends SftpCommand {
 				withDigest(digest).
 				withBlocksize(blocksize).
 				withAsyncRequests(outstandingRequests).
-				withLocalFolder(localFolder.orElse(Path.of(getSftpClient().lpwd()))).
+				withLocalFolder(expandLocalSingleOr(localFolder)).
 				withIntegrityVerification(verifyIntegrity).
 				withIgnoreIntegrity(ignoreIntegrity).
 				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
-				withProgress(fileTransferProgress(progress, "Downloading {0}")).build());
+				withProgress(fileTransferProgress(getRootCommand().getTerminal(), progress, "Downloading {0}")).build());
 		}
 
 		return 0;

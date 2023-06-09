@@ -11,8 +11,8 @@ import picocli.CommandLine.Parameters;
 @Command(name = "put", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "Upload local file.")
 public class Put extends SftpCommand implements Callable<Integer> {
 
-	@Parameters(index = "0", arity = "1", description = "File to upload")
-	private Path file;
+	@Parameters(index = "0", arity = "1..", description = "File to upload")
+	private Path[] files;
 
 	@Parameters(index = "1", arity = "0..1", description = "The remote path")
 	private Optional<String> destination;
@@ -40,7 +40,9 @@ public class Put extends SftpCommand implements Callable<Integer> {
 		var target = destination.orElse(sftp.pwd());
 
 		try(var progress = getTerminal().progressBuilder().withInterruptable().withTiming(timing).withRateLimit().build()) {
-			sftp.put(resolveLocalPath(file).toString(), target, fileTransferProgress(progress, "Uploading {0}"));
+			expandLocalAndDo((path) -> {
+				sftp.put(path.toString(), target, fileTransferProgress(getRootCommand().getTerminal(), progress, "Uploading {0}"));
+			}, true, files);
 		}
 
 		return 0;

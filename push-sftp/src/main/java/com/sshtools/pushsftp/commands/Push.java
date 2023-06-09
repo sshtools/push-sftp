@@ -3,9 +3,7 @@ package com.sshtools.pushsftp.commands;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.sshtools.client.sftp.RemoteHash;
 import com.sshtools.client.tasks.PushTask.PushTaskBuilder;
@@ -44,7 +42,7 @@ public class Push extends SftpCommand {
 
 	@Option(names = { "-r",
 			"--remote-dir" }, paramLabel = "PATH", description = "the directory on the remote host you want to transfer the files to")
-	Optional<Path> remoteFolder;
+	Optional<String> remoteFolder;
 
 	@Option(names = { "-a", "--async-requests" }, description = "the number of async requests to send", defaultValue = "0")
 	int outstandingRequests;
@@ -77,19 +75,20 @@ public class Push extends SftpCommand {
 					}
 				}).
 				withPrimarySftpClient(getSftpClient()).
-				withPaths(Arrays.asList(files).stream().map(this::resolveLocalPath).collect(Collectors.toList())).
+				withPaths(expandLocalArray(files)).
 				withChunks(chunks).
 				withDigest(digest).
 				withBlocksize(blocksize).
 				withAsyncRequests(outstandingRequests).
-				withRemoteFolder(remoteFolder.orElse(Path.of(getSftpClient().pwd()))).
+				withRemoteFolder(expandRemoteSingle(remoteFolder)).
 				withIntegrityVerification(verifyIntegrity).
 				withIgnoreIntegrity(ignoreIntegrity).
 				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
-				withProgress(fileTransferProgress(progress, "Uploading {0}")).build());
+				withProgress(fileTransferProgress(getRootCommand().getTerminal(), progress, "Uploading {0}")).build());
 		}
 
 		return 0;
 	}
+
 }

@@ -3,6 +3,7 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.load;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,9 +15,13 @@ import java.util.stream.Collectors;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.sshtools.common.ssh.SshException;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
+import com.sshtools.pushsftp.jfx.PushSFTPUIApp.NotificationType;
 
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -36,6 +41,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 public class DropTarget extends StackPane implements Initializable {
+	final static Logger LOG = LoggerFactory.getLogger(DropTarget.class);
 
 	@FXML
 	private FontIcon folderIcon;
@@ -98,8 +104,21 @@ public class DropTarget extends StackPane implements Initializable {
 		var f1 = new FadeTransition(Duration.seconds(3));
 		f1.setFromValue(1.0);
 		f1.setToValue(0);
+		
+//		var c1 = new Transition() {
+//
+//			{
+//				setCycleDuration(Duration.seconds(3));
+//			}
+//
+//			protected void interpolate(double frac) {
+//				Bounds boundsInLocal = fileIcon.getBoundsInLocal();
+//				fileIcon.setClip(new Rectangle(boundsInLocal.getMinX(),boundsInLocal.getMinY(),boundsInLocal.getWidth(),boundsInLocal.getHeight() * frac));
+//			}
+//
+//		};
 
-		var tp = new ParallelTransition(t1, f1);
+		var tp = new ParallelTransition(t1, f1/* , c1 */);
 
 		var t2 = new TranslateTransition();
 		t2.setToX(0);
@@ -186,7 +205,12 @@ public class DropTarget extends StackPane implements Initializable {
 	}
 
 	private void drop(List<Path> files) {
-		service.drop(target, files);
+		try {
+			service.drop(target, files);
+		} catch (IOException | SshException e) {
+			LOG.error("Failed to drop files.", e);
+			context.notification(NotificationType.ERROR, DropPage.RESOURCES.getString("error.failedToDrop"), e.getMessage());
+		}
 	}
 	
 	private void showFolderText(boolean show) {

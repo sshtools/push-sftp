@@ -3,6 +3,7 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.emptyPathIfBlankString;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sshtools.client.sftp.RemoteHash;
+import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.IOUtils;
 import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.PushJob.Reporter;
@@ -47,6 +49,21 @@ import javafx.collections.ObservableList;
 public class FileTransferService implements Closeable, Reporter {
 	final static Logger LOG = LoggerFactory.getLogger(FileTransferService.class);
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(FileTransferService.class.getName());
+	
+	public enum TransferUnit {
+		KB_S,
+		MB_S,
+		GB_S,
+		KBITS_S,
+		MBITS_S,
+		GBITS_S,
+		KIB_S,
+		MIB_S,
+		GIB_S,
+		KIBITS_S,
+		MIBITS_S,
+		GIBITS_S
+	}
 
 	public static final class TransferStats {
 		private final long timeTaken;
@@ -82,20 +99,63 @@ public class FileTransferService implements Closeable, Reporter {
 
 		public long timeRemaining() {
 			var rem = remaining();
-			return rem == 0 ? 0 : (rem / Math.max(1, bytesPerSecond()));
+			return rem == 0 ? 0 : (rem * 1000 / Math.max(1, bytesPerSecond()));
 		}
 
 		public String timeRemainingString() {
 			var seconds = timeRemaining() / 1000;
 			return String.format("%5d:%02d", (int) (seconds > 60 ? seconds / 60 : 0), (int) (seconds % 60));
 		}
-
-		public long bytesPerSecond() {
-			return timeTaken == 0 ? 0 : transferred / timeTaken;
+		
+		public double secondsTaken() {
+			return (double)timeTaken  / 1000d;
 		}
 
+		public long bytesPerSecond() {
+			return timeTaken == 0 ? 0 :  (long)((double)transferred / secondsTaken());
+		}
+
+		public long bitsPerSecond() {
+			return bytesPerSecond() * 8;
+		}
+		
+		public double transferRate(TransferUnit unit) {
+			switch(unit) {
+			case KB_S:
+				return (double)bytesPerSecond() / 1000D;
+			case MB_S:
+				return (double)bytesPerSecond() / 1000000D;
+			case GB_S:
+				return (double)bytesPerSecond() / 1000000000D;
+			case KIB_S:
+				return (double)bytesPerSecond() / 1024D;
+			case MIB_S:
+				return (double)bytesPerSecond() / 1048576D;
+			case GIB_S:
+				return (double)bytesPerSecond() / 1073741824D;
+			case KBITS_S:
+				return (double)bitsPerSecond() / 1000D;
+			case MBITS_S:
+				return (double)bitsPerSecond() / 1000000D;
+			case GBITS_S:
+				return (double)bitsPerSecond() / 1000000000D;
+			case KIBITS_S:
+				return (double)bitsPerSecond() / 1024D;
+			case MIBITS_S:
+				return (double)bitsPerSecond() / 1048576D;
+			case GIBITS_S:
+				return (double)bitsPerSecond() / 1073741824D;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
+		
 		public String transferRateString() {
-			return String.format("%.1fMibit/s", bytesPerSecond() / 1024D);
+			return transferRateString(TransferUnit.MB_S);
+		}
+		
+		public String transferRateString(TransferUnit unit) {
+			return String.format("%.1fMibit/s", transferRate(unit));
 		}
 
 		public String percentageString() {
@@ -151,7 +211,7 @@ public class FileTransferService implements Closeable, Reporter {
 		return targets;
 	}
 
-	public void drop(Target target, List<Path> files) {
+	public void drop(Target target, List<Path> files) throws SshException, IOException {
 
 		var prefs = context.getContainer().getAppPreferences();
 		var agentSocket = prefs.get("agentSocket", "");
@@ -162,9 +222,15 @@ public class FileTransferService implements Closeable, Reporter {
 				.withPaths(files)
 				.withTarget(target)
 				.withReporter(this)
+				.withHostKeyVerification(context.createHostKeyVerificationPrompt(target))
 				.withPassphrasePrompt(context.createPassphrasePrompt(target))
 				.withPassword(context.createPasswordPrompt(target)).build();
 		
+		task.setOnCancelled(evt -> {
+			context.notification(NotificationType.ERROR, RESOURCES.getString("toast.cancelled.title"), //$NON-NLS-1$ //$NON-NLS-2$
+					MessageFormat.format(RESOURCES.getString("toast.cancelled.text"), files.size(), target.username(),
+							target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
+		});
 		task.setOnFailed(evt -> {
 			var e = task.exceptionNow();
 			LOG.error("Failed.", e);

@@ -8,6 +8,7 @@ import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.JajaFXApp.DarkMode;
 import com.sshtools.jajafx.PrefBind;
 import com.sshtools.jaul.Phase;
+import com.sshtools.pushsftp.jfx.FileTransferService.TransferUnit;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,15 +34,30 @@ public class OptionsPage extends AbstractTile<PushSFTPUIApp> {
 	ComboBox<Phase> phase;
 	@FXML
 	ComboBox<DarkMode> darkMode;
+	@FXML
+	ComboBox<TransferUnit> transferSpeedUnits;
 
 	private FileChooser agentSocketChooser;
 
 	@Override
 	protected void onConfigure() {
-		phase.getItems().addAll(getContext().getContainer().getUpdateService().getPhases());
+		
+		transferSpeedUnits.getItems().addAll(TransferUnit.values());
+		transferSpeedUnits.getSelectionModel().select(TransferUnit.MB_S);
+		transferSpeedUnits.setConverter(new StringConverter<TransferUnit>() {
+			@Override
+			public String toString(TransferUnit object) {
+				return RESOURCES.getString("transferSpeedUnits." + object.name());
+			}
+			
+			@Override
+			public TransferUnit fromString(String string) {
+				return null;
+			}
+		});
+		
 		darkMode.getItems().addAll(DarkMode.values());
 		darkMode.getSelectionModel().select(DarkMode.AUTO);
-
 		darkMode.setConverter(new StringConverter<DarkMode>() {
 			@Override
 			public String toString(DarkMode object) {
@@ -52,7 +68,10 @@ public class OptionsPage extends AbstractTile<PushSFTPUIApp> {
 			public DarkMode fromString(String string) {
 				return null;
 			}
-		});phase.setConverter(new StringConverter<Phase>() {
+		});
+
+		phase.getItems().addAll(getContext().getContainer().getUpdateService().getPhases());
+		phase.setConverter(new StringConverter<Phase>() {
 			@Override
 			public String toString(Phase object) {
 				return RESOURCES.getString("phase." + object.name());
@@ -69,6 +88,7 @@ public class OptionsPage extends AbstractTile<PushSFTPUIApp> {
 		prefBind.bind(agentSocket);
 		prefBind.bind(Phase.class, phase); 
 		prefBind.bind(DarkMode.class, darkMode);
+		prefBind.bind(TransferUnit.class, transferSpeedUnits);
 		agentSocket.setPromptText(System.getenv("SSH_AUTH_SOCK"));
 		
 	}

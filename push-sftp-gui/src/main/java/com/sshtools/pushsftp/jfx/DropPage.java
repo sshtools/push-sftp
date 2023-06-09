@@ -2,6 +2,8 @@ package com.sshtools.pushsftp.jfx;
 
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 import org.controlsfx.control.NotificationPane;
 
@@ -10,6 +12,7 @@ import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.ScrollStack;
+import com.sshtools.pushsftp.jfx.FileTransferService.TransferUnit;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import eu.hansolo.medusa.Gauge;
@@ -24,7 +27,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
-public class DropPage extends AbstractTile<PushSFTPUIApp> {
+public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceChangeListener {
 
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(DropPage.class.getName());
 
@@ -53,6 +56,8 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 
 	
 	NotificationPane  notificationPane;
+
+	private TransferUnit transferUnit;
 
 	@Override
 	protected void onConfigure() {
@@ -104,7 +109,10 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 		AnchorPane.setRightAnchor(notificationPane, 0d);
 		
 		resetGauges();
+		updateLabels();
 		updateGauges();
+		
+		getContext().getContainer().getAppPreferences().addPreferenceChangeListener(this);
 	}
 
 	private void resetGauges() {
@@ -116,10 +124,16 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 		progressGauge.setValue(0);
 	}
 	
+	private void updateLabels() {
+		transferUnit = TransferUnit.valueOf(getContext().getContainer().getAppPreferences().get("transferSpeedUnits", TransferUnit.MB_S.name()));
+		speedGauge.setMaxValue(100);
+		speedGauge.setUnit(OptionsPage.RESOURCES.getString("transferSpeedUnits." + transferUnit.name()));
+	}
+	
 	private void updateGauges() {
 		var summary = getContext().getService().summaryProperty().get();
 		progressGauge.setValue(summary.percentage());
-		var speed = summary.bytesPerSecond() / 1024D;
+		var speed = summary.transferRate(transferUnit);
 		if(speed > speedGauge.getMaxValue())
 			speedGauge.setMaxValue(speed);
 		speedGauge.setValue(speed);
@@ -130,6 +144,18 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> {
 		progressGauge.setTitle(summary.size() == 0 ? "" :  summary.timeRemainingString());
 	}
 	
+	@Override
+	public void close() {
+		getContext().getContainer().getAppPreferences().removePreferenceChangeListener(this);
+	}
+
+	@Override
+	public void preferenceChange(PreferenceChangeEvent evt) {
+		if(evt.getKey().equals("transferSpeedUnits")) {
+			FXUtil.maybeQueue(() -> updateLabels());
+		}		
+	}
+
 	private DropTarget findDropTarget(Target target) {
 		for(var child : scrollStack.getNodes()) {
 			if(target.equals(((DropTarget)child).getTarget())) {

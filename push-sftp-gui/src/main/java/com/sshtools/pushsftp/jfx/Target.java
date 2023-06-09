@@ -320,6 +320,11 @@ public final class Target {
 		return displayName;
 	}
 
+	public String bestDisplayName() {
+		return displayName.orElse(getDefaultDisplayName());
+	}
+
+
 	public Optional<String> unsafePassword() {
 		return unsafePassword;
 	}

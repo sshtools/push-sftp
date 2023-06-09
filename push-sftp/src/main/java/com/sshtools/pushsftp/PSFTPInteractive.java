@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpClient.SftpClientBuilder;
+import com.sshtools.client.tasks.PushTask.PushTaskBuilder;
 import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.CliCommand;
 import com.sshtools.commands.ExceptionHandler;
@@ -25,11 +27,14 @@ import com.sshtools.pushsftp.commands.Cd;
 import com.sshtools.pushsftp.commands.Chgrp;
 import com.sshtools.pushsftp.commands.Chmod;
 import com.sshtools.pushsftp.commands.Chown;
+import com.sshtools.pushsftp.commands.Df;
 import com.sshtools.pushsftp.commands.Get;
 import com.sshtools.pushsftp.commands.Help;
 import com.sshtools.pushsftp.commands.Info;
 import com.sshtools.pushsftp.commands.Lcd;
 import com.sshtools.pushsftp.commands.Lls;
+import com.sshtools.pushsftp.commands.Lmkdir;
+import com.sshtools.pushsftp.commands.Ln;
 import com.sshtools.pushsftp.commands.Lpwd;
 import com.sshtools.pushsftp.commands.Ls;
 import com.sshtools.pushsftp.commands.Mkdir;
@@ -37,9 +42,13 @@ import com.sshtools.pushsftp.commands.Pull;
 import com.sshtools.pushsftp.commands.Push;
 import com.sshtools.pushsftp.commands.Put;
 import com.sshtools.pushsftp.commands.Pwd;
+import com.sshtools.pushsftp.commands.Rename;
 import com.sshtools.pushsftp.commands.Rm;
 import com.sshtools.pushsftp.commands.Rmdir;
+import com.sshtools.pushsftp.commands.SftpCommand;
+import com.sshtools.pushsftp.commands.Symlink;
 import com.sshtools.pushsftp.commands.Umask;
+import com.sshtools.sequins.Progress.Level;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -48,8 +57,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "push-sftp-interactive", description = "Push secure file transfer", subcommands = { Ls.class, Cd.class, Lcd.class, Pwd.class, Lls.class, 
-		Lpwd.class, Help.class, Rm.class, Rmdir.class,
-		Mkdir.class, Umask.class, Bye.class, Chgrp.class, 
+		Lpwd.class, Help.class, Rm.class, Rmdir.class, Df.class,
+		Mkdir.class, Rename.class, Lmkdir.class, Ln.class, Symlink.class, Umask.class, Bye.class, Chgrp.class, 
 		Chown.class, Chmod.class, Push.class, Pull.class, Put.class, Get.class,
 		ChildUpdateCommand.class, Info.class
 		}, versionProvider = PSFTPInteractive.Version.class)
@@ -97,6 +106,9 @@ public class PSFTPInteractive extends CliCommand {
 	@Parameters(index = "0", arity = "0..1", description = "The remote server, with optional username.")
 	private Optional<String> destination;
 	
+	@Parameters(index = "1", arity = "0..1", description = "A number of files to pass directly to a 'push' command.")
+	private Path[] files;
+	
 	private Optional<String> cachedHostname = Optional.empty();
 	private Optional<String> cachedUsername = Optional.empty();
 	private Optional<Integer> cachedPort = Optional.empty();
@@ -128,7 +140,32 @@ public class PSFTPInteractive extends CliCommand {
 		return cachedPort.orElse(port);
 	}
 	
-	protected boolean startCLI() throws IOException, InterruptedException {
+	protected boolean startCLI() throws IOException, InterruptedException, SftpStatusException, SshException {
+
+		if(files != null && files.length > 0) {
+			try (var progress = getTerminal().progressBuilder().withRateLimit().build()) {
+				getSshClient().runTask(PushTaskBuilder.create().
+					withClients((idx) -> {
+						if (idx == 0)
+							return ssh;
+						else {
+							try {
+								return connect(false, idx < 2);
+							} catch (IOException e) {
+								throw new UncheckedIOException(e);
+							} catch (SshException e) {
+								throw new IllegalStateException(e);
+							}
+						}
+					}).
+					withPrimarySftpClient(getSftpClient()).
+					withPaths(files).
+					withRemoteFolder(Path.of(getSftpClient().pwd())).
+					withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
+					withProgress(SftpCommand.fileTransferProgress(getTerminal(), progress, "Uploading {0}")).build());
+			}
+			return false;
+		}
 		
 		if(localDirectory.isPresent()) {
 			if(!Files.exists(localDirectory.get())) {
@@ -259,15 +296,11 @@ public class PSFTPInteractive extends CliCommand {
 	}
 
 	@Override
-	protected Path getLcwd() {
+	public Path getLcwd() {
 		return localDirectory.orElse(super.getLcwd());
-	}
-
-	public void setRemoteDirectory(String path) {
-		remoteDirectory = Optional.of(path);
 	}
 	
 	public void setLocalDirectory(Path path) {
-		localDirectory = Optional.of(path);
+		localDirectory = Optional.of(path.toAbsolutePath());
 	}
 }

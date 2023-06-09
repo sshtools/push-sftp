@@ -2,22 +2,25 @@ package com.sshtools.pushsftp.commands;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TreeSet;
+import java.util.Optional;
 
 import com.sshtools.common.files.AbstractFile;
 import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
-import com.sshtools.common.util.UnsignedInteger64;
 import com.sshtools.common.util.Utils;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 @Command(name = "lls", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "List directory")
 public class Lls extends SftpCommand {
@@ -30,6 +33,9 @@ public class Lls extends SftpCommand {
 	
 	@Option(names = "-a", description = "show hidden files")
 	boolean showHidden;
+
+	@Parameters(index = "0", arity="0..1", paramLabel="PATH", description = "path of directory to list")
+	Optional<Path> path;
 
 	@Override
 	protected Integer onCall() throws Exception {
@@ -45,95 +51,68 @@ public class Lls extends SftpCommand {
 
 	private void printNames() throws IOException, SftpStatusException, SshException {
 
-		var sftp = getSftpClient();
-		
-		var results = new TreeSet<String>();
 		var maximumFilenameLength = 0;
 		var columns = getRootCommand().getTerminal().getWidth();
 		
-		try {
-			var cwd = sftp.getCurrentWorkingDirectory();
-			for(var file : cwd.getChildren()) {
-				String displayName = file.getName();
+		try(var stream = Files.newDirectoryStream(expandLocalSingle(path))) {
+			for(var p : stream) {
+				String displayName = p.getFileName().toString();
 				if(Utils.isBlank(displayName) || (displayName.startsWith(".") && !showHidden)) {
 					continue;
 				}
 				maximumFilenameLength = Math.max(displayName.length() + 1, maximumFilenameLength);
-				results.add(displayName);
 			}
-			
-			int printingColumns = 1;
-			if(maximumFilenameLength < (columns / 2)) {
-				printingColumns = columns / maximumFilenameLength;
-			}
-			
-			if(printingColumns > 1) {
-				var format = "%1$-"+ (columns / printingColumns) + "s";
-				var itr = results.iterator();
+		}
+		
+		int printingColumns = 1;
+		if(maximumFilenameLength < (columns / 2)) {
+			printingColumns = columns / maximumFilenameLength;
+		}
+		
+		if(printingColumns > 1) {
+			var format = "%1$-"+ (columns / printingColumns) + "s";
+
+			try(var stream = Files.newDirectoryStream(expandLocalSingle(path))) {
+				var itr = stream.iterator();
 				while(itr.hasNext()) {
 					for(int i=0;i<printingColumns;i++) {
-						System.out.print(String.format(format, itr.next()));
+						System.out.print(String.format(format, itr.next().getFileName()));
 						if(!itr.hasNext()) {
 							break;
 						}
 					}
 					System.out.println();
 				}
-			} else {
-				for(String result : results) {
-					System.out.println(result);
+			}
+		} else {
+			try(var stream = Files.newDirectoryStream(expandLocalSingle(path))) {
+				for(var p : stream) {
+					System.out.println(p.getFileName().toString());
 				}
 			}
-		} catch ( PermissionDeniedException e) {
-			throw new IOException(e.getMessage(), e);
 		}
 	}
 	
 	private String getLongname(AbstractFile file) throws FileNotFoundException, IOException, PermissionDeniedException {
-		
-		var attrs = file.getAttributes();	
-		var str = new StringBuffer();
-		str.append(Utils.pad(10 - attrs.getPermissionsString().length())
-				+ attrs.getPermissionsString());
-		if(attrs.isDirectory()) {
-			str.append(" 1 ");
-		} else {
-			str.append(" 1 ");
-		}
-		if(attrs.hasUID()) {
-			str.append(attrs.getUID() + Utils.pad(8 - attrs.getUID().length()));
-		} else {
-			str.append(String.valueOf(attrs.getUID()) + Utils.pad(8 - String.valueOf(attrs.getUID()).length()));
-		}
-		str.append(" ");
-		if(attrs.hasGID()) {
-			str.append(attrs.getGID()
-					+ Utils.pad(8 - attrs.getGID().length()));
-		} else {
-			str.append(String.valueOf(attrs.getGID()) + Utils.pad(8 - String.valueOf(attrs.getGID()).length()));
-		}
-		str.append(" ");
-
-		str.append(Utils.pad(11 - attrs.getSize().toString().length())
-				+ attrs.getSize().toString());
-		str.append(" ");
-		
-		var modTime = getModTimeStringInContext(attrs.getModifiedTime(), Locale.getDefault());
-		str.append(Utils.pad(12 - modTime.length()) + modTime);
-		str.append(" ");
-		str.append(file.getName());
-
-		return str.toString();
+		var attrs = file.getAttributes();
+		return String.format("%9s %01d %-9s %-9s %10d %12s %s",
+				attrs.toPermissionsString(),
+				attrs.linkCount(),
+				attrs.bestUsername(),
+				attrs.bestGroup(),
+				attrs.size().longValue(),
+				getModTimeStringInContext(attrs.lastModifiedTime(), Locale.getDefault()),
+				file.getName());
 	}
 
-	private String getModTimeStringInContext(UnsignedInteger64 mtime,
+	private String getModTimeStringInContext(FileTime mtime,
 			Locale locale) {
 		if (mtime == null) {
 			return "";
 		}
 
 		SimpleDateFormat df;
-		long mt = (mtime.longValue() * 1000L);
+		long mt = mtime.toMillis();
 		long now = System.currentTimeMillis();
 
 		if ((now - mt) > (6 * 30 * 24 * 60 * 60 * 1000L)) {

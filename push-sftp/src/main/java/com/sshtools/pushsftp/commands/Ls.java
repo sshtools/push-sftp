@@ -2,6 +2,8 @@ package com.sshtools.pushsftp.commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.TreeSet;
 
 import com.sshtools.client.sftp.SftpClient;
@@ -12,6 +14,7 @@ import com.sshtools.common.util.Utils;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 @Command(name = "ls", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "List directory")
 public class Ls extends SftpCommand {
@@ -21,6 +24,9 @@ public class Ls extends SftpCommand {
 	
 	@Option(names = "-a", description = "show hidden files")
 	boolean showHidden;
+
+	@Parameters(index = "0", arity="0..1", paramLabel="PATH", description = "path of directory to list")
+	Optional<String> path;
 	
 	@Override
 	protected Integer onCall() throws Exception {
@@ -36,13 +42,12 @@ public class Ls extends SftpCommand {
 
 	private void printNames() throws SftpStatusException, SshException {
 
-		var sftp = getSftpClient();
 		
 		var results = new TreeSet<String>();
 		int maximumFilenameLength = 0;
 		int columns = getRootCommand().getTerminal().getWidth();
-		
- 		var it = sftp.lsIterator();
+
+		var it = lsIterator();
 		while(it.hasNext()) {
 			var file = it.next();
 			var displayName = longnames ? file.getLongname() : file.getFilename();
@@ -77,12 +82,16 @@ public class Ls extends SftpCommand {
 		}
 	}
 
-	private void printLongnames() throws SftpStatusException, SshException {
-		
+	private Iterator<SftpFile> lsIterator() throws SftpStatusException, SshException {
 		var sftp = getSftpClient();
+ 		var it = path.isPresent() ? sftp.lsIterator(path.get()) : sftp.lsIterator();
+		return it;
+	}
+
+	private void printLongnames() throws SftpStatusException, SshException {
+
+		var it = lsIterator();
 		var results = new ArrayList<SftpFile>();
-		
-		var it = sftp.lsIterator();
 		while(it.hasNext()) {
 			var file = it.next();
 			if(file.getFilename().startsWith(".") && !showHidden) {

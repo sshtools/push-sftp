@@ -31,9 +31,8 @@ public class Chown extends SftpCommand  {
 		} else {
 			UID.append(uid);
 		}
-
 		
-		expand(path, (fp) -> {
+		expandRemoteAndDo((fp) -> {
 		
 			if(GID.length() > 0) {
 				getSftpClient().chown(UID.toString(), GID.toString(), fp);
@@ -44,7 +43,7 @@ public class Chown extends SftpCommand  {
 					getSftpClient().chown(uid, fp);
 				}
 			}
-		}, false);
+		}, false, path);
 		return 0;
 	}
 }
