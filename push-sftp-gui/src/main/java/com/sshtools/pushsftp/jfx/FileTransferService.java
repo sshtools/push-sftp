@@ -258,9 +258,9 @@ public class FileTransferService implements Closeable, Reporter {
 			} finally {
 				Platform.runLater(() -> {
 					stats.remove(task);
-					rebuildStats();
 					activeTargets.remove(target);
 					jobs.remove(task);
+					rebuildStats();
 				});
 			}
 		});

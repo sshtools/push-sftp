@@ -26,31 +26,24 @@ import com.sshtools.client.tasks.FileTransferProgress;
 public class RateLimitedFileTransferProgress implements FileTransferProgress {
 
 	private final long ms;
-	private final ScheduledExecutorService executor;
 	private final FileTransferProgress delegate;
-	private final boolean root;
 	private final Object lock = new Object();
 
 	private ScheduledFuture<?> task;
 	private volatile long bytesSoFar;
+	private ScheduledExecutorService executor;
 
 	public RateLimitedFileTransferProgress(FileTransferProgress delegate, long ms) {
 		this.delegate = delegate;
 		this.ms = ms;
-		this.root = true;
-		executor = Executors.newScheduledThreadPool(1);
 	}
 
 	@Override
 	public void completed()  {
-		finishTask();
-		try {
-			delegate.completed();
-		}
-		finally {
-			if(root) {
-				executor.shutdown();
-			}
+		synchronized(lock) {
+			scheduleOne(true);
+			finishTask();
+			executor.shutdown();
 		}
 	}
 
@@ -63,6 +56,7 @@ public class RateLimitedFileTransferProgress implements FileTransferProgress {
 	@Override
 	public void started(long bytesTotal, String file) {
 		finishTask();
+		executor = Executors.newScheduledThreadPool(1);
 		delegate.started(bytesTotal, file);
 	}
 
@@ -70,20 +64,31 @@ public class RateLimitedFileTransferProgress implements FileTransferProgress {
 	public void progressed(long bytesSoFar) {
 		synchronized (lock) {
 			this.bytesSoFar = bytesSoFar;
-		}
-		if (task == null || task.isDone()) {
-			task = executor.schedule(() -> {
-				delegate.progressed(RateLimitedFileTransferProgress.this.bytesSoFar);
-			}, ms, TimeUnit.MILLISECONDS);
+			scheduleOne(false);
 		}
 
 	}
 
+	public void scheduleOne(boolean complete) {
+		if (task == null || task.isDone()) {
+			task = executor.schedule(() -> {
+				if(complete)
+					delegate.completed();
+				else
+					delegate.progressed(RateLimitedFileTransferProgress.this.bytesSoFar);
+			}, ms, TimeUnit.MILLISECONDS);
+		}
+	}
+
 	private void finishTask() {
-		if (task != null) {
-			try {
-				task.get();
-			} catch (InterruptedException | ExecutionException e) {
+		synchronized(lock) {
+			if (task != null) {
+				try {
+					task.get();
+				} catch (InterruptedException | ExecutionException e) {
+				} finally {
+					task = null;
+				}
 			}
 		}
 	}

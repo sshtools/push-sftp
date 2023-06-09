@@ -16,6 +16,8 @@ import com.sshtools.pushsftp.jfx.FileTransferService.TransferUnit;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.events.UpdateEvent;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -61,6 +63,7 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 
 	@Override
 	protected void onConfigure() {
+		
 		var service = getContext().getService();
 		var targets = service.getTargets();
 		
@@ -92,7 +95,10 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 				resetGauges(); 
 			}
 		});
-		service.summaryProperty().addListener((c,o,n) -> updateGauges());
+		service.summaryProperty().addListener((c,o,n) -> {
+			if(service.busyProperty().get())
+				updateGauges(); 
+		});
 		
 		scrollPrevious.visibleProperty().bind(Bindings.not(scrollStack.showingFirstProperty()));
 		scrollNext.visibleProperty().bind(Bindings.not(scrollStack.showingLastProperty()));
@@ -132,16 +138,40 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 	
 	private void updateGauges() {
 		var summary = getContext().getService().summaryProperty().get();
-		progressGauge.setValue(summary.percentage());
+		progressGauge.setTitle(summary.size() == 0 ? "" :  summary.timeRemainingString());
 		var speed = summary.transferRate(transferUnit);
 		if(speed > speedGauge.getMaxValue())
 			speedGauge.setMaxValue(speed);
 		speedGauge.setValue(speed);
 		if(summary.percentage() == 100) {
+			if(progressGauge.getValue() != progressGauge.getCurrentValue()) {
+				/* NOTE
+				 * 
+				 * There appears to be a bug in Medusa gauges animation, that when a value is
+				 * set while it is animation, the value might get missed, leaving
+				 * the gauge needle at the previous position.
+				 *
+				 * After trying many different things, this is the only hack I found
+				 * that seems to correct it.
+				 * 
+				 * It is only noticeable for the final value (i.e. when upload has finished),
+				 * and for small files (i.e. one or two update events).
+				 * 
+				 * We first detect if we are actually animating when the progress has finished,
+				 * and if so reset the animation duration before setting the value.
+				 * 
+				 * This way we get to keep animation, and still have the correct "100%" value
+				 * at the end of an upload.
+				 */
+				var dur = progressGauge.getAnimationDuration();
+				progressGauge.setAnimationDuration(0);
+				progressGauge.setValue(summary.percentage());
+				progressGauge.setAnimationDuration(dur);
+			}
 			speedGauge.setBarColor(Color.GREEN.darker());
 			progressGauge.setBarColor(Color.GREEN.darker());
 		}
-		progressGauge.setTitle(summary.size() == 0 ? "" :  summary.timeRemainingString());
+		progressGauge.setValue(summary.percentage());
 	}
 	
 	@Override

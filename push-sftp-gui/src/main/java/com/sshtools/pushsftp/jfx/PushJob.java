@@ -55,6 +55,11 @@ public final class PushJob extends SshConnectionJob<Void> {
 		}
 
 		@Override
+		public void completed() {
+			report(message, total.get(), allFilesTotal, started.get());
+		}
+
+		@Override
 		public boolean isCancelled() {
 			return PushJob.this.isCancelled();
 		}
