@@ -71,6 +71,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 
 	private TargetBuilder createTarget() {
 		return TargetBuilder.builder().
+				fromTarget(target).
 				withUsername(textOrPrompt(username)).
 				withUnsafePassword(FXUtil.optionalText(unsafePassword.getText())).
 				withHostname(textOrPrompt(hostname)).

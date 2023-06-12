@@ -220,7 +220,22 @@ public class FileTransferService implements Closeable, Reporter {
 				withVerbose(prefs.getBoolean("verbose", false))
 				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
 				.withPaths(files)
-				.withTarget(target)
+				.withTarget(() -> {
+					var idx = targets.indexOf(target);
+					if(idx == -1)
+						throw new IllegalStateException("Target has been removed.");
+					else
+						return targets.get(idx);
+				})
+				.withSerializer((t) -> {
+					var idx = targets.indexOf(target);
+					if(idx == -1) {
+						targets.add(t);
+					}
+					else {
+						targets.set(idx, t);
+					}
+				})
 				.withReporter(this)
 				.withHostKeyVerification(context.createHostKeyVerificationPrompt(target))
 				.withPassphrasePrompt(context.createPassphrasePrompt(target))
@@ -274,6 +289,7 @@ public class FileTransferService implements Closeable, Reporter {
 	public void close() {
 		service.shutdown();
 	}
+	
 
 	private void rebuildStats() {
 		var size = new AtomicLong();
@@ -291,43 +307,17 @@ public class FileTransferService implements Closeable, Reporter {
 	private static ObservableList<Target> loadTargets() {
 		ObservableList<Target> targets = FXCollections.observableArrayList();
 
-//		var bldr = ConfigurationStoreBuilder.builder().
-//			withApp(PushSFTPUI.class).
-//			withName("targets").
-//			withoutFailOnMissingFile().
-//			withBinding(ArrayBindingBuilder.builder(Target.class, targets).
-//				withBindingBuilder(() -> TargetBuilder.builder(), (b) -> b.build(), (b) -> 
-//					ObjectBindingBuilder.builder(Target.class).withBinding(
-//						xstring("hostname", b::withHostname, Target.class, Target::hostname).build(),
-//						xstring("username", b::withUsername, Target.class, Target::username).build(),
-//						xstring("remoteFolder", b::withRemoteFolderPath, Target.class, t -> t.remoteFolder().map(Path::toString).orElse("")).build(),
-//						xstring("privateKey", b::withIdentityPath, Target.class, t -> t.remoteFolder().map(Path::toString).orElse("")).build(), 
-//						xinteger("port", b::withPort, Target.class, Target::port).build(),
-//						xboolean("agentAuthentication", b::withAgent).build(),
-//						xboolean("defaultIdentities", b::withIdentities).build(),
-//						xobject(Mode.class, "mode", b::withMode).build(),
-//						xboolean("passwordAuthentication", b::withPassword).build(), 
-//						xinteger("chunks", b::withChunks, Target.class, Target::chunks).build(),
-//						xboolean("verifyIntegrity", b::withVerifyIntegrity, Target.class, Target::verifyIntegrity).build(),
-//						xboolean("ignoreIntegrity", b::withIgnoreIntegrity, Target.class, Target::ignoreIntegrity).build(),
-//						xboolean("preAllocate", b::withPreAllocate, Target.class, Target::preAllocate).build(),
-//						xboolean("copyDataExtension", b::withCopyDataExtension, Target.class, Target::copyDataExtension).build(),
-//						xobject(RemoteHash.class, "hash", b::withHash, Target.class, Target::hash).build()
-//						).build()
-//				).
-//				build());
-//		
-//		var store = bldr.build();
-//		store.retrieve();
-
-		var bldr = ConfigurationStoreBuilder.builder().withApp(PushSFTPUI.class).withName("targets")
-				.withoutFailOnMissingFile().withDeserializer((j) -> {
+		var bldr = ConfigurationStoreBuilder.builder().
+				withApp(PushSFTPUI.class).withName("targets").
+				withoutFailOnMissingFile().
+				withDeserializer((j) -> {
 					targets.clear();
 					var arr = j.asJsonArray();
 					for (var el : arr) {
 						targets.add(fromJsonObject(el.asJsonObject()));
 					}
-				}).withSerializer(() -> {
+				}).
+				withSerializer(() -> {
 					var ob = Json.createArrayBuilder();
 					for (var target : targets) {
 						ob.add(toJsonObject(target));
@@ -350,11 +340,14 @@ public class FileTransferService implements Closeable, Reporter {
 	}
 
 	private static Target fromJsonObject(JsonObject obj) {
-		return TargetBuilder.builder().withHostname(obj.getString("hostname", ""))
-				.withUsername(obj.getString("username", "")).withPort(obj.getInt("port", 22))
+		return TargetBuilder.builder()
+				.withHostname(obj.getString("hostname", ""))
+				.withUsername(obj.getString("username", ""))
+				.withPort(obj.getInt("port", 22))
 				.withChunks(obj.getInt("chunks", 3))
 				.withDisplayName(obj.getString("displayName", null))
 				.withIdentity(emptyPathIfBlankString(obj.getString("privateKey", "")))
+				.withPreferredIdentity(emptyPathIfBlankString(obj.getString("preferredPrivateKey", "")))
 				.withRemoteFolder(emptyPathIfBlankString(obj.getString("remoteFolder", "")))
 				.withAgent(obj.getBoolean("agentAuthentication", true))
 				.withPassword(obj.getBoolean("passwordAuthentication", true))
@@ -365,7 +358,8 @@ public class FileTransferService implements Closeable, Reporter {
 				.withMultiplex(obj.getBoolean("multiplex", false))
 				.withIgnoreIntegrity(obj.getBoolean("ignoreIntegrity", false))
 				.withAuthenticationTimeout(obj.getInt("authenticationTimeout", 120))
-				.withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name()))).build();
+				.withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name())))
+				.build();
 	}
 
 	private static JsonValue toJsonObject(Target target) {
@@ -377,6 +371,7 @@ public class FileTransferService implements Closeable, Reporter {
 		bldr.add("port", target.port());
 		bldr.add("chunks", target.chunks());
 		bldr.add("privateKey", target.identity().map(Path::toString).orElse(""));
+		bldr.add("preferredPrivateKey", target.preferredIdentity().map(Path::toString).orElse(""));
 		bldr.add("remoteFolder", target.remoteFolder().map(Path::toString).orElse(""));
 		bldr.add("agentAuthentication", target.agent());
 		bldr.add("passwordAuthentication", target.password());

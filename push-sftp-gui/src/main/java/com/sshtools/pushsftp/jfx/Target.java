@@ -18,6 +18,7 @@ public final class Target {
 		private boolean agent = true;
 		private boolean password = true;
 		private Optional<Path> identity = Optional.empty();
+		private Optional<Path> preferredIdentity = Optional.empty();
 		private Optional<Path> remoteFolder = Optional.empty();
 		private int authenticationTimeout = 120;
 		private Optional<Mode> mode = Optional.empty();
@@ -27,6 +28,30 @@ public final class Target {
 		private boolean multiplex = false;
 		private Optional<RemoteHash> hash = Optional.empty();
 		private Optional<String> unsafePassword = Optional.empty();
+		
+		public TargetBuilder fromTarget(Target target) {
+			if(target == null)
+				return this;
+			this.displayName = target.displayName;
+			this.username = Optional.of(target.username);
+			this.hostname = Optional.of(target.hostname);
+			this.port = target.port;
+			this.identities = target.identities;
+			this.agent = target.agent;
+			this.password = target.password;
+			this.identity = target.identity;
+			this.preferredIdentity = target.preferredIdentity;
+			this.remoteFolder = target.remoteFolder;
+			this.authenticationTimeout = target.authenticationTimeout;
+			this.mode = Optional.of(target.mode);
+			this.chunks = Optional.of(target.chunks);
+			this.verifyIntegrity= target.verifyIntegrity;
+			this.ignoreIntegrity= target.ignoreIntegrity;
+			this.multiplex= target.multiplex;
+			this.hash =Optional.of(target.hash);
+			this.unsafePassword = target.unsafePassword;
+			return this;
+		}
 
 		public TargetBuilder withUnsafePassword(String unsafePassword) {
 			return withUnsafePassword(Optional.ofNullable(unsafePassword));
@@ -181,6 +206,15 @@ public final class Target {
 			return withIdentity(Optional.of(identity));
 		}
 
+		public TargetBuilder withPreferredIdentity(Path preferredIdentity) {
+			return withPreferredIdentity(Optional.of(preferredIdentity));
+		}
+
+		public TargetBuilder withPreferredIdentity(Optional<Path> preferredIdentity) {
+			this.preferredIdentity = preferredIdentity;
+			return this;
+		}
+
 		public TargetBuilder withIdentity(Optional<Path> identity) {
 			this.identity = identity;
 			return this;
@@ -208,6 +242,7 @@ public final class Target {
 	private final boolean agent;
 	private final boolean password;
 	private final Optional<Path> identity;
+	private final Optional<Path> preferredIdentity;
 	private final Optional<Path> remoteFolder;
 	private final int authenticationTimeout;
 	private final Mode mode;
@@ -236,6 +271,7 @@ public final class Target {
 		this.hash = builder.hash.orElse(RemoteHash.sha512);
 		this.displayName = builder.displayName;
 		this.unsafePassword = builder.unsafePassword;
+		this.preferredIdentity = builder.preferredIdentity;
 	}
 
 	@Override
@@ -290,6 +326,10 @@ public final class Target {
 
 	public Optional<Path> identity() {
 		return identity;
+	}
+
+	public Optional<Path> preferredIdentity() {
+		return preferredIdentity;
 	}
 
 	public int authenticationTimeout() {

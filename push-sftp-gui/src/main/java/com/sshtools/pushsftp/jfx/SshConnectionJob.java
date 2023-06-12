@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +29,7 @@ import com.sshtools.client.SshClient.SshClientBuilder;
 import com.sshtools.client.SshClientContext;
 import com.sshtools.common.knownhosts.HostKeyVerification;
 import com.sshtools.common.ssh.SshException;
+import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import javafx.concurrent.Task;
 
@@ -58,13 +62,20 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 	}
 
 	public static abstract class AbstractSshConnectionJobBuilder<J extends SshConnectionJob<?>, B extends AbstractSshConnectionJobBuilder<J, B>> {
-		private Optional<Target> target = Optional.empty();
+		private Optional<Supplier<Target>> target = Optional.empty();
 		private Optional<String> agentSocket = Optional.empty();
 		private boolean verbose;
 		private Optional<String> agentName = Optional.empty();
 		private Optional<PassphrasePrompt> passphrasePrompt = Optional.empty();
 		private Optional<PasswordPrompt> password = Optional.empty();
 		private Optional<HostKeyVerification> hostKeyVerification = Optional.empty();
+		private Optional<Consumer<Target>> serializer = Optional.empty();
+		
+		@SuppressWarnings("unchecked")
+		public B withSerializer(Consumer<Target> serializer) {
+			this.serializer = Optional.of(serializer);
+			return (B)this;
+		}
 
 		public B withHostKeyVerification(HostKeyVerification hostKeyVerification) {
 			return withHostKeyVerification(Optional.of(hostKeyVerification));
@@ -110,8 +121,12 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 			return (B) this;
 		}
 
-		@SuppressWarnings("unchecked")
 		public B withTarget(Target target) {
+			return withTarget(() -> target);
+		}
+
+		@SuppressWarnings("unchecked")
+		public B withTarget(Supplier<Target> target) {
 			this.target = Optional.of(target);
 			return (B) this;
 		}
@@ -139,13 +154,16 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		public abstract J build();
 	}
 
-	protected final Target target;
+	protected final Supplier<Target> target;
 	protected final Optional<String> agentSocket;
 	protected final String agentName;
 	protected final boolean verbose;
+	protected final Optional<Consumer<Target>> serializer;
 	protected final Optional<PassphrasePrompt> passphrasePrompt;
 	protected final Optional<PasswordPrompt> password;
 	protected final Optional<HostKeyVerification> hostKeyVerification;
+	
+	private SshClient ssh;
 
 	protected SshConnectionJob(AbstractSshConnectionJobBuilder<?, ?> builder) {
 		this.target = builder.target.orElseThrow(() -> new IllegalStateException("Target must be provided.")); //$NON-NLS-1$
@@ -155,6 +173,7 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		this.passphrasePrompt = builder.passphrasePrompt;
 		this.password = builder.password;
 		this.hostKeyVerification = builder.hostKeyVerification;
+		this.serializer = builder.serializer;
 	}
 
 	@Override
@@ -163,9 +182,22 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		return onConnected(client);
 	}
 
+	@Override
+	protected final void cancelled() {
+		if(ssh != null && ssh.isConnected())
+			ssh.disconnect();
+		onCancelled();
+	}
+	
+	protected void onCancelled() {
+		
+	}
+
 	protected abstract V onConnected(SshClient client) throws Exception;
 
 	private SshClient connect() throws IOException, SshException {
+		
+		var target = this.target.get();
 
 		updateMessage(MessageFormat.format(RESOURCES.getString("progress.connection"), target.username(), //$NON-NLS-1$
 				target.hostname(), target.port()));
@@ -179,44 +211,62 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 				withSshContext(ctx).
 				withConnectTimeout(Duration.ofSeconds(120));
 		
-		var ssh = bldr.build();
+		ssh = bldr.build();
 
-		if (target.agent()) {
-			try {
-				try (var agent = SshAgentClient.connectOpenSSHAgent(agentName,
-						agentSocket.orElse(SshAgentClient.getEnvironmentSocket()))) {
-					if (ssh.authenticate(new ExternalKeyAuthenticator(agent),
-							TimeUnit.SECONDS.toMillis(target.authenticationTimeout()))) {
-						if (verbose)
-							updateMessage(RESOURCES.getString("progress.authenticatedByAgent")); //$NON-NLS-1$
-					} else {
-						if (verbose && agentSocket.isPresent())
-							updateMessage(RESOURCES.getString("progress.notAuthenticatedByAgent")); //$NON-NLS-1$
-					}
-				} catch (IOException e) {
-					if (agentSocket.isPresent() && verbose) {
-						updateMessage(MessageFormat.format(RESOURCES.getString("error.failedToConnectToAgent"), //$NON-NLS-1$
-								e.getMessage()));
-					}
-				}
-			} catch (AgentNotAvailableException e) {
+		var identity = target.identity();
+		if (identity.isPresent()) {
+
+			if(!isCancelled() && !ssh.isConnected()) {
+				ssh = bldr.build();
+			}
+
+			if (!Files.exists(identity.get())) {
 				if (verbose)
-					updateMessage(RESOURCES.getString("error.noAgent")); //$NON-NLS-1$
+					updateMessage(RESOURCES.getString("progress.noIdentityFile")); //$NON-NLS-1$
+			} else {
+				if (ssh.authenticate(new PrivateKeyFileAuthenticator(identity.get(), createPassphrasePrompt()),
+						TimeUnit.SECONDS.toMillis(target.authenticationTimeout()))) {
+					//
+				} else {
+					if (verbose)
+						updateMessage(RESOURCES.getString("progress.badIdentityFile")); //$NON-NLS-1$
+				}
 			}
 		} else {
 			if (verbose)
-				updateMessage(RESOURCES.getString("progress.agentAuthenticationDisable")); //$NON-NLS-1$
+				updateMessage(RESOURCES.getString("progress.noSpecificIdentity")); //$NON-NLS-1$
 		}
 
 		if (!ssh.isAuthenticated()) {
 			if (target.identities()) {
-				if(!ssh.isConnected()) {
+				if(!isCancelled() && !ssh.isConnected()) {
 					ssh = bldr.build();
 				}
 				
-				if (ssh.authenticate(new IdentityFileAuthenticator(createPassphrasePrompt()),
+				IdentityFileAuthenticator authenticator;
+				if(target.preferredIdentity().isPresent()) {
+					var list = new ArrayList<>(IdentityFileAuthenticator.collectIdentities(false));
+					var preferredKey = target.preferredIdentity().get();
+					list.remove(preferredKey);
+					list.add(0, preferredKey);
+					authenticator = new IdentityFileAuthenticator(list, createPassphrasePrompt());
+				}
+				else {
+					authenticator = new IdentityFileAuthenticator(createPassphrasePrompt());
+				}
+				
+				if (ssh.authenticate(authenticator,
 						TimeUnit.SECONDS.toMillis(target.authenticationTimeout()))) {
 					//
+					serializer.ifPresent(s -> {
+						var path = authenticator.getCurrentPath();
+						if(!path.equals(target.preferredIdentity().orElse(null))) {
+							s.accept(TargetBuilder.builder().
+									fromTarget(target).
+									withPreferredIdentity(path).
+									build());
+						}
+					});
 				}
 			} else {
 				if (verbose)
@@ -224,36 +274,44 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 			}
 		}
 
-		var identity = target.identity();
 		if (!ssh.isAuthenticated()) {
-			if (identity.isPresent()) {
+			if(target.agent()) {
 
-				if(!ssh.isConnected()) {
+				if(!isCancelled() && !ssh.isConnected()) {
 					ssh = bldr.build();
 				}
-
-				if (!Files.exists(identity.get())) {
-					if (verbose)
-						updateMessage(RESOURCES.getString("progress.noIdentityFile")); //$NON-NLS-1$
-				} else {
-					if (ssh.authenticate(new PrivateKeyFileAuthenticator(identity.get(), createPassphrasePrompt()),
-							TimeUnit.SECONDS.toMillis(target.authenticationTimeout()))) {
-						//
-					} else {
-						if (verbose)
-							updateMessage(RESOURCES.getString("progress.badIdentityFile")); //$NON-NLS-1$
+				
+				try {
+					try (var agent = SshAgentClient.connectOpenSSHAgent(agentName,
+							agentSocket.orElse(SshAgentClient.getEnvironmentSocket()))) {
+						if (ssh.authenticate(new ExternalKeyAuthenticator(agent),
+								TimeUnit.SECONDS.toMillis(target.authenticationTimeout()))) {
+							if (verbose)
+								updateMessage(RESOURCES.getString("progress.authenticatedByAgent")); //$NON-NLS-1$
+						} else {
+							if (verbose && agentSocket.isPresent())
+								updateMessage(RESOURCES.getString("progress.notAuthenticatedByAgent")); //$NON-NLS-1$
+						}
+					} catch (IOException e) {
+						if (agentSocket.isPresent() && verbose) {
+							updateMessage(MessageFormat.format(RESOURCES.getString("error.failedToConnectToAgent"), //$NON-NLS-1$
+									e.getMessage()));
+						}
 					}
+				} catch (AgentNotAvailableException e) {
+					if (verbose)
+						updateMessage(RESOURCES.getString("error.noAgent")); //$NON-NLS-1$
 				}
 			} else {
 				if (verbose)
-					updateMessage(RESOURCES.getString("progress.noSpecificIdentity")); //$NON-NLS-1$
+					updateMessage(RESOURCES.getString("progress.agentAuthenticationDisable")); //$NON-NLS-1$
 			}
 		}
 
 		if (!ssh.isAuthenticated()) {
 			if (target.password()) {
 
-				if(!ssh.isConnected()) {
+				if(!isCancelled() && !ssh.isConnected()) {
 					ssh = bldr.build();
 				}
 				

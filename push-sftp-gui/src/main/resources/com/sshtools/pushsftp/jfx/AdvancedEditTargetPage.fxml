@@ -82,7 +82,7 @@
                                     <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="26.0" styleClass="spaced">
                                        <children>
                                           <Label prefWidth="120.0" text="%chunks" />
-                                          <TextField fx:id="chunks" prefWidth="40.0" promptText="3">
+                                          <TextField fx:id="chunks" prefWidth="80.0" promptText="3">
                                              <tooltip>
                                                 <Tooltip text="%chunks.toolTip" />
                                              </tooltip>

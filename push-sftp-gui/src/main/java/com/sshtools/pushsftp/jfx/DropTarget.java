@@ -133,6 +133,13 @@ public class DropTarget extends StackPane implements Initializable {
 		tr.setNode(fileIcon);
 		tr.setCycleCount(Animation.INDEFINITE);
 		anim = tr;
+
+		if(service.busyProperty().get()) {
+			fileIcon.setOpacity(1);
+			fileIcon.setVisible(true);
+			anim.play();
+			updateFolderIcon();
+		}
 		
 		return this;
 	}

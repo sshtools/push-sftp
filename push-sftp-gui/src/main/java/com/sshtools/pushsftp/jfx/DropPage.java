@@ -11,13 +11,12 @@ import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
+import com.sshtools.jajafx.PrefBind;
 import com.sshtools.jajafx.ScrollStack;
 import com.sshtools.pushsftp.jfx.FileTransferService.TransferUnit;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import eu.hansolo.medusa.Gauge;
-import eu.hansolo.medusa.events.UpdateEvent;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -60,9 +59,12 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 	NotificationPane  notificationPane;
 
 	private TransferUnit transferUnit;
+	private PrefBind prefBind;
 
 	@Override
 	protected void onConfigure() {
+		
+		prefBind = new PrefBind(getContext().getContainer().getAppPreferences());
 		
 		var service = getContext().getService();
 		var targets = service.getTargets();
@@ -71,16 +73,19 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 		targets.addListener((ListChangeListener.Change<? extends Target> c) -> {
 			while (c.next()) {
 				if(c.wasReplaced()) {
-					// A bit brute force, look for better way
-					scrollStack.clear();
-					targets.forEach(t -> scrollStack.add(new DropTarget().setup(t, getContext())));
+					var ai = c.getAddedSubList().iterator();
+					for (var t : c.getRemoved()) {
+						var old = findDropTarget(t);
+						var newTarget = ai.next();
+						scrollStack.set(scrollStack.indexOf(old), new DropTarget().setup(newTarget, getContext()));
+					}
 				}
 				else {
-					for (var t : c.getAddedSubList()) {
-						scrollStack.add(new DropTarget().setup(t, getContext()));
-					}
 					for(var t : c.getRemoved()) {
 						scrollStack.remove(findDropTarget(t));
+					}
+					for (var t : c.getAddedSubList()) {
+						scrollStack.add(new DropTarget().setup(t, getContext()));
 					}
 				}
 			}
@@ -119,20 +124,22 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 		updateGauges();
 		
 		getContext().getContainer().getAppPreferences().addPreferenceChangeListener(this);
+		
+		prefBind.bind(scrollStack.indexProperty(), "scrollStack");
 	}
 
 	private void resetGauges() {
 		speedGauge.setBarColor(Color.valueOf("#0078d7"));
 		progressGauge.setTitle("");
 		progressGauge.setBarColor( Color.valueOf("#0078d7"));
-		speedGauge.setMaxValue(100);
+		speedGauge.setMaxValue(10);
 		speedGauge.setValue(0);
 		progressGauge.setValue(0);
 	}
 	
 	private void updateLabels() {
 		transferUnit = TransferUnit.valueOf(getContext().getContainer().getAppPreferences().get("transferSpeedUnits", TransferUnit.MB_S.name()));
-		speedGauge.setMaxValue(100);
+		speedGauge.setMaxValue(10);
 		speedGauge.setUnit(OptionsPage.RESOURCES.getString("transferSpeedUnits." + transferUnit.name()));
 	}
 	
@@ -176,6 +183,7 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 	
 	@Override
 	public void close() {
+		prefBind.close();
 		getContext().getContainer().getAppPreferences().removePreferenceChangeListener(this);
 	}
 

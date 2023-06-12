@@ -153,6 +153,7 @@ public final class PushJob extends SshConnectionJob<Void> {
 
 	@Override
 	protected Void onConnected(SshClient client) throws Exception {
+		var target = this.target.get();
 		switch (target.mode()) {
 		case CHUNKED:
 			client.runTask(PushTaskBuilder.create()
@@ -255,17 +256,18 @@ public final class PushJob extends SshConnectionJob<Void> {
     }
 
 	@Override
-	protected void cancelled() {
+	protected void onCancelled() {
 		updateMessage(RESOURCES.getString("cancelled")); //$NON-NLS-1$
 	}
 
 	SshClient acquireClient(int index, SshClient defaultClient) {
+		var target = this.target.get();
 		if (index == 0 || target.multiplex() || target.chunks() < 2)
 			return defaultClient;
 		else {
 			try {
 				return SshConnectionJob.forConnection().
-						withTarget(target).
+						withTarget(this.target).
 						withVerbose(verbose).
 						withAgentSocket(agentSocket).
 						withPassword(password).
