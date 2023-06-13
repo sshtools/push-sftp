@@ -228,13 +228,15 @@ public class FileTransferService implements Closeable, Reporter {
 						return targets.get(idx);
 				})
 				.withSerializer((t) -> {
-					var idx = targets.indexOf(target);
-					if(idx == -1) {
-						targets.add(t);
-					}
-					else {
-						targets.set(idx, t);
-					}
+					Platform.runLater(() -> {
+						var idx = targets.indexOf(target);
+						if(idx == -1) {
+							targets.add(t);
+						}
+						else {
+							targets.set(idx, t);
+						}
+					});
 				})
 				.withReporter(this)
 				.withHostKeyVerification(context.createHostKeyVerificationPrompt(target))
