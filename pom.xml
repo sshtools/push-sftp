@@ -17,11 +17,48 @@
 		<!-- For configuring Install4J -->
 		<build.phase>continuous</build.phase>
 		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
+		<build.arch>${os.arch}</build.arch>
+		<build.platform>${build.os.family}-${os.arch}</build.platform>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
 		<module>push-sftp-gui</module>
 	</modules>
+	<profiles>
+		<profile>
+			<id>mac-build</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<build.os.family>macos</build.os.family>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-build</id>
+			<activation>
+				<os>
+					<family>linux</family>
+				</os>
+			</activation>
+			<properties>
+				<build.os.family>linux</build.os.family>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-build</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<build.os.family>windows</build.os.family>
+			</properties>
+		</profile>
+	</profiles>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -154,8 +191,6 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	<profiles>
-	</profiles>
 	<repositories>
 		<repository>
 			<id>oss-snapshots</id>

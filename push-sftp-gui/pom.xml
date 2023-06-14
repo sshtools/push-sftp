@@ -184,39 +184,6 @@
 		</plugins>
 	</build>
 	<profiles>
-		<profile>
-			<id>mac-jfx</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-			<properties>
-				<javafx.os.family>mac</javafx.os.family>
-			</properties>
-		</profile>
-		<profile>
-			<id>linux-jfx</id>
-			<activation>
-				<os>
-					<family>linux</family>
-				</os>
-			</activation>
-			<properties>
-				<javafx.os.family>linux</javafx.os.family>
-			</properties>
-		</profile>
-		<profile>
-			<id>windows-jfx</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<properties>
-				<javafx.os.family>windows</javafx.os.family>
-			</properties>
-		</profile>
 		<!-- Graal Native Image -->
 		<profile>
 			<id>native-images</id>

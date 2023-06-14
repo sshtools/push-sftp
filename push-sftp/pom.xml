@@ -57,6 +57,21 @@
 		<!-- Graal Native Image -->
 		<profile>
 			<id>native-image</id>
+
+			<distributionManagement>
+				<!-- These are for the jars of natively compiled commands -->
+				<repository>
+					<id>libs-releases-local</id>
+					<name>libs-releases</name>
+					<url>https://artifactory.jadaptive.com/libs-releases-local</url>
+				</repository>
+				<snapshotRepository>
+					<id>libs-snapshots-local</id>
+					<name>libs-snapshots</name>
+					<url>https://artifactory.jadaptive.com/libs-snapshots-local</url>
+				</snapshotRepository>
+			</distributionManagement>
+			
 			<dependencies>
 				<dependency>
 					<groupId>org.graalvm.sdk</groupId>
@@ -70,8 +85,26 @@
 					<version>10.0.4</version>
 				</dependency>
 			</dependencies>
+			
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<configuration>
+									<target>
+										<mkdir dir="${project.build.directory}/exe" />
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<groupId>org.graalvm.nativeimage</groupId>
 						<artifactId>native-image-maven-plugin</artifactId>
@@ -84,12 +117,37 @@
 								</goals>
 								<phase>package</phase>
 								<configuration>
+									<outputDirectory>${project.build.directory}/exe</outputDirectory>
 									<mainClass>${main.class}</mainClass>
 									<skip>false</skip>
 									<imageName>push-sftp</imageName>
 									<buildArgs>--allow-incomplete-classpath
 										--report-unsupported-elements-at-runtime
 									</buildArgs>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>3.3.0</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<archive>
+										<addMavenDescriptor>false</addMavenDescriptor>
+										<forced>true</forced>
+									</archive>
+									<classifier>${build.platform}</classifier>
+									<classesDirectory>${project.build.directory}/exe</classesDirectory>
+									<includes>
+										<include>push-sftp</include>
+									</includes>
 								</configuration>
 							</execution>
 						</executions>
