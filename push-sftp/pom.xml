@@ -5,7 +5,7 @@
 	<artifactId>push-sftp</artifactId>
 	<parent>
 		<groupId>com.sshtools</groupId>
-		<version>0.1.1-SNAPSHOT</version>
+		<version>0.1.2-SNAPSHOT</version>
 		<artifactId>push-sftp-group</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
