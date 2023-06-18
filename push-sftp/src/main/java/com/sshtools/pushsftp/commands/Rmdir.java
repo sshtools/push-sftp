@@ -13,7 +13,7 @@ public class Rmdir extends SftpCommand {
 	protected Integer onCall() throws Exception {
 		var expandedPath = expandRemoteSingle(file);
 		getTerminal().messageln("Removing dir {0}", expandedPath);
-		getSftpClient().rmdir(expandedPath);
+		getSftpClient().getSubsystemChannel().removeDirectory(expandedPath);
 		return 0;
 	}
 
