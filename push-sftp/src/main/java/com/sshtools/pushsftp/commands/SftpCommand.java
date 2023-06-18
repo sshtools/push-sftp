@@ -205,7 +205,7 @@ public abstract class SftpCommand extends ChildCommand {
 				@Override
 				public FileVisitResult preVisitDirectory(SftpFile dir, BasicFileAttributes attrs) throws IOException {
 					String filePath = dir.getAbsolutePath();
-					if(parentMatcher == null | parentMatcher.matches(Paths.get(filePath))) {
+					if(parentMatcher == null || parentMatcher.matches(Paths.get(filePath))) {
 						return FileVisitResult.CONTINUE;
 					}
 					return FileVisitResult.SKIP_SUBTREE;
