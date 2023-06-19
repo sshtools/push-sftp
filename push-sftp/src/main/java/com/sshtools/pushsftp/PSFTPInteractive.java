@@ -301,6 +301,6 @@ public class PSFTPInteractive extends CliCommand {
 	}
 	
 	public void setLocalDirectory(Path path) {
-		localDirectory = Optional.of(path.toAbsolutePath());
+		localDirectory = Optional.of(localDirectory.isPresent() ? localDirectory.get().resolve(path) : path);
 	}
 }

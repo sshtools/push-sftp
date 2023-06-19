@@ -1,13 +1,17 @@
 package com.sshtools.pushsftp.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.TreeSet;
 
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpFile;
+import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.Utils;
@@ -40,7 +44,7 @@ public class Ls extends SftpCommand {
 		return 0;
 	}
 
-	private void printNames() throws SftpStatusException, SshException {
+	private void printNames() throws SftpStatusException, SshException, IOException, PermissionDeniedException {
 
 		
 		var results = new TreeSet<String>();
@@ -82,13 +86,34 @@ public class Ls extends SftpCommand {
 		}
 	}
 
-	private Iterator<SftpFile> lsIterator() throws SftpStatusException, SshException {
+	@SuppressWarnings("unchecked")
+	private Iterator<SftpFile> lsIterator() throws SftpStatusException, SshException, IOException, PermissionDeniedException {
 		var sftp = getSftpClient();
- 		var it = path.isPresent() ? sftp.lsIterator(path.get()) : sftp.lsIterator();
-		return it;
+		if(path.isPresent()) {
+			var expanded = expandRemoteArray(path.get());
+			if(expanded.length == 1)
+				return lsPath(expanded[0]);
+			else {
+				var l = new ArrayList<Iterator<SftpFile>>();
+				for(var path : expanded) {
+					l.add(lsPath(path));
+				}
+				return new CompoundIterator<SftpFile>(l.toArray(new Iterator[0]));
+			}
+		}
+		else
+			return sftp.lsIterator();
 	}
 
-	private void printLongnames() throws SftpStatusException, SshException {
+	private Iterator<SftpFile> lsPath(String path) throws SftpStatusException, SshException {
+		var resolved = getSftpClient().getSubsystemChannel().getFile(path);
+		if(resolved.attributes().isDirectory())
+			return  getSftpClient().lsIterator(path);
+		else
+			return Arrays.asList(resolved).iterator();
+	}
+
+	private void printLongnames() throws SftpStatusException, SshException, IOException, PermissionDeniedException {
 
 		var it = lsIterator();
 		var results = new ArrayList<SftpFile>();
@@ -105,6 +130,45 @@ public class Ls extends SftpCommand {
 		for(var result : results) {
 			System.out.println(SftpClient.formatLongname(result));
 		}
+	}
+	
+	class CompoundIterator<T> implements Iterator<T> {
+
+	    private final LinkedList<Iterator<T>> iteratorQueue;
+	    private Iterator<T> current;
+
+	    @SafeVarargs
+	    public CompoundIterator(final Iterator<T>... iterators) {
+	        this.iteratorQueue = new LinkedList<Iterator<T>>();
+	        for (var iterator : iterators) {
+	            iteratorQueue.push(iterator);
+	        }
+	        current = Collections.<T>emptyList().iterator();
+	    }
+
+	    public boolean hasNext() {
+	       var curHasNext = current.hasNext();
+	        if (!curHasNext && !iteratorQueue.isEmpty()) {
+	            current = iteratorQueue.pop();
+	            return current.hasNext();
+	        } else {
+	            return curHasNext;
+	        }
+	    }
+
+	    public T next() {
+	        if (current.hasNext()) {
+	            return current.next();
+	        }
+	        if (!iteratorQueue.isEmpty()) {
+	            current = iteratorQueue.pop();
+	        }
+	        return current.next();
+	    }
+
+	    public void remove() {
+	        throw new UnsupportedOperationException("remove() unsupported");
+	    }
 	}
 
 }

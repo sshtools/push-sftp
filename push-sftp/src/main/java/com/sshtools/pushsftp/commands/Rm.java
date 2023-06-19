@@ -7,8 +7,8 @@ import picocli.CommandLine.Parameters;
 @Command(name = "rm", usageHelpAutoWidth = true, mixinStandardHelpOptions = true, description = "Remove file")
 public class Rm extends SftpCommand {
 
-	@Parameters(index = "0", arity = "1", description = "File to remove")
-	private String file;
+	@Parameters(index = "0", arity = "1..", description = "File(s) to remove")
+	private String[] files;
 	
 	@Option(names = "-f", description = "force deletion of children")
 	private boolean force;
@@ -18,9 +18,12 @@ public class Rm extends SftpCommand {
 	
 	@Override
 	protected Integer onCall() throws Exception {
-		var expandedPath = expandRemoteSingle(file);
-		getTerminal().messageln("Removing {0}", expandedPath);
-		getSftpClient().rm(expandedPath, force, recursive);
+		var terminal = getTerminal();
+		var sftp = getSftpClient();
+		expandRemoteAndDo(p -> {
+			terminal.messageln("Removing {0}", p);
+			sftp.rm(p, force, recursive);
+		}, true, files);
 		return 0;
 	}
 

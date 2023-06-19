@@ -3,20 +3,17 @@ package com.sshtools.pushsftp.commands;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Optional;
 
 import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
-import com.sshtools.client.sftp.SftpFile;
-import com.sshtools.client.sftp.SftpFileVisitor;
 import com.sshtools.client.tasks.FileTransferProgress;
 import com.sshtools.commands.ChildCommand;
+import com.sshtools.common.permissions.PermissionDeniedException;
 import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.FileUtils;
@@ -104,7 +101,7 @@ public abstract class SftpCommand extends ChildCommand {
 		return l.toArray(new Path[0]);
 	}
 
-	protected Optional<String> expandRemoteSingleOr(Optional<String> path) throws SshException, SftpStatusException {
+	protected Optional<String> expandRemoteSingleOr(Optional<String> path) throws SshException, SftpStatusException, IOException, PermissionDeniedException {
 		if(path.isEmpty()) {
 			return path;
 		}
@@ -112,7 +109,7 @@ public abstract class SftpCommand extends ChildCommand {
 			return Optional.of(expandRemoteSingle(path.get()));
 	}
 
-	protected String expandRemoteSingle(Optional<String> path) throws SshException, SftpStatusException {
+	protected String expandRemoteSingle(Optional<String> path) throws SshException, SftpStatusException, IOException, PermissionDeniedException {
 		var expandRemoteSingleOr = expandRemoteSingleOr(path);
 		if(expandRemoteSingleOr.isPresent())
 			return expandRemoteSingleOr.get();
@@ -122,7 +119,7 @@ public abstract class SftpCommand extends ChildCommand {
 		}
 	}
 
-	protected String expandRemoteSingle(String path) throws SshException, SftpStatusException {
+	protected String expandRemoteSingle(String path) throws SshException, SftpStatusException, IOException, PermissionDeniedException {
 		var l = new ArrayList<String>();
 		expandRemoteAndDo((fp) -> {
 			if(!l.isEmpty())
@@ -135,7 +132,7 @@ public abstract class SftpCommand extends ChildCommand {
 			return l.get(0);
 	}
 	
-	protected String[] expandRemoteArray(String[] paths)  throws SshException, SftpStatusException {
+	protected String[] expandRemoteArray(String... paths)  throws SshException, SftpStatusException, IOException, PermissionDeniedException {
 		var l = new ArrayList<String>();
 		for(var path : paths) {
 			expandRemoteAndDo((fp) -> {
@@ -149,24 +146,32 @@ public abstract class SftpCommand extends ChildCommand {
 
 		PSFTPInteractive cmd = getInteractiveCommand().rootCommand();
 		for(var path : paths) {
+			
 			path = expandSpecialLocalPath(path);
+			path = path.normalize();
+			
+			if(path.toString().equals("..")) {
+				var parentPath = cmd.getLcwd().toAbsolutePath().getParent();
+				path = parentPath == null ? path.getRoot() : parentPath;
+			}
 
 			var root = path.isAbsolute() ? path.getRoot() : cmd.getLcwd();
-			Path resolved = root;
+			var resolved = root;
 			var pathCount = path.getNameCount();
+			
 			for(int i = 0 ; i < pathCount; i++) {
+				
 				var pathPart = path.getName(i);
-				if(pathPart.toString().equals("..")) {
-					//
-					//XXXXXXX TODO XXXXXXXXX
-					//
-				}
 				var matches = 0;
+				
 				try(var stream = Files.newDirectoryStream(resolved)) {
+					
 					var matcher = FileSystems.getDefault().getPathMatcher("glob:" + pathPart.toString());
+					
 					for(var pathPartPath : stream) {
+						var fullPath = resolved;
 						if(matcher.matches(pathPartPath.getFileName())) {
-							resolved = resolved.resolve(pathPartPath.getFileName());
+							fullPath = fullPath.resolve(pathPartPath.getFileName());
 							matches++;
 							if(i == pathCount -1) {
 								try {
@@ -182,60 +187,71 @@ public abstract class SftpCommand extends ChildCommand {
 						}
 					}
 				}
+				
 				if(!recurse || matches == 0)
 					break;
+				
+				resolved = resolved.resolve(pathPart);
 			}
 		}
 	}
 
-	protected void expandRemoteAndDo(FileOp op, boolean recurse, String... paths) throws SshException, SftpStatusException {
-		for(var path : paths) {
+	protected void expandRemoteAndDo(FileOp op, boolean recurse, String... paths) throws SshException, SftpStatusException, IOException, PermissionDeniedException  {
 
-			//
-			//XXXXXXX TODO XXXXXXXXX
-			//
-			// Copy the local version (more efficient)
-			//
+		for(var path : paths) {
 			
-			var matcher = FileSystems.getDefault().getPathMatcher("glob:" + path);
-			var parent = Paths.get(path).getParent();
-			var parentMatcher = parent == null ? null : FileSystems.getDefault().getPathMatcher("glob:" + parent);
-	
-			getSftpClient().visit(path, new SftpFileVisitor() {
-				@Override
-				public FileVisitResult preVisitDirectory(SftpFile dir, BasicFileAttributes attrs) throws IOException {
-					String filePath = dir.getAbsolutePath();
-					if(parentMatcher == null || parentMatcher.matches(Paths.get(filePath))) {
-						return FileVisitResult.CONTINUE;
-					}
-					return FileVisitResult.SKIP_SUBTREE;
-				}
+			path = expandSpecialRemotePath(path);
+			path = Path.of(path).normalize().toString();
+			
+			if(path.toString().equals("..")) {
+				var parentFile = getSftpClient().getCurrentWorkingDirectory().getParentFile();
+				var parentPath = parentFile == null ? null : parentFile.getAbsolutePath();
+				path = parentPath == null ? "/" : parentPath;
+			}
+
+			var absolute = path.startsWith("/");
+			var root = absolute ? "/" : getSftpClient().pwd();
+			var resolved = root;
+			var pathParts = ( path.startsWith("/") ? path.substring(1) : path ).split("/");
+			var pathCount = pathParts.length;
+			
+			for(int i = 0 ; i < pathCount; i++) {
+				var pathPart = pathParts[i];
+				var matches = 0;
+				var matcher = FileSystems.getDefault().getPathMatcher("glob:" + pathPart);
 				
-				@Override
-				public FileVisitResult postVisitDirectory(SftpFile dir, IOException exc) throws IOException {
-					if(recurse)
-						return FileVisitResult.TERMINATE;
-					else
-						return FileVisitResult.CONTINUE;
-				}
-	
-				@Override
-				public FileVisitResult visitFile(SftpFile file, BasicFileAttributes attrs) throws IOException {
-					String filePath = file.getAbsolutePath();
-					if(matcher.matches(Paths.get(filePath))) {
-						try {
-							op.op(filePath);
-						} catch(EOFException ee) {
-							return FileVisitResult.TERMINATE;
-						} catch(IOException | RuntimeException re) {
-							throw re;
-						} catch (Exception e) {
-							throw new IOException("Failed to match pattern.", e);
+				for(var it =  getSftpClient().lsIterator(resolved); it.hasNext(); ) {
+					var pathPartPath = it.next();
+					var fullPath = resolved;
+					var filename = pathPartPath.getFilename();
+					if(filename.equals(".") || filename.equals("..")) {
+						continue;
+					}
+					if(matcher.matches(Path.of(filename))) {
+						fullPath += "/" + filename;
+						matches++;
+						if(i == pathCount -1) {
+							try {
+								op.op(fullPath);
+							} catch(EOFException ee) {
+								return;
+							} catch (Exception e) {
+								if(e instanceof SftpStatusException)
+									throw (SftpStatusException)e;
+								else if(e instanceof SshException)
+									throw (SshException)e;
+								else
+									throw new SshException(e);
+							}
 						}
 					}
-					return FileVisitResult.CONTINUE;
 				}
-			});
+				
+				if(!recurse || matches == 0)
+					break;
+				
+				resolved = resolved + "/" + pathPart;
+			}
 		}
 	}
 
@@ -350,18 +366,14 @@ public abstract class SftpCommand extends ChildCommand {
 		};
 	}
 
-	
-//	protected Path resolveLocalPath(Path p) {
-//		var expanded = expandPath(p);
-//		Path resolved;
-//		try {
-//			resolved = Paths.get(getSftpClient().lpwd());
-//		} catch (IOException | PermissionDeniedException e) {
-//			throw new IllegalArgumentException("Could not expand path.");
-//		}
-//		return resolved.resolve(expanded);
-//	}
-//	
+	String expandSpecialRemotePath(String path) throws SftpStatusException, SshException {
+		if(path.toString().startsWith("~/") || path.toString().startsWith("~\\")) {
+			return getSftpClient().getDefaultDirectory() + path.toString().substring(1);
+		}
+		else
+			return path;
+	}
+
 	static Path expandSpecialLocalPath(Path path) {
 		if(path.toString().startsWith("~/") || path.toString().startsWith("~\\")) {
 			return Paths.get(System.getProperty("user.home") + path.toString().substring(1));
