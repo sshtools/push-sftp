@@ -28,6 +28,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -118,7 +119,10 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 		var context = getContext();
 		var prefs = context.getContainer().getAppPreferences();
 		var agentSocket = prefs.get("agentSocket", "");
-		var job = SshConnectionJob.forConnection().withTarget(target).withVerbose(prefs.getBoolean("verbose", false))
+		var job = SshConnectionJob.forConnection()
+				.withTarget(target)
+				.withHostKeyVerification(context.createHostKeyVerificationPrompt(target))
+				.withVerbose(prefs.getBoolean("verbose", false))
 				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
 				.withPassphrasePrompt(context.createPassphrasePrompt(target))
 				.withPassword(context.createPasswordPrompt(target)).build();
@@ -157,8 +161,8 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 				});
 			} catch (Exception e) {
 				LOG.error("Failed to browse.", e);
-				message(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE), "notification-danger", "failed",
-						target.bestDisplayName(), e.getMessage());
+				runLater(() -> message(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE), "notification-danger", "failed",
+						target.bestDisplayName(), e.getMessage()));
 			}
 
 		});
@@ -174,8 +178,10 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 		notificationPane.getStyleClass().removeAll("notification-danger", "notification-warning", "notification-info",
 				"notification-success");
 		notificationPane.setGraphic(graphic);
+		var msg = MessageFormat.format(RESOURCES.getString(key), args);
+		notificationPane.setTooltip(new Tooltip(msg));
 		notificationPane.getStyleClass().add(style);
-		notificationPane.show(MessageFormat.format(RESOURCES.getString(key), args));
+		notificationPane.show(msg);
 	}
 
 	class FileTreeItem extends TreeItem<Path> {
@@ -217,8 +223,8 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 				loaded = true;
 			} catch (Exception e) {
 				LOG.error("Failed to expand folder.", e);
-				runLater(() -> message(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE), "notification-danger", "failed",
-						target.bestDisplayName(), e.getMessage()));
+				runLater(() -> message(FontIcon.of(FontAwesomeSolid.EXCLAMATION_TRIANGLE), "notification-warning", "failedToLoad",
+						path, e.getMessage()));
 			} finally {
 				loading = false;
 			}
