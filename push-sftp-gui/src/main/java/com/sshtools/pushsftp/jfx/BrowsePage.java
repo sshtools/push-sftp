@@ -5,6 +5,9 @@ import static javafx.application.Platform.runLater;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -30,7 +33,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 
 public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 	final static Logger LOG = LoggerFactory.getLogger(BrowsePage.class);
@@ -39,10 +41,10 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 
 	@FXML
 	TreeView<Path> browser;
-	
+
 	@FXML
 	private Hyperlink select;
-	
+
 	@FXML
 	private BorderPane browseTop;
 
@@ -55,25 +57,32 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 	protected void onConfigure() {
 		select.disableProperty().bind(Bindings.isEmpty(browser.getSelectionModel().getSelectedItems()));
 		browser.setOnMouseClicked(evt -> {
-			if(evt.getClickCount() == 2) {
+			if (evt.getClickCount() == 2) {
 				select(null);
 			}
 		});
-		
+
 		var dropTopParent = browseTop.getParent();
 		notificationPane = new NotificationPane(browseTop);
-		((AnchorPane)dropTopParent).getChildren().setAll(notificationPane);
+		((AnchorPane) dropTopParent).getChildren().setAll(notificationPane);
 		AnchorPane.setBottomAnchor(notificationPane, 0d);
 		AnchorPane.setTopAnchor(notificationPane, 0d);
 		AnchorPane.setLeftAnchor(notificationPane, 0d);
 		AnchorPane.setRightAnchor(notificationPane, 0d);
-		
+
 		browser.setCellFactory(param -> new TreeCell<Path>() {
 			@Override
 			public void updateItem(Path item, boolean empty) {
 				super.updateItem(item, empty);
 				if (!empty) {
-					setText(item.getFileName().toString());
+					setText(item.getFileName() == null ? "/" : item.getFileName().toString());
+					var icon = FontIcon.of(FontAwesomeSolid.FOLDER);
+					icon.getStyleClass().add("icon-accent");
+					setGraphic(icon);
+				}
+				else {
+					setText(null);
+					setGraphic(null);
 				}
 			}
 		});
@@ -93,7 +102,7 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 
 	@Override
 	public void close() {
-		if(connection != null) {
+		if (connection != null) {
 			try {
 				connection.close();
 			} catch (IOException e) {
@@ -104,54 +113,131 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 	void refreshView() {
 	}
 
-	void setTarget(Target target) throws Exception {
+	void setTarget(Target target, Optional<String> originalPath) throws Exception {
 
 		var context = getContext();
 		var prefs = context.getContainer().getAppPreferences();
 		var agentSocket = prefs.get("agentSocket", "");
-		var job = SshConnectionJob.forConnection().
-				withTarget(target).
-				withVerbose(prefs.getBoolean("verbose", false)).
-				withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket)).
-				withPassphrasePrompt(context.createPassphrasePrompt(target)).
-				withPassword(context.createPasswordPrompt(target)).
-				build();
+		var job = SshConnectionJob.forConnection().withTarget(target).withVerbose(prefs.getBoolean("verbose", false))
+				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
+				.withPassphrasePrompt(context.createPassphrasePrompt(target))
+				.withPassword(context.createPasswordPrompt(target)).build();
 
 		context.getContainer().getScheduler().execute(() -> {
 			try {
 				connection = job.call();
-				notificationPane.hide();
 				sftp = SftpClientBuilder.create().withClient(connection).build();
+				var rootPath = Path.of("/");
+				var homePath = Path.of(originalPath.orElse(sftp.getDefaultDirectory()));
+				var rootItem = new FileTreeItem(rootPath, target);
+				runLater(() -> {
+					browser.setRoot(rootItem);
+					notificationPane.hide();
+				});
 
-				var rootPath = Path.of(sftp.pwd());
-				var rootItem = new TreeItem<>(rootPath);
-				runLater(() -> browser.setRoot(rootItem));
-				var it = sftp.lsIterator();
-				while (it.hasNext()) {
-					var file = it.next();
-					if(file.attributes().isDirectory() && !file.getFilename().startsWith("."))
-						runLater(() -> rootItem.getChildren().add(new TreeItem<>(rootPath.resolve(file.getFilename()))));
+				var item = rootItem;
+				FileTreeItem child = null;
+				for (int i = 0; i < homePath.getNameCount(); i++) {
+					item.load();
+					var fItem = item;
+					runLater(() -> fItem.setExpanded(true));
+					var name = homePath.getName(i);
+					child = item.getChildForPath(name);
+					if (child != null) {
+						item = child;
+					} else {
+						break;
+					}
 				}
+
+				var fItem = item;
+				runLater(() -> {
+					browser.getSelectionModel().select(fItem);
+					browser.scrollTo(browser.getSelectionModel().getSelectedIndex());
+				});
 			} catch (Exception e) {
 				LOG.error("Failed to browse.", e);
-				notify(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE), "notification-danger", "failed", target.bestDisplayName(), e.getMessage());
+				message(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE), "notification-danger", "failed",
+						target.bestDisplayName(), e.getMessage());
 			}
 
 		});
-		notify(FontIcon.of(FontAwesomeSolid.INFO_CIRCLE), "notification-info", "connecting", target.bestDisplayName());
+		message(FontIcon.of(FontAwesomeSolid.INFO_CIRCLE), "notification-info", "connecting", target.bestDisplayName());
 
 	}
-
 
 	public void setOnSelect(Consumer<Path> onSelect) {
 		this.onSelect = onSelect;
 	}
-	
-	private void notify(Node graphic, String style, String key, Object... args) {
-		notificationPane.getStyleClass().removeAll("notification-danger", "notification-warning", "notification-info", "notification-success");
+
+	private void message(Node graphic, String style, String key, Object... args) {
+		notificationPane.getStyleClass().removeAll("notification-danger", "notification-warning", "notification-info",
+				"notification-success");
 		notificationPane.setGraphic(graphic);
 		notificationPane.getStyleClass().add(style);
 		notificationPane.show(MessageFormat.format(RESOURCES.getString(key), args));
 	}
 
+	class FileTreeItem extends TreeItem<Path> {
+
+		boolean loaded;
+		boolean loading;
+		Path path;
+		Target target;
+		List<FileTreeItem> newItems = Collections.emptyList();
+
+		public FileTreeItem(Path path, Target target) {
+			super(path);
+
+			this.path = path;
+			this.target = target;
+
+			var context = getContext();
+
+			expandedProperty().addListener((c, o, n) -> {
+				if (n && !loaded && !loading) {
+					context.getContainer().getScheduler().execute(() -> {
+						load();
+					});
+				}
+			});
+		}
+
+		void load() {
+			try {
+				loading = true;
+				var it = sftp.lsIterator(path.toString());
+				newItems = new ArrayList<FileTreeItem>();
+				while (it.hasNext()) {
+					var file = it.next();
+					if (file.attributes().isDirectory() && !file.getFilename().startsWith("."))
+						newItems.add(new FileTreeItem(path.resolve(file.getFilename()), target));
+				}
+				runLater(() -> getChildren().setAll(newItems));
+				loaded = true;
+			} catch (Exception e) {
+				LOG.error("Failed to expand folder.", e);
+				runLater(() -> message(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE), "notification-danger", "failed",
+						target.bestDisplayName(), e.getMessage()));
+			} finally {
+				loading = false;
+			}
+		}
+
+		FileTreeItem getChildForPath(Path name) {
+			for (var c : newItems) {
+				var item = (FileTreeItem) c;
+				if (item.path.getFileName().equals(name)) {
+					return item;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public boolean isLeaf() {
+			return loaded && super.isLeaf();
+		}
+
+	}
 }

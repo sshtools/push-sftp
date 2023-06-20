@@ -53,7 +53,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 		}
 	}
 	
-	@Option(names = { "-m", "--ssh-log" }, paramLabel = "LEVEL", description = "Enable Maverick API debugging (for SSH related output).")
+	@Option(names = { "-l", "--log" }, paramLabel = "LEVEL", description = "Enable Maverick API debugging (for SSH related output).")
 	Optional<Level> sshLog;
 
 	PushSFTPUI(PushSFTPUIBuilder builder) {

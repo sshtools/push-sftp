@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
 <AnchorPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.BrowsePage">
    <children>
       <BorderPane fx:id="browseTop" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -31,7 +30,7 @@
                <left>
                   <HBox BorderPane.alignment="CENTER">
                      <children>
-                        <Hyperlink fx:id="select" text="%select">
+                        <Hyperlink fx:id="select" onAction="#select" text="%select">
                            <graphic>
                               <FontIcon iconLiteral="fas-check-circle" iconSize="48">
                                  <styleClass>

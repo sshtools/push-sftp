@@ -108,7 +108,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	private void browseRemoteFolder() throws Exception {
 		var browser = getContext().getTiles().popup(BrowsePage.class, PageTransition.FROM_RIGHT);
-		browser.setTarget(createTarget().build());
+		browser.setTarget(createTarget().build(), FXUtil.optionalText(remoteFolder));
 		browser.setOnSelect(path -> remoteFolder.setText(path.toString()));
 	}
 
