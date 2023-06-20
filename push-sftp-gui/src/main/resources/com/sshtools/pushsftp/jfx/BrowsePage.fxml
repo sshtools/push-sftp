@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -7,23 +8,44 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.BrowsePage">
-   <center>
-      <AnchorPane BorderPane.alignment="CENTER">
-         <children>
-            <TreeView fx:id="browser" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-      </AnchorPane>
-   </center>
-   <bottom>
-      <HBox BorderPane.alignment="CENTER">
-         <children>
-            <Hyperlink onAction="#back" text="%back">
-               <graphic>
-                  <FontIcon iconLiteral="fas-arrow-alt-circle-left" iconSize="48" styleClass="icon-accent" />
-               </graphic>
-            </Hyperlink>
-         </children>
-      </HBox>
-   </bottom>
-</BorderPane>
+
+<AnchorPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.BrowsePage">
+   <children>
+      <BorderPane fx:id="browseTop" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <TreeView fx:id="browser" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+            </AnchorPane>
+         </center>
+         <bottom>
+            <BorderPane BorderPane.alignment="CENTER">
+               <right>
+                  <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                     <children>
+                        <Hyperlink onAction="#back" text="%back" />
+                     </children>
+                  </HBox>
+               </right>
+               <left>
+                  <HBox BorderPane.alignment="CENTER">
+                     <children>
+                        <Hyperlink fx:id="select" text="%select">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-check-circle" iconSize="48">
+                                 <styleClass>
+                                    <String fx:value="icon-accent" />
+                                    <String fx:value="large-icom" />
+                                 </styleClass>
+                              </FontIcon>
+                           </graphic>
+                        </Hyperlink>
+                     </children>
+                  </HBox>
+               </left>
+            </BorderPane>
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

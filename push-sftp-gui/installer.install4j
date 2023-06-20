@@ -1278,6 +1278,5 @@ return true;</property>
         <entry location="win" />
       </exclude>
     </unixInstaller>
-    <macos name="macOS Single Bundle" id="135" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-singlebundle-${compiler:sys.version}" launcherId="52" />
   </mediaSets>
 </install4j>
