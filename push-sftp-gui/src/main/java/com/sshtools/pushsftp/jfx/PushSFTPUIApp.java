@@ -3,7 +3,6 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.maybeQueue;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -278,7 +277,6 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	private boolean mismatchedHost(Target target, String host, List<SshPublicKey> allowedHostKey, SshPublicKey actualHostKey) throws SshException, UnknownHostException {
 		var sem = new Semaphore(1);
 		var result = new AtomicBoolean();
-		var addr = InetAddress.getByName(host);
 		var others = String.join("\n", allowedHostKey.stream().map(t -> {
 			try {
 				return t.getFingerprint();
@@ -287,7 +285,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			}
 		}).collect(Collectors.toList()));
 		var txt = MessageFormat.format(RESOURCES.getString("mismatchedHost.content"), 
-				target.bestDisplayName(), addr.getHostName(), addr.getHostAddress(), 
+				host, 
 				actualHostKey.getJCEPublicKey().getAlgorithm(), actualHostKey.getFingerprint(),
 				others);
 		
@@ -323,9 +321,8 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		var sem = new Semaphore(1);
 		var remember = new AtomicBoolean(false);
 		var result = new AtomicBoolean();
-		var addr = InetAddress.getByName(host);
 		var txt = MessageFormat.format(RESOURCES.getString("unknownHost.content"), 
-				target.bestDisplayName(), addr.getHostName(), addr.getHostAddress(), 
+				host, 
 				key.getJCEPublicKey().getAlgorithm(), key.getFingerprint());
 		try {
 			sem.acquire();
