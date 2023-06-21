@@ -792,6 +792,9 @@ if (context.isUnattended()) {
                                   <string>${installer:updaterDownloadFile}</string>
                                 </object>
                               </property>
+                              <property name="stderrRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.OutputRedirectionMode" value="INHERIT" />
+                              <property name="stdinRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.InputRedirectionMode" value="INHERIT" />
+                              <property name="stdoutRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.OutputRedirectionMode" value="INHERIT" />
                               <property name="workingDirectory">
                                 <object class="java.io.File">
                                   <string>${installer:updaterDownloadLocation}</string>
