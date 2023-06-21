@@ -144,18 +144,26 @@ public abstract class SftpCommand extends ChildCommand {
 
 	protected void expandLocalAndDo(PathOp op, boolean recurse, Path... paths) throws IOException  {
 
-		PSFTPInteractive cmd = getInteractiveCommand().rootCommand();
+		Path lcwd;
+		if(getSpec().parent().userObject() instanceof PSFTPCommands) {
+			PSFTPInteractive icmd = getInteractiveCommand().rootCommand(); 
+			lcwd = icmd.getLcwd();
+		}
+		else {
+			lcwd = Paths.get(System.getProperty("user.dir"));
+		}
+		
 		for(var path : paths) {
 			
 			path = expandSpecialLocalPath(path);
 			path = path.normalize();
 			
 			if(path.toString().equals("..")) {
-				var parentPath = cmd.getLcwd().toAbsolutePath().getParent();
+				var parentPath = lcwd.toAbsolutePath().getParent();
 				path = parentPath == null ? path.getRoot() : parentPath;
 			}
 
-			var root = path.isAbsolute() ? path.getRoot() : cmd.getLcwd();
+			var root = path.isAbsolute() ? path.getRoot() : lcwd;
 			var resolved = root;
 			var pathCount = path.getNameCount();
 			
