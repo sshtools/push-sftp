@@ -121,7 +121,7 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 		var agentSocket = prefs.get("agentSocket", "");
 		var job = SshConnectionJob.forConnection()
 				.withTarget(target)
-				.withHostKeyVerification(context.createHostKeyVerificationPrompt(target))
+				.withHostKeyVerification(context.createHostKeyVerificationPrompt())
 				.withVerbose(prefs.getBoolean("verbose", false))
 				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
 				.withPassphrasePrompt(context.createPassphrasePrompt(target))

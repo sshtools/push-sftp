@@ -239,7 +239,7 @@ public class FileTransferService implements Closeable, Reporter {
 					});
 				})
 				.withReporter(this)
-				.withHostKeyVerification(context.createHostKeyVerificationPrompt(target))
+				.withHostKeyVerification(context.createHostKeyVerificationPrompt())
 				.withPassphrasePrompt(context.createPassphrasePrompt(target))
 				.withPassword(context.createPasswordPrompt(target)).build();
 		

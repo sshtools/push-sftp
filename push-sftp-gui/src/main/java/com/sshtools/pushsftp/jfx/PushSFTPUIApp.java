@@ -66,6 +66,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	private final Optional<Keyring> keyring;
 
 	private Tiles<PushSFTPUIApp> tiles;
+	private HostKeyVerification hkv;
 
 	public PushSFTPUIApp() {
 		super(PushSFTPUIApp.class.getResource("icon.png"), RESOURCES.getString("title"), (PushSFTPUI) PushSFTPUI.getInstance());
@@ -156,8 +157,13 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		});
 	}
 
+	public HostKeyVerification createHostKeyVerificationPrompt() throws SshException, IOException {
+		if(hkv == null)
+			hkv = createHostKeyVerificationPromptImpl();
+		return hkv;
+	}
 
-	public HostKeyVerification createHostKeyVerificationPrompt(Target target) throws SshException, IOException {
+	public HostKeyVerification createHostKeyVerificationPromptImpl() throws IOException, SshException {
 		var file = KnownHostsFile.defaultKnownHostsFile();
 		if(!Files.exists(file))
 			Files.createFile(file);
@@ -171,7 +177,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			@Override
 			protected void onUnknownHost(String host, SshPublicKey key) throws SshException {
 				try {
-					unknownHost(target, host, key).ifPresent(always -> {
+					unknownHost(host, key).ifPresent(always -> {
 						try {
 							allowHost(host, key, always);
 						} catch (SshException e) {
@@ -187,7 +193,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 			protected void onHostKeyMismatch(String host, List<SshPublicKey> allowedHostKey, SshPublicKey actualHostKey)
 					throws SshException {
 				try {
-					if(mismatchedHost(target, host, allowedHostKey, actualHostKey)) {
+					if(mismatchedHost(host, allowedHostKey, actualHostKey)) {
 						try {
 							for(var key : allowedHostKey) {
 								removeEntries(key);
@@ -274,7 +280,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		};
 	}
 
-	private boolean mismatchedHost(Target target, String host, List<SshPublicKey> allowedHostKey, SshPublicKey actualHostKey) throws SshException, UnknownHostException {
+	private boolean mismatchedHost(String host, List<SshPublicKey> allowedHostKey, SshPublicKey actualHostKey) throws SshException, UnknownHostException {
 		var sem = new Semaphore(1);
 		var result = new AtomicBoolean();
 		var others = String.join("\n", allowedHostKey.stream().map(t -> {
@@ -317,7 +323,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		return result.get();
 	}
 
-	private Optional<Boolean> unknownHost(Target target, String host, SshPublicKey key) throws SshException, UnknownHostException {
+	private Optional<Boolean> unknownHost(String host, SshPublicKey key) throws SshException, UnknownHostException {
 		var sem = new Semaphore(1);
 		var remember = new AtomicBoolean(false);
 		var result = new AtomicBoolean();
