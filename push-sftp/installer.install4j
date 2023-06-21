@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.5" transformSequenceNumber="10">
+<install4j version="10.0.6" transformSequenceNumber="10">
   <directoryPresets config="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
@@ -782,7 +782,7 @@ if (context.isUnattended()) {
                             </serializedBean>
                           </action>
                           <action id="90" beanClass="com.install4j.runtime.beans.actions.update.ShutdownCallingLauncherAction" actionElevationType="none" />
-                          <action id="91" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" failureStrategy="quit" errorMessage="${i18n:updater.LaunchError}">
+                          <action id="91" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" failureStrategy="quit" errorMessage="${i18n:updater.LaunchError}">
                             <serializedBean>
                               <property name="arguments" type="array" elementType="string" length="1">
                                 <element index="0">${installer:installerArguments}</element>
