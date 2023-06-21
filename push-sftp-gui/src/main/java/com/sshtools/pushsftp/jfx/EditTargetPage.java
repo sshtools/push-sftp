@@ -147,6 +147,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		remoteFolder.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
 		unsafePassword.setText(target.unsafePassword().orElse(""));
 		unsafePasswordContainer.setVisible(!getContext().isKeyringAvailable());
+		rebuildDisplayNamePrompt();
 	}
 
 	private void rebuildDisplayNamePrompt() {
