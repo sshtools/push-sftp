@@ -36,6 +36,10 @@ public class Lls extends SftpCommand {
 
 	@Parameters(index = "0", arity="0..1", paramLabel="PATH", description = "path of directory to list")
 	Optional<Path> path;
+	
+	public Lls() {
+		super(FilenameCompletionMode.DIRECTORIES_LOCAL);
+	}
 
 	@Override
 	protected Integer onCall() throws Exception {
@@ -52,7 +56,7 @@ public class Lls extends SftpCommand {
 	private void printNames() throws IOException, SftpStatusException, SshException {
 
 		var maximumFilenameLength = 0;
-		var columns = getRootCommand().getTerminal().getWidth();
+		var columns = getRootCommand().io().getWidth();
 		
 		try(var stream = Files.newDirectoryStream(expandLocalSingle(path))) {
 			for(var p : stream) {

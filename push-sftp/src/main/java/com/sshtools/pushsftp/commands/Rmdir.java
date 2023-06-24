@@ -9,10 +9,14 @@ public class Rmdir extends SftpCommand {
 	@Parameters(index = "0", arity = "1", description = "Directory to remove")
 	private String file;
 	
+	public Rmdir() {
+		super(FilenameCompletionMode.DIRECTORIES_REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		var expandedPath = expandRemoteSingle(file);
-		getTerminal().messageln("Removing dir {0}", expandedPath);
+		io().messageln("Removing dir {0}", expandedPath);
 		getSftpClient().rmdir(expandedPath);
 		return 0;
 	}

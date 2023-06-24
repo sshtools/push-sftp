@@ -12,6 +12,10 @@ public class Symlink extends SftpCommand {
 	@Parameters(index = "1", arity = "1", description = "Path of link file")
 	private String link;
 	
+	public Symlink() {
+		super(FilenameCompletionMode.REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		var expandedLinkPath = expandRemoteSingle(link);

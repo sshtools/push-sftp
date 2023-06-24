@@ -26,6 +26,10 @@ public class Put extends SftpCommand implements Callable<Integer> {
 	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "0")
 	int blocksize; 
 	
+	public Put() {
+		super(FilenameCompletionMode.LOCAL_THEN_REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 
@@ -39,12 +43,12 @@ public class Put extends SftpCommand implements Callable<Integer> {
 		
 		var target = destination.orElse(sftp.pwd());
 
-		try(var progress = getTerminal().progressBuilder().withInterruptable().withTiming(timing).withRateLimit().build()) {
+		try(var progress = io().progressBuilder().withInterruptable().withTiming(timing).withRateLimit().build()) {
 			expandLocalAndDo((path) -> {
-				sftp.put(path.toString(), target, fileTransferProgress(getRootCommand().getTerminal(), progress, "Uploading {0}"));
+				sftp.put(path.toString(), target, fileTransferProgress(getRootCommand().io(), progress, "Uploading {0}"));
 			}, true, files);
 		}
-
+		
 		return 0;
 	}
 }

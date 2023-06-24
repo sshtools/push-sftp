@@ -53,10 +53,14 @@ public class Pull extends SftpCommand {
 	@Option(names = { "-B", "--verbose" }, description = "verbose progress output")
 	boolean verboseOutput;
 	
+	public Pull() {
+		super(FilenameCompletionMode.REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 
-		try (var progress = getTerminal().progressBuilder().withTiming(timing).withRateLimit().build()) {
+		try (var progress = io().progressBuilder().withTiming(timing).withRateLimit().build()) {
 			getSshClient().runTask(PullTaskBuilder.create().
 				withClients((idx) -> {
 					if (multiplex || idx == 0)
@@ -82,7 +86,7 @@ public class Pull extends SftpCommand {
 				withIgnoreIntegrity(ignoreIntegrity).
 				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
-				withProgress(fileTransferProgress(getRootCommand().getTerminal(), progress, "Downloading {0}")).build());
+				withProgress(fileTransferProgress(getRootCommand().io(), progress, "Downloading {0}")).build());
 		}
 
 		return 0;

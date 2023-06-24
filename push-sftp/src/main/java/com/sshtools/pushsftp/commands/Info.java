@@ -14,41 +14,46 @@ public class Info extends SftpCommand {
 	protected Integer onCall() throws Exception {
 		SshClient ssh = getSshClient();
 		
-		getTerminal().messageln("-HOST-----------------");
-		getTerminal().messageln("Hostname             : {0}", ssh.getHost());
-		getTerminal().messageln("Port                 : {0}", ssh.getPort());
-		getTerminal().messageln("Username             : {0}", ssh.getConnection().getUsername());
-		getTerminal().messageln("Remote identification: {0}", ssh.getRemoteIdentification());
-		getTerminal().messageln("");
+		var term = io();
+		var connection = ssh.getConnection();
 		
-		getTerminal().messageln("-KEX------------------");
-		getTerminal().messageln("Host key type        : {0}", ssh.getConnection().getHostKeyAlgorithm());
-		getTerminal().messageln("Host key fingerprint : {0}", SshKeyUtils.getFingerprint(ssh.getHostKey()));
-		getTerminal().messageln("Key exchange         : {0}", ssh.getConnection().getKeyExchangeInUse());
-		getTerminal().messageln("Cipher (c->s)        : {0}", ssh.getConnection().getCipherInUseCS());
-		getTerminal().messageln("Cipher (s->c)        : {0}", ssh.getConnection().getCipherInUseSC());
-		getTerminal().messageln("Mac (c->s)           : {0}", ssh.getConnection().getMacInUseCS());
-		getTerminal().messageln("Mac (s->c)           : {0}", ssh.getConnection().getMacInUseSC());
-		getTerminal().messageln("Compression (c->s)   : {0}", ssh.getConnection().getCompressionInUseCS());
-		getTerminal().messageln("Compression (s->c)   : {0}", ssh.getConnection().getCompressionInUseSC());
-		getTerminal().messageln("");
-		getTerminal().messageln("-SFTP-----------------");	
+		term.println(term.createSequence().underlineOn().span("Host", term.getWidth() / 2).toString());
+		term.newline();
+		term.messageln("Hostname             : {0}", ssh.getHost());
+		term.messageln("Port                 : {0}", ssh.getPort());
+		term.messageln("Username             : {0}", connection.getUsername());
+		term.messageln("Remote identification: {0}", ssh.getRemoteIdentification());
+		term.newline();
+
+		term.println(term.createSequence().underlineOn().span("KEX", term.getWidth() / 2).toString());
+		term.newline();
+		term.messageln("Host key type        : {0}", connection.getHostKeyAlgorithm());
+		term.messageln("Host key fingerprint : {0}", SshKeyUtils.getFingerprint(ssh.getHostKey()));
+		term.messageln("Key exchange         : {0}", connection.getKeyExchangeInUse());
+		term.messageln("Cipher (c->s)        : {0}", connection.getCipherInUseCS());
+		term.messageln("Cipher (s->c)        : {0}", connection.getCipherInUseSC());
+		term.messageln("Mac (c->s)           : {0}", connection.getMacInUseCS());
+		term.messageln("Mac (s->c)           : {0}", connection.getMacInUseSC());
+		term.messageln("Compression (c->s)   : {0}", connection.getCompressionInUseCS());
+		term.messageln("Compression (s->c)   : {0}", connection.getCompressionInUseSC());
+		term.newline();
+		term.println(term.createSequence().underlineOn().span("SFTP", term.getWidth() / 2).toString());
+		term.newline();	
 		
 		if(showSFTPStatistic(      "Write blocksize      : {0} bytes", "maverick.write.optimizedBlock")) {
 			showSFTPStatistic(      "Write roundtrip      : {0} ", "maverick.write.blockRoundtrip");
 			showSFTPStatistic(      "Write max requests   : {0}", "maverick.write.minAsyncRequests"); 
 			showSFTPStatistic(      "Write min requests   : {0}", "maverick.write.maxAsyncRequests"); 
 		} else {
-			getTerminal().messageln("Perform a put or push operation to generate SFTP write operation statistics");
+			term.messageln("Perform a put or push operation to generate SFTP write operation statistics");
 		}
 		if(showSFTPStatistic(      "Read blocksize       : {0}ms", "maverick.read.optimizedBlock")) {
 			showSFTPStatistic(      "Read roundtrip       : {0}ms", "maverick.read.blockRoundtrip");
 			showSFTPStatistic(      "Read async requests  : {0}", "maverick.read.asyncRequests");
 		} else {
-			getTerminal().messageln("Perform a get or pull operation to generate SFTP read operation statistics");
+			term.messageln("Perform a get or pull operation to generate SFTP read operation statistics");
 		}
-		
-		getTerminal().messageln("");
+		term.newline();	
 	
 		return 0;
 	}
@@ -59,7 +64,7 @@ public class Info extends SftpCommand {
 			return false;
 		}
 		
-		getTerminal().messageln(message, v);
+		io().messageln(message, v);
 		return true;
 	}
 }

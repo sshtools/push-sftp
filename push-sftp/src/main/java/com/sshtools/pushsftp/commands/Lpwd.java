@@ -7,7 +7,7 @@ public class Lpwd extends SftpCommand {
 
 	@Override
 	protected Integer onCall() throws Exception {
-		getTerminal().messageln("Local working directory: {0}", getSftpClient().lpwd());
+		io().messageln("Local working directory: {0}", getSftpClient().lpwd());
 		return 0;
 	}
 }

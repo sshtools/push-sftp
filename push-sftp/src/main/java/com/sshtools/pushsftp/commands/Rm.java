@@ -16,9 +16,13 @@ public class Rm extends SftpCommand {
 	@Option(names = "-r", description = "recursively delete directory and all children.")
 	private boolean recursive;
 	
+	public Rm() {
+		super(FilenameCompletionMode.REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
-		var terminal = getTerminal();
+		var terminal = io();
 		var sftp = getSftpClient();
 		expandRemoteAndDo(p -> {
 			terminal.messageln("Removing {0}", p);

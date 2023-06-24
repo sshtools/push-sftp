@@ -10,6 +10,10 @@ public class Cd extends SftpCommand {
 	@Parameters(index = "0", arity="1", paramLabel="PATH", description = "change directory to PATH", defaultValue = ".")
 	String path;
 	
+	public Cd() {
+		super(FilenameCompletionMode.DIRECTORIES_REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		var expandedPath = expandRemoteSingle(path);

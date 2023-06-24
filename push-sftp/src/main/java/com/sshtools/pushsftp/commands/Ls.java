@@ -32,6 +32,10 @@ public class Ls extends SftpCommand {
 	@Parameters(index = "0", arity="0..1", paramLabel="PATH", description = "path of directory to list")
 	Optional<String> path;
 	
+	public Ls() {
+		super(FilenameCompletionMode.DIRECTORIES_REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		
@@ -49,7 +53,7 @@ public class Ls extends SftpCommand {
 		
 		var results = new TreeSet<String>();
 		int maximumFilenameLength = 0;
-		int columns = getRootCommand().getTerminal().getWidth();
+		int columns = getRootCommand().io().getWidth();
 
 		var it = lsIterator();
 		while(it.hasNext()) {

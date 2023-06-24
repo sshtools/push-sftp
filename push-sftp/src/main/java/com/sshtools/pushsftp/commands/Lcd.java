@@ -13,6 +13,10 @@ public class Lcd extends SftpCommand {
 	@Parameters(index = "0", arity="1", paramLabel="PATH", description = "change directory to PATH", defaultValue = ".")
 	Path path;
 	
+	public Lcd() {
+		super(FilenameCompletionMode.DIRECTORIES_LOCAL);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		var resolvedPath = expandLocalSingle(path);

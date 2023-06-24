@@ -7,7 +7,7 @@ public class Pwd extends SftpCommand {
 	
 	@Override
 	protected Integer onCall() throws Exception {
-		getTerminal().messageln("Remote working directory: {0}", getSftpClient().pwd());
+		io().messageln("Remote working directory: {0}", getSftpClient().pwd());
 		return 0;
 	}
 }

@@ -16,6 +16,10 @@ public class Ln extends SftpCommand {
 	@Option(names = "-s", description = "symbolic link")
 	private boolean symobolic;
 	
+	public Ln() {
+		super(FilenameCompletionMode.REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		var expandedLinkPath = expandRemoteSingle(link);

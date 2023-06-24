@@ -15,6 +15,10 @@ public class Chgrp extends SftpCommand  {
 
 	@Parameters(index = "1", arity = "1", description = "Path to change group of")
 	private String path;
+	
+	public Chgrp() {
+		super(FilenameCompletionMode.REMOTE);
+	}
 
 	@Override
 	protected Integer onCall() throws Exception {

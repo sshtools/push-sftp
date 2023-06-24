@@ -56,10 +56,15 @@ public class Push extends SftpCommand {
 	@Option(names = { "-B", "--verbose" }, description = "verbose progress output")
 	boolean verboseOutput;
 	
+	public Push() {
+		super(FilenameCompletionMode.LOCAL);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 
-		try (var progress = getTerminal().progressBuilder().withTiming(timing).withRateLimit().build()) {
+		try (var progress = io().progressBuilder().withTiming(timing).withRateLimit().build()) {
+			var localFiles = expandLocalArray(files);
 			getSshClient().runTask(PushTaskBuilder.create().
 				withClients((idx) -> {
 					if (multiplex || idx == 0)
@@ -75,7 +80,7 @@ public class Push extends SftpCommand {
 					}
 				}).
 				withPrimarySftpClient(getSftpClient()).
-				withPaths(expandLocalArray(files)).
+				withPaths(localFiles).
 				withChunks(chunks).
 				withDigest(digest).
 				withBlocksize(blocksize).
@@ -85,7 +90,7 @@ public class Push extends SftpCommand {
 				withIgnoreIntegrity(ignoreIntegrity).
 				withVerboseOutput(verboseOutput).
 				withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
-				withProgress(fileTransferProgress(getRootCommand().getTerminal(), progress, "Uploading {0}")).build());
+				withProgress(fileTransferProgress(getRootCommand().io(), progress, "Uploading {0}")).build());
 		}
 
 		return 0;

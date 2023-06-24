@@ -16,6 +16,10 @@ public class Rename extends SftpCommand {
 	@Option(names = "-p", description = "use POSIX extension")
 	private boolean posix;
 	
+	public Rename() {
+		super(FilenameCompletionMode.REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		var expandedOldPath = expandRemoteSingle(oldPath);

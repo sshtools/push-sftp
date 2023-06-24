@@ -7,11 +7,25 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.jline.builtins.Completers.FileNameCompleter;
+import org.jline.builtins.Styles;
+import org.jline.console.impl.SystemRegistryImpl;
+import org.jline.reader.Candidate;
+import org.jline.reader.Completer;
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.StyleResolver;
 
 import com.sshtools.client.SshClient;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpClient.SftpClientBuilder;
+import com.sshtools.client.sftp.SftpFile;
 import com.sshtools.client.tasks.PushTask.PushTaskBuilder;
 import com.sshtools.commands.ChildUpdateCommand;
 import com.sshtools.commands.CliCommand;
@@ -55,6 +69,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.shell.jline3.PicocliCommands;
 
 @Command(name = "push-sftp-interactive", description = "Push secure file transfer", subcommands = { Ls.class, Cd.class, Lcd.class, Pwd.class, Lls.class, 
 		Lpwd.class, Help.class, Rm.class, Rmdir.class, Df.class,
@@ -140,10 +155,94 @@ public class PSFTPInteractive extends CliCommand {
 		return cachedPort.orElse(port);
 	}
 	
+	@Override
+	protected void configureSystemRegistry(SystemRegistryImpl systemRegistry, PicocliCommands commands, Map<String, CommandLine> subs) {
+		
+		var remote = new RemoteFileNameCompleter();
+		var remoteDirs = new RemoteFileNameCompleter() {
+
+			@Override
+			protected boolean accept(SftpFile path) {
+				return super.accept(path) && path.attributes().isDirectory();
+			}
+			
+		};
+		var local = new FileNameCompleter() {
+			@Override
+			protected Path getUserDir() {
+				return getLcwd();
+			}
+
+			@Override
+	        protected String getSeparator(boolean useForwardSlash) {
+	            return useForwardSlash ? "/" : ( isWindowsParsing() ? "\\" : "/" );
+	        }
+		};
+		var localDirs = new FileNameCompleter() {
+			@Override
+			protected Path getUserDir() {
+				return getLcwd();
+			}
+
+			@Override
+			protected boolean accept(Path path) {
+				return super.accept(path) && Files.isDirectory(path);
+			}
+
+			@Override
+	        protected String getSeparator(boolean useForwardSlash) {
+	            return useForwardSlash ? "/" : ( isWindowsParsing() ? "\\" : "/" );
+	        }
+		};
+		
+		systemRegistry.addCompleter(new Completer() {
+			
+			@Override
+			public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+				var cmd = line.words().get(0);
+				var cli  = subs.get(cmd);
+				if(cli != null && cli.getCommand() instanceof SftpCommand) {
+					SftpCommand sub = cli.getCommand();
+					var mode = sub.completionMode();
+					switch(mode) {
+					case LOCAL:
+					case LOCAL_THEN_REMOTE: /* TODO remote when below is supported */
+						local.complete(reader, line, candidates);
+						break;
+					case DIRECTORIES_LOCAL:
+					case DIRECTORIES_LOCAL_THEN_REMOTE: /* TODO remote when below is supported */
+						localDirs.complete(reader, line, candidates);
+						break;
+					case REMOTE:
+					case REMOTE_THEN_LOCAL:  /* TODO remote when below is supported */
+						remote.complete(reader, line, candidates);
+						break;
+					case DIRECTORIES_REMOTE:
+					case DIRECTORIES_REMOTE_THEN_LOCAL:  /* TODO remote when below is supported */
+						remoteDirs.complete(reader, line, candidates);
+						break;
+//					case LOCAL_THEN_REMOTE:
+						// TODO base on index
+//						local.complete(reader, line, candidates);
+//						remote.complete(reader, line, candidates);
+//						break;
+//					case REMOTE_THEN_LOCAL:
+						// TODO base on index
+//						remote.complete(reader, line, candidates);
+//						local.complete(reader, line, candidates);
+//						break;
+					default:
+						break;
+					}
+				}
+			}
+		});
+	}
+
 	protected boolean startCLI() throws IOException, InterruptedException, SftpStatusException, SshException {
 
 		if(files != null && files.length > 0) {
-			try (var progress = getTerminal().progressBuilder().withRateLimit().build()) {
+			try (var progress = io().progressBuilder().withRateLimit().build()) {
 				getSshClient().runTask(PushTaskBuilder.create().
 					withClients((idx) -> {
 						if (idx == 0)
@@ -162,14 +261,14 @@ public class PSFTPInteractive extends CliCommand {
 					withPaths(files).
 					withRemoteFolder(Path.of(getSftpClient().pwd())).
 					withProgressMessages((fmt, args) -> progress.message(Level.NORMAL, fmt, args)).
-					withProgress(SftpCommand.fileTransferProgress(getTerminal(), progress, "Uploading {0}")).build());
+					withProgress(SftpCommand.fileTransferProgress(io(), progress, "Uploading {0}")).build());
 			}
 			return false;
 		}
 		
 		if(localDirectory.isPresent()) {
 			if(!Files.exists(localDirectory.get())) {
-				getTerminal().error("{0} not found!", localDirectory.get());
+				io().error("{0} not found!", localDirectory.get());
 				return false;
 			}
 		}
@@ -178,12 +277,12 @@ public class PSFTPInteractive extends CliCommand {
 		}
 		File script = batchFile.get();
 		if(script.exists()) {
-			getTerminal().message("Executing batch script {0}", script.getName());
+			io().message("Executing batch script {0}", script.getName());
 			try(InputStream in = new FileInputStream(script)) {
 				source(in);
 			}
 		} else {
-			getTerminal().error("{0} not found!", script);
+			io().error("{0} not found!", script);
 		}
 		return false;
 	}
@@ -198,7 +297,7 @@ public class PSFTPInteractive extends CliCommand {
 		return host.orElseGet(() -> {
 			if(promptHostAndUser) {
 				if(cachedHostname.isEmpty()) {
-					var h = getTerminal().prompt("Hostname (Enter for {0}):", "localhost");
+					var h = io().prompt("Hostname (Enter for {0}):", "localhost");
 					if(h == null) {
 						throw new IllegalArgumentException("Host must be supplied either as an option or as part of the destination.");					
 					}
@@ -236,7 +335,7 @@ public class PSFTPInteractive extends CliCommand {
 		return username.orElseGet(() -> {
 			if(promptHostAndUser) {
 				if(cachedUsername.isEmpty()) {
-					var u = getTerminal().prompt("Username (Enter for {0}):", System.getProperty("user.name"));
+					var u = io().prompt("Username (Enter for {0}):", System.getProperty("user.name"));
 					if(u == null) {
 						throw new IllegalArgumentException("Username must be supplied either as an option or as part of the destination.");					
 					}
@@ -268,7 +367,7 @@ public class PSFTPInteractive extends CliCommand {
 
 	@Override
 	protected void error(String msg, Exception e) {
-		getTerminal().error(msg, e);
+		io().error(msg, e);
 	}
 
 	@Override
@@ -303,4 +402,126 @@ public class PSFTPInteractive extends CliCommand {
 	public void setLocalDirectory(Path path) {
 		localDirectory = Optional.of(localDirectory.isPresent() ? localDirectory.get().resolve(path) : path);
 	}
+	
+
+
+    /**
+     * A file name completer takes the buffer and issues a list of
+     * potential completions.
+     * <p>
+     * This completer tries to behave as similar as possible to
+     * <i>bash</i>'s file name completion (using GNU readline)
+     * with the following exceptions:
+     * <ul>
+     * <li>Candidates that are directories will end with "/"</li>
+     * <li>Wildcard regular expressions are not evaluated or replaced</li>
+     * <li>The "~" character can be used to represent the user's home,
+     * but it cannot complete to other users' homes, since java does
+     * not provide any way of determining that easily</li>
+     * </ul>
+     *
+     * @author <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
+     * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
+     * @since 2.3
+     */
+    class RemoteFileNameCompleter implements org.jline.reader.Completer {
+
+        public void complete(LineReader reader, ParsedLine commandLine, final List<Candidate> candidates) {
+            assert commandLine != null;
+            assert candidates != null;
+
+            String buffer = commandLine.word().substring(0, commandLine.wordCursor());
+
+            String current;
+            String curBuf;
+            String sep = getSeparator(reader.isSet(LineReader.Option.USE_FORWARD_SLASH));
+            int lastSep = buffer.lastIndexOf(sep);
+            try {
+                if (lastSep >= 0) {
+                    curBuf = buffer.substring(0, lastSep + 1);
+                    if (curBuf.startsWith("~")) {
+                    	var userHome = getUserHome();
+                        if (curBuf.startsWith("~" + sep)) {
+                            current = userHome + curBuf.substring(2);
+                        } else {
+                        	var parentIdx = userHome.lastIndexOf('/');
+                        	if(parentIdx > 0) {
+                                current = userHome.substring(0, parentIdx + 1) + curBuf.substring(1);	
+                        	}
+                        	else
+                                current = userHome + curBuf.substring(1);
+                        }
+                    } else {
+                        current = getUserDir() + "/" + curBuf;
+                    }
+                } else {
+                    curBuf = "";
+                    current = getUserDir();
+                }
+                StyleResolver resolver = Styles.lsStyle();
+                for(var it = sftp.lsIterator(current); it.hasNext(); ) {
+                	var p = it.next();
+                	if(!accept(p))
+                		continue;
+                	String value = curBuf + p.getFilename();
+                    if (p.attributes().isDirectory()) {
+                        candidates.add(new Candidate(
+                                value + (reader.isSet(LineReader.Option.AUTO_PARAM_SLASH) ? sep : ""),
+                                getDisplay(io().terminal(), p, resolver, sep),
+                                null,
+                                null,
+                                reader.isSet(LineReader.Option.AUTO_REMOVE_SLASH) ? sep : null,
+                                null,
+                                false));
+                    } else {
+                        candidates.add(new Candidate(
+                                value,
+                                getDisplay(io().terminal(), p, resolver, sep),
+                                null,
+                                null,
+                                null,
+                                null,
+                                true));
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
+        protected boolean accept(SftpFile path) {
+            return !path.getFilename().startsWith(".");
+        }
+
+        protected String getUserDir() throws SftpStatusException, SshException {
+            return sftp.pwd();
+        }
+
+        protected String getUserHome() throws SftpStatusException, SshException {
+            return sftp.getDefaultDirectory();
+        }
+
+        protected String getSeparator(boolean useForwardSlash) {
+            return useForwardSlash ? "/" : ( isWindowsParsing() ? "\\" : "/" );
+        }
+
+        protected String getDisplay(Terminal terminal, SftpFile p, StyleResolver resolver, String separator) {
+            AttributedStringBuilder sb = new AttributedStringBuilder();
+            String name = p.getFilename();
+            int idx = name.lastIndexOf(".");
+            String type = idx != -1 ? ".*" + name.substring(idx) : null;
+            if (p.attributes().isLink()) {
+                sb.styled(resolver.resolve(".ln"), name).append("@");
+            } else if (p.attributes().isDirectory()) {
+                sb.styled(resolver.resolve(".di"), name).append(separator);
+            } else if (type != null && resolver.resolve(type).getStyle() != 0) {
+                sb.styled(resolver.resolve(type), name);
+            } else if (p.attributes().isFile()) {
+                sb.styled(resolver.resolve(".fi"), name);
+            } else {
+                sb.append(name);
+            }
+            return sb.toAnsi(terminal);
+        }
+    }
 }

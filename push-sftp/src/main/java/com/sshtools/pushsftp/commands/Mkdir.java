@@ -11,6 +11,10 @@ public class Mkdir extends SftpCommand {
 	@Parameters(index = "0", arity = "1", description = "Directory to create")
 	private String directory;
 	
+	public Mkdir() {
+		super(FilenameCompletionMode.DIRECTORIES_REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		SftpClient sftp = getSftpClient();

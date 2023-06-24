@@ -23,9 +23,29 @@ import com.sshtools.pushsftp.PSFTPInteractive;
 import com.sshtools.sequins.Progress;
 import com.sshtools.sequins.Progress.Level;
 import com.sshtools.sequins.ProgressBar;
+import com.sshtools.sequins.Sequins;
 import com.sshtools.sequins.Terminal;
 
 public abstract class SftpCommand extends ChildCommand {
+	
+	public enum FilenameCompletionMode {
+		DIRECTORIES_REMOTE, DIRECTORIES_REMOTE_THEN_LOCAL, DIRECTORIES_LOCAL, DIRECTORIES_LOCAL_THEN_REMOTE, 
+		REMOTE, REMOTE_THEN_LOCAL, LOCAL, LOCAL_THEN_REMOTE, NONE
+	}
+
+	private final FilenameCompletionMode mode;
+	
+	protected SftpCommand() {
+		this(FilenameCompletionMode.NONE);
+	}
+	
+	protected SftpCommand(FilenameCompletionMode mode) {
+		this.mode = mode;
+	}
+	
+	public final FilenameCompletionMode completionMode() {
+		return mode;
+	}
 
 	public interface FileOp {
 		void op(String path) throws Exception;
@@ -35,8 +55,13 @@ public abstract class SftpCommand extends ChildCommand {
 		void op(Path path) throws Exception;
 	}
 
+	@Deprecated
 	protected Terminal getTerminal() {
-		return ((PSFTPInteractive)getRootCommand()).getTerminal();
+		return ((PSFTPInteractive)getRootCommand()).io();
+	}
+
+	protected Sequins io() {
+		return ((PSFTPInteractive)getRootCommand()).io();
 	}
 
 	protected SftpClient getSftpClient() {
@@ -162,6 +187,19 @@ public abstract class SftpCommand extends ChildCommand {
 				var parentPath = lcwd.toAbsolutePath().getParent();
 				path = parentPath == null ? path.getRoot() : parentPath;
 			}
+			
+			if(Files.exists(path)) {
+				try {
+					op.op(path);
+					continue;
+				} catch(EOFException ee) {
+					return;
+				} catch(IOException | RuntimeException re) {
+					throw re;
+				} catch (Exception e) {
+					throw new IOException("Failed to match pattern.", e);
+				}
+			}
 
 			var root = path.isAbsolute() ? path.getRoot() : lcwd;
 			var resolved = root;
@@ -178,7 +216,7 @@ public abstract class SftpCommand extends ChildCommand {
 					
 					for(var pathPartPath : stream) {
 						var fullPath = resolved;
-						if(matcher.matches(pathPartPath.getFileName())) {
+						if(matcher.matches(pathPartPath.getFileName()) || pathPartPath.getFileName().toString().equals(pathPart.toString())) {
 							fullPath = fullPath.resolve(pathPartPath.getFileName());
 							matches++;
 							if(i == pathCount -1) {
@@ -283,7 +321,6 @@ public abstract class SftpCommand extends ChildCommand {
 		}
 	}
 
-
 	public static synchronized boolean report(Terminal terminal, Progress progress, String name, long totalSoFar, long length, long started) {
 
 		boolean isDone = false;
@@ -318,7 +355,7 @@ public abstract class SftpCommand extends ChildCommand {
 			var timeStr = String.format("%5d:%02d", (int) (timeSeconds > 60 ? timeSeconds / 60 : 0),
 					(int) (timeSeconds % 60));
 
-			var available = cols - 41;
+			var available = Math.max(2, cols - 41);
 
 			var half = available / 2;
 			var nameLen = half;
@@ -347,7 +384,8 @@ public abstract class SftpCommand extends ChildCommand {
 		}
 		return isDone;
 	}
-
+	
+	
 	public static FileTransferProgress fileTransferProgress(Terminal terminal, Progress progress, String messagePattern) {
 		return new FileTransferProgress() {
 			private long bytesTotal;
@@ -383,7 +421,7 @@ public abstract class SftpCommand extends ChildCommand {
 	}
 
 	static Path expandSpecialLocalPath(Path path) {
-		if(path.toString().startsWith("~/") || path.toString().startsWith("~\\")) {
+		if(path.toString().equals("~") || path.toString().startsWith("~/") || path.toString().startsWith("~\\")) {
 			return Paths.get(System.getProperty("user.home") + path.toString().substring(1));
 		}
 		else

@@ -28,6 +28,9 @@ public class Get extends SftpCommand implements Callable<Integer> {
 	@Option(names = { "-b", "--blocksize" }, description = "the block size to use", defaultValue = "0")
 	int blocksize; 
 	
+	public Get() {
+		super(FilenameCompletionMode.REMOTE_THEN_LOCAL);
+	}
 	
 	@Override
 	protected Integer onCall() throws Exception {
@@ -39,12 +42,12 @@ public class Get extends SftpCommand implements Callable<Integer> {
 			sftp.setMaxAsyncRequests(outstandingRequests);
 		}
 		var expandedLocalPath = expandLocalSingleOr(localPath);
-		try(var progress = getTerminal().progressBuilder().withRateLimit().withTiming(timing).withInterruptable().build()) {
+		try(var progress = io().progressBuilder().withRateLimit().withTiming(timing).withInterruptable().build()) {
 			expandRemoteAndDo(remotePath -> {
 				if(expandedLocalPath.isPresent())
-					sftp.get(remotePath, expandedLocalPath.get().toString(), fileTransferProgress(getRootCommand().getTerminal(), progress, "Downloading {0}"));
+					sftp.get(remotePath, expandedLocalPath.get().toString(), fileTransferProgress(getRootCommand().io(), progress, "Downloading {0}"));
 				else
-					sftp.get(remotePath, fileTransferProgress(getRootCommand().getTerminal(), progress, "Downloading {0}"));
+					sftp.get(remotePath, fileTransferProgress(getRootCommand().io(), progress, "Downloading {0}"));
 			}, true, remotePaths);
 		}
 

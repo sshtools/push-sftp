@@ -20,23 +20,27 @@ public class Df extends SftpCommand {
 	@Parameters(index = "0", arity="0..1", paramLabel="PATH", description = "path of directory to list")
 	private Optional<String> path;
 	
+	public Df() {
+		super(FilenameCompletionMode.DIRECTORIES_REMOTE);
+	}
+	
 	@Override
 	protected Integer onCall() throws Exception {
 		if(inodes) {
-			getTerminal().messageln("     Inodes        Used       Avail      (root)    %Capacity");
+			io().messageln("     Inodes        Used       Avail      (root)    %Capacity");
 		}
 		else {
-			getTerminal().messageln("        Size         Used        Avail       (root)    %Capacity");
+			io().messageln("        Size         Used        Avail       (root)    %Capacity");
 		}
 		var stat = getSftpClient().statVFS(expandRemoteSingle(path));
 		if(inodes) {
-			getTerminal().messageln(String.format("%11d %11d %11d %11d %10d%%", 
+			io().messageln(String.format("%11d %11d %11d %11d %10d%%", 
 						stat.getINodes(), stat.getINodes() - stat.getFreeINodes(), 
 						stat.getAvailINodes(), 0, 0));
 		}
 		else {
 			if(humanReadable) {
-				getTerminal().messageln(String.format("%12s %12s %12s %12s %11d%%", 
+				io().messageln(String.format("%12s %12s %12s %12s %11d%%", 
 							toByteSize(stat.getSize()), 
 							toByteSize(stat.getUsed()), 
 							toByteSize(stat.getAvailForNonRoot()),
@@ -44,7 +48,7 @@ public class Df extends SftpCommand {
 							stat.getCapacity()));
 			}
 			else { 
-				getTerminal().messageln(String.format("%12d %12d %12d %12d %11d%%", 
+				io().messageln(String.format("%12d %12d %12d %12d %11d%%", 
 							stat.getSize(), 
 							stat.getUsed(), 
 							stat.getAvailForNonRoot(),
