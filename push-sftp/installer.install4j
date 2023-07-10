@@ -14,6 +14,7 @@
         <entry>jkeychain-*</entry>
         <entry>install4j-*</entry>
         <entry>jline-*</entry>
+        <entry>jansi*</entry>
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest">
