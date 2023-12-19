@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>two-slices</artifactId>
-			<version>0.9.1-SNAPSHOT</version>
+			<version>0.9.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
@@ -96,12 +96,12 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx</artifactId>
-			<version>0.0.5-SNAPSHOT</version>
+			<version>0.1.2</version>  
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jaul</artifactId>
-			<version>0.0.4-SNAPSHOT</version>
+			<version>0.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>pt.davidafsilva.apple</groupId>
