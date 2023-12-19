@@ -144,13 +144,13 @@ pipeline {
 	 		  	unstash 'macos-gui'
 	 		  	
 				/* Unstash updates.xml */
-	 		  	dir('push-sftp-gui/target/linux-media') {
+	 		  	dir('push-sftp-gui/target/media-linux') {
 	 		  		unstash 'linux-gui-updates-xml'
     			}
-	 		  	dir('push-sftp-gui/target/windows-media') {
+	 		  	dir('push-sftp-gui/target/media-windows') {
 	 		  		unstash 'windows-gui-updates-xml'
     			}
-	 		  	dir('push-sftp-gui/target/macos-media') {
+	 		  	dir('push-sftp-gui/target/media-macos') {
 	 		  		unstash 'macos-gui-updates-xml'
     			}
     			

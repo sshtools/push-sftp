@@ -19,8 +19,8 @@
 		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
 		<build.arch>${os.arch}</build.arch>
 		<build.platform>${build.os.family}-${os.arch}</build.platform>
-		<build.projectProperties>${project.basedir}/jadaptive.build.properties</build.projectProperties>
-		<build.userProperties>${user.home}/.jadaptive.build.properties</build.userProperties>
+		<build.projectProperties>${project.basedir}/hypersocket.build.properties</build.projectProperties>
+		<build.userProperties>${user.home}/.hypersocket.build.properties</build.userProperties>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
