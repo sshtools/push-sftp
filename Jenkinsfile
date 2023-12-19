@@ -167,7 +167,7 @@ pipeline {
 		 			dontSetBuildResultOnFailure: false, 
 		 			dontWaitForConcurrentBuildCompletion: false, 
 		 			entries: [[
-		 				bucket: 'sshtools-public/push-sftp/' + env.FULL_VERSION, 
+		 				bucket: 'sshtools-public/push-sftp/EXPERIMENTAL/' + env.FULL_VERSION, 
 		 				noUploadOnFailure: true, 
 		 				selectedRegion: 'eu-west-1', 
 		 				sourceFile: 'push-sftp/target/media/*', 
@@ -182,7 +182,7 @@ pipeline {
 		 			dontSetBuildResultOnFailure: false, 
 		 			dontWaitForConcurrentBuildCompletion: false, 
 		 			entries: [[
-		 				bucket: 'sshtools-public/push-sftp-gui/' + env.FULL_VERSION, 
+		 				bucket: 'sshtools-public/push-sftp-gui/EXPERIMENTAL/' + env.FULL_VERSION, 
 		 				noUploadOnFailure: true, 
 		 				selectedRegion: 'eu-west-1', 
 		 				sourceFile: 'push-sftp-gui/target/media/*', 
@@ -200,7 +200,7 @@ pipeline {
 		 			dontSetBuildResultOnFailure: false, 
 		 			dontWaitForConcurrentBuildCompletion: false, 
 		 			entries: [[
-		 				bucket: 'sshtools-public/push-sftp/continuous', 
+		 				bucket: 'sshtools-public/push-sftp/EXPERIMENTAL/continuous', 
 		 				noUploadOnFailure: true, 
 		 				selectedRegion: 'eu-west-1', 
 		 				sourceFile: 'push-sftp-gui/target/media/updates.xml', 
