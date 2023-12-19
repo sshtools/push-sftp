@@ -29,7 +29,7 @@ import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
 import com.sshtools.pushsftp.jfx.PushJob.Reporter;
 import com.sshtools.pushsftp.jfx.PushSFTPUIApp.NotificationType;
 import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
-import com.sshtools.simjac.ConfigurationStoreBuilder;
+import com.sshtools.simjac.store.ConfigurationStoreBuilder;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
