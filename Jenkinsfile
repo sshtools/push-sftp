@@ -145,13 +145,13 @@ pipeline {
 	 		  	
 				/* Unstash updates.xml */
 	 		  	dir('push-sftp-gui/target/linux-macos') {
-	 		  		unstash 'linux-updates-xml'
+	 		  		unstash 'linux-gui-updates-xml'
     			}
 	 		  	dir('push-sftp-gui/target/windows-macos') {
-	 		  		unstash 'windows-updates-xml'
+	 		  		unstash 'windows-gui-updates-xml'
     			}
 	 		  	dir('push-sftp-gui/target/media-macos') {
-	 		  		unstash 'macos-updates-xml'
+	 		  		unstash 'macos-gui-updates-xml'
     			}
     			
     			/* Merge all updates.xml into one */
