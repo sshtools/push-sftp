@@ -36,7 +36,7 @@ pipeline {
 			        			stash includes: 'push-sftp-gui/target/media/*', name: 'linux-gui'
 			        			
 			        			/* Stash updates.xml (just FileDrop atm) */
-			        			dir('push-sftp-gui/target/media/*') {
+			        			dir('push-sftp-gui/target/media') {
 									stash includes: 'updates.xml', name: 'linux-gui-updates-xml'
 			        			}
 					 		}
@@ -72,7 +72,7 @@ pipeline {
 			        			stash includes: 'push-sftp-gui/target/media/*', name: 'windows-gui'
 			        			
 			        			/* Stash updates.xml (just FileDrop atm) */
-			        			dir('push-sftp-gui/target/media/*') {
+			        			dir('push-sftp-gui/target/media') {
 									stash includes: 'updates.xml', name: 'windows-gui-updates-xml'
 			        			}
 					 		}
@@ -109,7 +109,7 @@ pipeline {
 			        			stash includes: 'push-sftp-gui/target/media/*', name: 'macos-gui'
 			        			
 			        			/* Stash updates.xml (just FileDrop atm) */
-			        			dir('push-sftp-gui/target/media/*') {
+			        			dir('push-sftp-gui/target/media') {
 									stash includes: 'updates.xml', name: 'macos-gui-updates-xml'
 			        			}
 					 		}
