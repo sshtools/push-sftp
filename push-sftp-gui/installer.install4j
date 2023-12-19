@@ -5,7 +5,8 @@
     <variables>
       <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
     </variables>
-    <codeSigning macEnabled="true" macPkcs12File="${compiler:env.HOME}/.jadaptive-developer-id.p12" windowsEnabled="true" windowsPkcs12File="${compiler:env.HOME}/.jadaptive.pfx" macNotarize="true" appleId="lee@sshtools.com">
+    <codeSigning macEnabled="true" macPkcs12File="${compiler:env.HOME}/.logonbox-developer-id.p12" windowsEnabled="true" windowsKeySource="windows" windowsPkcs12File="${compiler:env.HOME}/.logonbox.p12" macNotarize="true" appleId="brett@logonbox.com">
+      <windowsKeystoreIdentifier issuer="Sectigo Public Code Signing CA EV R36" serial="6a2d74c3e24c71aa08000ead302fbd46" subject="Jadaptive Limited" />
       <macSearchedJars>
         <entry>jna-*</entry>
         <entry>swt-*</entry>

@@ -19,12 +19,35 @@
 		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
 		<build.arch>${os.arch}</build.arch>
 		<build.platform>${build.os.family}-${os.arch}</build.platform>
+		<build.projectProperties>${project.basedir}/jadaptive.build.properties</build.projectProperties>
+		<build.userProperties>${user.home}/.jadaptive.build.properties</build.userProperties>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
 		<module>push-sftp-gui</module>
 	</modules>
+
 	<profiles>
+		<profile>
+			<id>merge-installers</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.sshtools</groupId>
+						<artifactId>updatesxmlmerger-maven-plugin</artifactId>
+						<version>0.0.1</version>
+						<configuration>
+							<inputs>
+								<input>${project.build.directory}/media-macos/updates.xml</input>
+								<input>${project.build.directory}/media-windows/updates.xml</input>
+								<input>${project.build.directory}/media-linux/updates.xml</input>
+							</inputs>
+							<output>${project.build.directory}/media/updates.xml</output>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>mac-build</id>
 			<activation>
@@ -139,6 +162,19 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>com.sshtools</groupId>
+					<artifactId>updatesxmlmerger-maven-plugin</artifactId>
+					<version>0.0.1</version>
+					<configuration>
+						<inputs>
+							<input>${project.build.directory}/media-macos/updates.xml</input>
+							<input>${project.build.directory}/media-windows/updates.xml</input>
+							<input>${project.build.directory}/media-linux/updates.xml</input>
+						</inputs>
+						<output>${project.build.directory}/media/updates.xml</output>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
 					<version>2.15.0</version>
@@ -156,8 +192,8 @@
 							<configuration>
 								<quiet>true</quiet>
 								<files>
-									<file>${basedir}/jadaptive.build.properties</file>
-									<file>${user.home}/.jadaptive.build.properties</file>
+									<file>${build.projectProperties}</file>
+									<file>${build.userProperties}</file>
 								</files>
 							</configuration>
 						</execution>
