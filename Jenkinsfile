@@ -140,8 +140,8 @@ pipeline {
 	 		  	unstash 'linux-gui'
 	 		  	unstash 'windows-cli'
 	 		  	unstash 'windows-gui'
-	 		  	unstash 'macos-client'
-	 		  	unstash 'macos-client'
+	 		  	unstash 'macos-cli'
+	 		  	unstash 'macos-gui'
 	 		  	
 				/* Unstash updates.xml */
 	 		  	dir('push-sftp-gui/target/linux-macos') {
