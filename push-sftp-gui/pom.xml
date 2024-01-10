@@ -389,6 +389,12 @@
 								<configuration>
 									<variables>
 										<build.phase>${build.phase}</build.phase>
+										<install4j.appleId>${install4j.appleId}</install4j.appleId>
+										<install4j.macSigning>${install4j.macSigning}</install4j.macSigning>
+										<install4j.windowsSigning>${install4j.windowsSigning}</install4j.windowsSigning>>
+										<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
+										<install4j.windowsKeystoreSerial>${install4j.windowsKeystoreSerial}</install4j.windowsKeystoreSerial>>
+										<install4j.windowsKeystoreSubject>${install4j.windowsKeystoreSubject}</install4j.windowsKeystoreSubject>
 									</variables>
 									<release>${product.version}-${build.number}</release>
 									<mediaTypes>${build.mediaTypes}</mediaTypes>

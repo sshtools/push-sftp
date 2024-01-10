@@ -32,6 +32,11 @@
 			<version>1.1.1-SNAPSHOT</version>
 		</dependency> 
 		<dependency>
+		    <groupId>org.jline</groupId>
+		    <artifactId>jline-bitmap</artifactId>
+		    <version>3.23.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 		    <groupId>me.tongfei</groupId>
 		    <artifactId>progressbar</artifactId>
 		    <version>0.9.4</version>
@@ -234,6 +239,13 @@
 								<configuration>
 									<variables>
 										<build.phase>${build.phase}</build.phase>
+										
+										<install4j.appleId>${install4j.appleId}</install4j.appleId>
+										<install4j.macSigning>${install4j.macSigning}</install4j.macSigning>
+										<install4j.windowsSigning>${install4j.windowsSigning}</install4j.windowsSigning>>
+										<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
+										<install4j.windowsKeystoreSerial>${install4j.windowsKeystoreSerial}</install4j.windowsKeystoreSerial>>
+										<install4j.windowsKeystoreSubject>${install4j.windowsKeystoreSubject}</install4j.windowsKeystoreSubject>
 									</variables>
 									<release>${product.version}-${build.number}</release>
 									<mediaTypes>${build.mediaTypes}</mediaTypes>
