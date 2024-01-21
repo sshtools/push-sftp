@@ -203,6 +203,21 @@ pipeline {
 		 				bucket: 'sshtools-public/push-sftp/continuous', 
 		 				noUploadOnFailure: true, 
 		 				selectedRegion: 'eu-west-1', 
+		 				sourceFile: 'push-sftp/target/media/updates.xml', 
+		 				storageClass: 'STANDARD', 
+		 				useServerSideEncryption: false]], 
+		 			pluginFailureResultConstraint: 'FAILURE', 
+		 			profileName: 'JADAPTIVE Buckets', 
+		 			userMetadata: []
+		 		)
+		 		s3Upload(
+		 			consoleLogLevel: 'INFO', 
+		 			dontSetBuildResultOnFailure: false, 
+		 			dontWaitForConcurrentBuildCompletion: false, 
+		 			entries: [[
+		 				bucket: 'sshtools-public/push-sftp-gui/continuous', 
+		 				noUploadOnFailure: true, 
+		 				selectedRegion: 'eu-west-1', 
 		 				sourceFile: 'push-sftp-gui/target/media/updates.xml', 
 		 				storageClass: 'STANDARD', 
 		 				useServerSideEncryption: false]], 
