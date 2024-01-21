@@ -17,7 +17,7 @@ public class Info extends SftpCommand {
 		var term = io();
 		var connection = ssh.getConnection();
 		
-		term.println(term.createSequence().underlineOn().span("Host", term.getWidth() / 2).toString());
+		term.messageln(term.createSequence().underlineOn().span("Host", term.getWidth() / 2).toString());
 		term.newline();
 		term.messageln("Hostname             : {0}", ssh.getHost());
 		term.messageln("Port                 : {0}", ssh.getPort());
@@ -25,7 +25,7 @@ public class Info extends SftpCommand {
 		term.messageln("Remote identification: {0}", ssh.getRemoteIdentification());
 		term.newline();
 
-		term.println(term.createSequence().underlineOn().span("KEX", term.getWidth() / 2).toString());
+		term.messageln(term.createSequence().underlineOn().span("KEX", term.getWidth() / 2).toString());
 		term.newline();
 		term.messageln("Host key type        : {0}", connection.getHostKeyAlgorithm());
 		term.messageln("Host key fingerprint : {0}", SshKeyUtils.getFingerprint(ssh.getHostKey()));
@@ -37,7 +37,7 @@ public class Info extends SftpCommand {
 		term.messageln("Compression (c->s)   : {0}", connection.getCompressionInUseCS());
 		term.messageln("Compression (s->c)   : {0}", connection.getCompressionInUseSC());
 		term.newline();
-		term.println(term.createSequence().underlineOn().span("SFTP", term.getWidth() / 2).toString());
+		term.messageln(term.createSequence().underlineOn().span("SFTP", term.getWidth() / 2).toString());
 		term.newline();	
 		
 		if(showSFTPStatistic(      "Write blocksize      : {0} bytes", "maverick.write.optimizedBlock")) {

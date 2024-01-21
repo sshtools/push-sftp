@@ -5,7 +5,7 @@
 	<artifactId>push-sftp-gui</artifactId>
 	<parent>
 		<groupId>com.sshtools</groupId>
-		<version>0.1.3-SNAPSHOT</version>
+		<version>0.9.0</version>
 		<artifactId>push-sftp-group</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
@@ -91,12 +91,12 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx</artifactId>
-			<version>0.1.6</version>  
+			<version>0.9.3</version>  
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jaul</artifactId>
-			<version>0.0.4</version>
+			<version>0.9.9</version>
 		</dependency>
 		<dependency>
 			<groupId>pt.davidafsilva.apple</groupId>

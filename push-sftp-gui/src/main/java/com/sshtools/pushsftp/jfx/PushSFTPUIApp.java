@@ -48,6 +48,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	
@@ -401,7 +402,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	}
 
 	@Override
-	protected Node createContent() {
+	protected Node createContent(Stage stage) {
 		tiles = new Tiles<>(this);
 		tiles.add(DropPage.class);
 		tiles.getStyleClass().add("padded");

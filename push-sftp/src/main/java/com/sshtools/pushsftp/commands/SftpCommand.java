@@ -24,7 +24,6 @@ import com.sshtools.sequins.Progress;
 import com.sshtools.sequins.Progress.Level;
 import com.sshtools.sequins.ProgressBar;
 import com.sshtools.sequins.Sequins;
-import com.sshtools.sequins.Terminal;
 
 public abstract class SftpCommand extends ChildCommand {
 	
@@ -53,11 +52,6 @@ public abstract class SftpCommand extends ChildCommand {
 	
 	public interface PathOp {
 		void op(Path path) throws Exception;
-	}
-
-	@Deprecated
-	protected Terminal getTerminal() {
-		return ((PSFTPInteractive)getRootCommand()).io();
 	}
 
 	protected Sequins io() {
@@ -321,7 +315,7 @@ public abstract class SftpCommand extends ChildCommand {
 		}
 	}
 
-	public static synchronized boolean report(Terminal terminal, Progress progress, String name, long totalSoFar, long length, long started) {
+	public static synchronized boolean report(Sequins terminal, Progress progress, String name, long totalSoFar, long length, long started) {
 
 		boolean isDone = false;
 		if(totalSoFar > 0) {
@@ -386,7 +380,7 @@ public abstract class SftpCommand extends ChildCommand {
 	}
 	
 	
-	public static FileTransferProgress fileTransferProgress(Terminal terminal, Progress progress, String messagePattern) {
+	public static FileTransferProgress fileTransferProgress(Sequins terminal, Progress progress, String messagePattern) {
 		return new FileTransferProgress() {
 			private long bytesTotal;
 			private long started;

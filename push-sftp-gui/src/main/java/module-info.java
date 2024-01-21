@@ -20,5 +20,5 @@ module com.sshtools.pushsftp.jfx {
 	requires org.freedesktop.dbus;
 	requires static org.freedesktop.dbus.transport.jre;
 
-    requires static org.scenicview.scenicview;
+//    requires static org.scenicview.scenicview;
 }
