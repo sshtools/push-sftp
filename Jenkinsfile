@@ -159,6 +159,7 @@ pipeline {
 		 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde',
 		 		) {
 					sh 'mvn -P merge-installers -pl push-sftp-gui com.sshtools:updatesxmlmerger-maven-plugin:merge'
+					sh 'mvn -P merge-installers -pl push-sftp com.sshtools:updatesxmlmerger-maven-plugin:merge'
 		 		}
 		 		
     			/* Upload all CLI and GUI installers */
