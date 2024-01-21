@@ -35,9 +35,12 @@ pipeline {
 			        			stash includes: 'push-sftp/target/media/*', name: 'linux-cli'
 			        			stash includes: 'push-sftp-gui/target/media/*', name: 'linux-gui'
 			        			
-			        			/* Stash updates.xml (just FileDrop atm) */
+			        			/* Stash updates.xml */
 			        			dir('push-sftp-gui/target/media') {
 									stash includes: 'updates.xml', name: 'linux-gui-updates-xml'
+			        			}
+			        			dir('push-sftp/target/media') {
+									stash includes: 'updates.xml', name: 'linux-updates-xml'
 			        			}
 					 		}
         				}
@@ -71,9 +74,12 @@ pipeline {
 			        			stash includes: 'push-sftp/target/media/*', name: 'windows-cli'
 			        			stash includes: 'push-sftp-gui/target/media/*', name: 'windows-gui'
 			        			
-			        			/* Stash updates.xml (just FileDrop atm) */
+			        			/* Stash updates.xml */
 			        			dir('push-sftp-gui/target/media') {
 									stash includes: 'updates.xml', name: 'windows-gui-updates-xml'
+			        			}
+			        			dir('push-sftp/target/media') {
+									stash includes: 'updates.xml', name: 'windows-updates-xml'
 			        			}
 					 		}
         				}
@@ -108,9 +114,12 @@ pipeline {
 			        			stash includes: 'push-sftp/target/media/*', name: 'macos-cli'
 			        			stash includes: 'push-sftp-gui/target/media/*', name: 'macos-gui'
 			        			
-			        			/* Stash updates.xml (just FileDrop atm) */
+			        			/* Stash updates.xml */
 			        			dir('push-sftp-gui/target/media') {
 									stash includes: 'updates.xml', name: 'macos-gui-updates-xml'
+			        			}
+			        			dir('push-sftp/target/media') {
+									stash includes: 'updates.xml', name: 'macos-updates-xml'
 			        			}
 					 		}
         				}
@@ -152,6 +161,15 @@ pipeline {
     			}
 	 		  	dir('push-sftp-gui/target/media-macos') {
 	 		  		unstash 'macos-gui-updates-xml'
+    			}
+	 		  	dir('push-sftp/target/media-linux') {
+	 		  		unstash 'linux-updates-xml'
+    			}
+	 		  	dir('push-sftp/target/media-windows') {
+	 		  		unstash 'windows-updates-xml'
+    			}
+	 		  	dir('push-sftp/target/media-macos') {
+	 		  		unstash 'macos-updates-xml'
     			}
     			
     			/* Merge all updates.xml into one */
