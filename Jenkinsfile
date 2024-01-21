@@ -133,6 +133,12 @@ pipeline {
 				label 'linux'
 			}
 			steps {
+    			/* Clean */
+    			withMaven(
+		 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde',
+		 		) {
+					sh 'mvn clean'
+		 		}
 			
 				script {
 					/* Create full version number from Maven POM version and the
