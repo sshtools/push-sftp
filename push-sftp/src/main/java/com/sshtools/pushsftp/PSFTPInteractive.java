@@ -139,9 +139,9 @@ public class PSFTPInteractive extends CliCommand {
 	@Override
 	protected void onConnected(SshClient ssh) {
 		try {
-			var bitmapBldr = io().createBitmap();
-			var img = bitmapBldr.build("logo.png", PSFTPInteractive.class);
-			img.draw();
+//			var bitmapBldr = io().createBitmap();
+//			var img = bitmapBldr.build("logo.png", PSFTPInteractive.class);
+//			img.draw();
 			
 			sftp = SftpClientBuilder.create().withClient(ssh).build();
 			
