@@ -5,7 +5,7 @@
     <variables>
       <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
     </variables>
-    <codeSigning macPkcs12File="${compiler:install4j.macPkcs12File}" windowsKeySource="windows" macNotarize="true" appleId="${compiler:install4j.appleId}">
+    <codeSigning macEnabled="true" macPkcs12File="${compiler:install4j.macPkcs12File}" windowsEnabled="true" windowsKeySource="windows" macNotarize="true" appleId="${compiler:install4j.appleId}">
       <windowsKeystoreIdentifier issuer="${compiler:install4j.windowsKeystoreIssuer}" serial="${compiler:install4j.windowsKeystoreSerial}" subject="${compiler:install4j.windowsKeystoreSubject}" />
       <macSearchedJars>
         <entry>jna-*</entry>
