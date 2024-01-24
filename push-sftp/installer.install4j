@@ -3,8 +3,17 @@
   <directoryPresets config="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="Jadaptive Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
-      <variable name="build.phase" value="continuous" description="The phase under which the updates.xml will be iniitally placed. Usually &quot;continuous&quot;" />
-      <variable name="jaul.forceSystem" value="false" />
+      <variable name="install4j.phase" value="continuous" description="The phase under which the updates.xml will be initially placed. Usually &quot;continuous&quot;" />
+      <variable name="install4j.appleId" value="unset@logonbox.com" description="The apple ID to use for notarisation" />
+      <variable name="install4j.macSigning" value="false" description="Whether to sig for Mac" />
+      <variable name="install4j.macPkcs12File" value="~/.logonbox-developer-id.p12" description="Location of Mac developer certificate" />
+      <variable name="install4j.windowsSigning" value="false" description="Whether to sig for Windows" />
+      <variable name="install4j.windowsKeystoreIssuer" value="Sectigo Public Code Signing CA EV R36" description="Windows key store issuer" />
+      <variable name="install4j.windowsKeystoreSerial" value="6a2d74c3e24c71aa08000ead302fbd46" description="Windows key store serial" />
+      <variable name="install4j.windowsKeystoreSubject" value="Jadaptive Limited" description="Windows key store subject" />
+      <variable name="install4j.updatesBase" value="http://localhost/${compiler:install4j.phase}/updates.xml" description="The base folder (on S3 usually) where updates are" />
+      <variable name="install4j.jaulAppId" value="UNSET" description="The Jaul update system app Id, e.g. com.sshtools.MyApp" />
+      <variable name="install4j.jaulUpdaterId" value="999" description="The ID (in this install4j project) of the updater application. Its a bit annoying we can't get this automatically!" />
     </variables>
     <codeSigning macEnabled="true" macPkcs12File="${compiler:install4j.macPkcs12File}" windowsEnabled="true" windowsKeySource="windows" macNotarize="true" appleId="${compiler:install4j.appleId}">
       <windowsKeystoreIdentifier issuer="${compiler:install4j.windowsKeystoreIssuer}" serial="${compiler:install4j.windowsKeystoreSerial}" subject="${compiler:install4j.windowsKeystoreSubject}" />
@@ -52,7 +61,7 @@
       </java>
     </launcher>
   </launchers>
-  <installerGui autoUpdateDescriptorUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${compiler:build.phase}/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${compiler:sys.version}/">
+  <installerGui autoUpdateDescriptorUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${compiler:install4j.phase}/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${compiler:sys.version}/">
     <applications>
       <application id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication">
         <startup>
