@@ -18,9 +18,6 @@
 		<build.projectProperties>${project.basedir}/hypersocket.build.properties</build.projectProperties>
 		<build.userProperties>${user.home}/.hypersocket.build.properties</build.userProperties>
 		
-		<install4j.appleId>xxxxxx@logonbox.com</install4j.appleId>
-		<install4j.macSigning>true</install4j.macSigning>
-		<install4j.windowsSigning>true</install4j.windowsSigning>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
