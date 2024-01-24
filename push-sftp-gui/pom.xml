@@ -397,13 +397,16 @@
 								</goals>
 								<configuration>
 									<variables>
-										<build.phase>${build.phase}</build.phase>
+										<install4j.phase>${install4j.phase}</install4j.phase>
 										<install4j.appleId>${install4j.appleId}</install4j.appleId>
 										<install4j.macSigning>${install4j.macSigning}</install4j.macSigning>
 										<install4j.windowsSigning>${install4j.windowsSigning}</install4j.windowsSigning>>
 										<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
 										<install4j.windowsKeystoreSerial>${install4j.windowsKeystoreSerial}</install4j.windowsKeystoreSerial>>
 										<install4j.windowsKeystoreSubject>${install4j.windowsKeystoreSubject}</install4j.windowsKeystoreSubject>
+										<install4j.updatesBase>${install4j.updatesBase}</install4j.updatesBase>
+										<install4j.jaulAppId>${install4j.jaulAppId}</install4j.jaulAppId>
+										<install4j.jaulUpdaterId>${install4j.jaulUpdaterId}</install4j.jaulUpdaterId>
 									</variables>
 									<release>${product.version}-${build.number}</release>
 									<mediaTypes>${build.mediaTypes}</mediaTypes>
