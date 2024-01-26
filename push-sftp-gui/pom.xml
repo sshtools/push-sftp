@@ -120,22 +120,46 @@
 		<dependency>
 			<groupId>com.github.javakeyring</groupId>
 			<artifactId>java-keyring</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.4</version>
 			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>de.swiesend</groupId>
 					<artifactId>secret-service</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>de.swiesend</groupId>
-			<artifactId>secret-service</artifactId>
-			<version>1.8.1-jdk17</version>
+		    <groupId>de.swiesend</groupId>
+		    <artifactId>secret-service</artifactId>
+		    <version>1.8.1-jdk17</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>com.github.hypfvieh</groupId>
+		    		<artifactId>
+		    			dbus-java-core
+		    		</artifactId>
+		    	</exclusion>
+		    	<exclusion>
+		    		<groupId>com.github.hypfvieh</groupId>
+		    		<artifactId>
+		    			dbus-java-transport-jnr-unixsocket
+		    		</artifactId>
+		    	</exclusion>
+		    	<exclusion>
+		    		<groupId>com.github.hypfvieh</groupId>
+		    		<artifactId>
+		    			dbus-java-transport-native-unixsocket
+		    		</artifactId>
+		    	</exclusion>
+		    	<exclusion>
+		    		<groupId>org.slf4j</groupId>
+		    		<artifactId>slf4j-api</artifactId>
+		    	</exclusion>
+		    </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
