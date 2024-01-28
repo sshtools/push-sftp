@@ -54,6 +54,24 @@
 			<groupId>eu.hansolo</groupId>
 			<artifactId>medusa</artifactId>
 			<version>16.0.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-swing</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -62,6 +80,29 @@
 			<version>17.0.2</version>
 			<optional>true</optional>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-fxml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-swing</artifactId>
+			<version>${javafx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.install4j</groupId>
@@ -100,7 +141,7 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx</artifactId>
-			<version>0.9.4</version>  
+			<version>0.9.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
