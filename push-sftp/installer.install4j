@@ -46,7 +46,7 @@
   <launchers>
     <launcher name="push-sftp" id="25" excludeFromMenu="true">
       <executable name="push-sftp" stderrFile="${installer:sys.userHome}/.pushsftp/error.log" redirectStdout="true" stdoutFile="${installer:sys.userHome}/.pushsftp/output.log" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${launcher:sys.launcherDirectory}">
+      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module"  vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
           <directory location="lib" failOnError="false" />
         </modulePath>
@@ -54,7 +54,7 @@
     </launcher>
     <launcher name="push-sftp-prompt" id="116" excludeFromMenu="true">
       <executable name="push-sftp-prompt" stderrFile="${installer:sys.userHome}/.pushsftp/error.log" redirectStdout="true" stdoutFile="${installer:sys.userHome}/.pushsftp/output.log" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${launcher:sys.launcherDirectory}" arguments="--prompt">
+      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module"  vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}" arguments="--prompt">
         <modulePath>
           <directory location="lib" failOnError="false" />
         </modulePath>

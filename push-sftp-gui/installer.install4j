@@ -54,7 +54,7 @@
   <launchers>
     <launcher name="file-drop" id="52" menuName="FileDrop">
       <executable name="file-drop" iconSet="true" stderrFile="${installer:sys.userName}/.filedrop/error.log" redirectStdout="true" stdoutFile="${installer:sys.userName}/.filedrop/output.log" executableMode="gui" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module" vmParameters="-Dinstall4j.installationDir=${launcher:sys.launcherDirectory}">
+      <java mainClass="com.sshtools.pushsftp.jfx/com.sshtools.pushsftp.jfx.PushSFTPUI" mainMode="module"  vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
           <directory location="lib" failOnError="false" />
           <directory location="mac" failOnError="false" />
@@ -1265,7 +1265,7 @@ return true;</property>
         <entry location="win" />
       </exclude>
     </linuxDeb>
-    <windows name="Windows" id="34" installDir="FileDrop" architecture="64">
+    <windows name="Windows" id="34" installDir="Jadaptive\FileDrop" architecture="64">
       <exclude>
         <entry location="mac" />
         <entry location="linux" />
