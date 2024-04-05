@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.EditHttpTargetPage">
+   <center>
+      <AnchorPane>   <children>
+           <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <center>
+                  <AnchorPane>
+                     <children>
+                        <VBox styleClass="spaced" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <TextFlow styleClass="bpad">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="muted" text="%info" />
+                                 </children>
+                              </TextFlow>
+                              <Label styleClass="h3" text="%target" wrapText="true" />
+                              <BorderPane VBox.vgrow="NEVER">
+                                 <left>
+                                    <Label prefWidth="120.0" text="%url" BorderPane.alignment="CENTER" />
+                                 </left>
+                                 <center>
+                                    <TextField fx:id="url" promptText="https://securefile.exchange/" BorderPane.alignment="CENTER">
+                                       <tooltip>
+                                          <Tooltip text="%url.toolTip" />
+                                       </tooltip>
+                                    </TextField>
+                                 </center>
+                              </BorderPane>
+                              <BorderPane>
+                                 <left>
+                                    <Label prefWidth="120.0" text="%displayName" BorderPane.alignment="CENTER" />
+                                 </left>
+                                 <center>
+                                    <TextField fx:id="displayName" promptText="securefile.exchange" BorderPane.alignment="CENTER">
+                                       <tooltip>
+                                          <Tooltip text="%displayName.toolTip" />
+                                       </tooltip>
+                                    </TextField>
+                                 </center>
+                              </BorderPane>
+                              <Label minWidth="100.0" styleClass="h3" text="%youTitle" wrapText="true" />
+                              <Label minWidth="100.0" styleClass="muted" text="%you.info" wrapText="true" />
+                              <BorderPane>
+                                 <left>
+                                    <Label prefWidth="120.0" text="%name" BorderPane.alignment="CENTER" />
+                                 </left>
+                                 <center>
+                                    <TextField fx:id="name" prefWidth="300.0" BorderPane.alignment="CENTER">
+                                       <tooltip>
+                                          <Tooltip text="%name.toolTip" />
+                                       </tooltip>
+                                    </TextField>
+                                 </center>
+                              </BorderPane>
+                              <BorderPane>
+                                 <left>
+                                    <Label prefWidth="120.0" text="%email" BorderPane.alignment="CENTER" />
+                                 </left>
+                                 <center>
+                                    <TextField fx:id="email" prefWidth="300.0" BorderPane.alignment="CENTER">
+                                       <tooltip>
+                                          <Tooltip text="%email.toolTip" />
+                                       </tooltip>
+                                    </TextField>
+                                 </center>
+                              </BorderPane>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+               </center>
+               <top>
+                  <Label styleClass="h2" text="%type" wrapText="true" BorderPane.alignment="CENTER_LEFT" />
+               </top>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <BorderPane BorderPane.alignment="CENTER">
+         <left>
+            <Hyperlink onAction="#save" text="%save" BorderPane.alignment="CENTER">
+               <graphic>
+                  <FontIcon iconLiteral="fas-save" iconSize="48" styleClass="icon-accent" />
+               </graphic>
+            </Hyperlink>
+         </left>
+         <center>
+            <HBox alignment="CENTER_RIGHT" styleClass="spaced" BorderPane.alignment="CENTER">
+               <children>
+                  <Hyperlink fx:id="delete" layoutX="10.0" layoutY="26.0" onAction="#delete" text="%delete" />
+                  <Hyperlink onAction="#cancel" text="%cancel" />
+               </children>
+            </HBox>
+         </center>
+      </BorderPane>
+   </bottom>
+</BorderPane>

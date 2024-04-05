@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -30,12 +28,14 @@ public final class PushJob extends SshConnectionJob<Void> {
 		private final AtomicLong started;
 		private final AtomicLong total;
 		private final long allFilesTotal;
+		private final long noFiles;
 		private final String messagePattern;
 		private long bytesSoFar;
 		private String message;
 
-		private PushProgress(AtomicLong started, AtomicLong total, long allFilesTotal, String messagePattern) {
+		private PushProgress(long noFiles, AtomicLong started, AtomicLong total, long allFilesTotal, String messagePattern) {
 			this.started = started;
+			this.noFiles = noFiles;
 			this.total = total;
 			this.allFilesTotal = allFilesTotal;
 			this.messagePattern = messagePattern;
@@ -46,10 +46,10 @@ public final class PushJob extends SshConnectionJob<Void> {
 			this.bytesSoFar = 0;
 			if(started.get() == -1) {
 				started.set(System.currentTimeMillis());
-				if(files.size() == 1)
+				if(noFiles == 1)
 					message = file;
 				else
-					message = MessageFormat.format(RESOURCES.getString("fileCount"), files.size());
+					message = MessageFormat.format(RESOURCES.getString("fileCount"), noFiles);
 				updateMessage(MessageFormat.format(messagePattern, message));
 			}
 		}
@@ -73,12 +73,7 @@ public final class PushJob extends SshConnectionJob<Void> {
 		}
 	}
 
-	@FunctionalInterface
-	public interface Reporter {
-		void report(PushJob job, long length, long totalSoFar, long time);
-	}
-
-	public final static class PushJobBuilder extends AbstractSshConnectionJobBuilder<PushJob, PushJobBuilder> {
+	public final static class PushJobBuilder extends AbstractSshConnectionJobBuilder<PushJob, PushJobBuilder> implements TransferTaskBuilder<PushJobBuilder, SshTarget, PushJob> {
 		private final List<Path> files = new ArrayList<>();
 		private Optional<Reporter> reporter = Optional.empty();
 		private int chunks = 3;
@@ -202,59 +197,6 @@ public final class PushJob extends SshConnectionJob<Void> {
 				e.getMessage() == null ? "" : e.getMessage())); //$NON-NLS-1$
 	}
 
-	@Deprecated
-    public Void resultNow() {
-		/* NOTE: This is a patch to get some methods available in Java 19 (we 
-		 * build with 17 currently). Will be removed when built and deployed with
-		 * Java 19+
-		 */
-        if (!isDone())
-            throw new IllegalStateException("Task has not completed");
-        boolean interrupted = false;
-        try {
-            while (true) {
-                try {
-                    return get();
-                } catch (InterruptedException e) {
-                    interrupted = true;
-                } catch (ExecutionException e) {
-                    throw new IllegalStateException("Task completed with exception");
-                } catch (CancellationException e) {
-                    throw new IllegalStateException("Task was cancelled");
-                }
-            }
-        } finally {
-            if (interrupted) Thread.currentThread().interrupt();
-        }
-    }
-
-	@Deprecated
-    public Throwable exceptionNow() {
-		/* NOTE: This is a patch to get some methods available in Java 19 (we 
-		 * build with 17 currently). Will be removed when built and deployed with
-		 * Java 19+
-		 */
-        if (!isDone())
-            throw new IllegalStateException("Task has not completed");
-        if (isCancelled())
-            throw new IllegalStateException("Task was cancelled");
-        boolean interrupted = false;
-        try {
-            while (true) {
-                try {
-                    get();
-                    throw new IllegalStateException("Task completed with a result");
-                } catch (InterruptedException e) {
-                    interrupted = true;
-                } catch (ExecutionException e) {
-                    return e.getCause();
-                }
-            }
-        } finally {
-            if (interrupted) Thread.currentThread().interrupt();
-        }
-    }
-
 	@Override
 	protected void onCancelled() {
 		updateMessage(RESOURCES.getString("cancelled")); //$NON-NLS-1$
@@ -303,6 +245,6 @@ public final class PushJob extends SshConnectionJob<Void> {
 		var total = new AtomicLong();
 		var started = new AtomicLong(-1);
 		
-		return new RateLimitedFileTransferProgress(new PushProgress(started, total, allFilesTotal, messagePattern), 50);
+		return new RateLimitedFileTransferProgress(new PushProgress(files.size(), started, total, allFilesTotal, messagePattern), 50);
 	}
 }

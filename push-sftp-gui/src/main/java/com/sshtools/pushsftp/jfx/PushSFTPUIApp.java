@@ -5,7 +5,6 @@ import static com.sshtools.jajafx.FXUtil.maybeQueue;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +32,11 @@ import com.sshtools.common.ssh.components.SshPublicKey;
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaApp;
 import com.sshtools.jajafx.JajaFXApp;
-import com.sshtools.jajafx.PasswordPage;
+import com.sshtools.jajafx.JajaFXAppWindow;
 import com.sshtools.jajafx.Tiles;
 import com.sshtools.jajafx.UpdatePage;
-import com.sshtools.jajafx.YesNoPage;
+import com.sshtools.jajafx.progress.PasswordPage;
+import com.sshtools.jajafx.progress.YesNoPage;
 import com.sshtools.twoslices.Toast;
 import com.sshtools.twoslices.ToastType;
 import com.sshtools.twoslices.ToasterFactory;
@@ -70,7 +70,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	private HostKeyVerification hkv;
 
 	public PushSFTPUIApp() {
-		super(PushSFTPUIApp.class.getResource("icon.png"), RESOURCES.getString("title"), (PushSFTPUI) PushSFTPUI.getInstance());
+		super(PushSFTPUIApp.class.getResource("icon.png"), RESOURCES.getString("title"), (PushSFTPUI) PushSFTPUI.getInstance(), ((PushSFTPUI) PushSFTPUI.getInstance()).getAppPreferences());
 		service = new FileTransferService(this);
 		
 		Optional<Keyring> k;
@@ -83,6 +83,11 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		keyring = k;
 		
 		configureToaster();
+	}
+
+	@Override
+	protected JajaFXAppWindow createAppWindow(Stage stage) {
+		return new JajaFXAppWindow(stage, createContent(stage), this, 480, 660);
 	}
 
 	private void configureToaster() {
@@ -149,7 +154,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 	}
 
 	@Override
-	protected void needUpdate() {
+	public void needUpdate() {
 		maybeQueue(() -> {
 			if (!(tiles.getCurrentPage() instanceof AboutPage) && !(tiles.getCurrentPage() instanceof UpdatePage)
 					&& !service.busyProperty().get()) {
@@ -212,7 +217,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 		};
 	}
 
-	public PassphrasePrompt createPassphrasePrompt(Target target) {
+	public PassphrasePrompt createPassphrasePrompt(SshTarget target) {
 		var save = new AtomicBoolean();
 		return new PassphrasePrompt() {
 			@Override
@@ -249,8 +254,8 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 
 	public PasswordPrompt createPasswordPrompt(Target target) {
 		var save = new AtomicBoolean();
-		var serviceName = target.hostname() + ":" + target.port() + "/"
-				+ target.remoteFolder().map(Path::toString).orElse("");
+		var serviceName = target.uri().toString();
+		var username = target.uri().getUserInfo() == null ? "public" : target.uri().getUserInfo();
 		return new PasswordPrompt() {
 
 			@Override
@@ -258,9 +263,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 				try {
 					if (keyring.isEmpty())
 						throw new PasswordAccessException("No keyring.");
-					return keyring.get().getPassword(serviceName, target.username());
+					return keyring.get().getPassword(serviceName, username);
 				} catch (PasswordAccessException pae) {
-					return password(save, target.username(), RESOURCES.getString("passwordDialog.title"));
+					return password(save, username, RESOURCES.getString("passwordDialog.title"));
 				}
 			}
 
@@ -270,9 +275,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
 					try {
 						if (success) {
 							if (save.get())
-								k.setPassword(serviceName, target.username(), value);
+								k.setPassword(serviceName, username, value);
 						} else {
-							k.deletePassword(serviceName, target.username());
+							k.deletePassword(serviceName, username);
 						}
 					} catch (PasswordAccessException pae) {
 					}

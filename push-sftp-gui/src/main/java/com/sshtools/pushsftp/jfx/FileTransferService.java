@@ -1,15 +1,11 @@
 package com.sshtools.pushsftp.jfx;
 
-import static com.sshtools.jajafx.FXUtil.emptyPathIfBlankString;
-
 import java.io.Closeable;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,18 +13,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sshtools.client.sftp.RemoteHash;
-import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.util.IOUtils;
-import com.sshtools.pushsftp.jfx.PushJob.PushJobBuilder;
-import com.sshtools.pushsftp.jfx.PushJob.Reporter;
 import com.sshtools.pushsftp.jfx.PushSFTPUIApp.NotificationType;
-import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
+import com.sshtools.pushsftp.jfx.SshTarget.SshTargetBuilder;
 import com.sshtools.simjac.store.ConfigurationStoreBuilder;
 
 import javafx.application.Platform;
@@ -172,11 +163,11 @@ public class FileTransferService implements Closeable, Reporter {
 
 	}
 
-	private final ObservableList<PushJob> jobs = FXCollections.observableArrayList();
+	private final ObservableList<TargetJob<?, ?>> jobs = FXCollections.observableArrayList();
 	private final ScheduledExecutorService service;
 	private final ObservableList<Target> targets = loadTargets();
 	private final ObservableList<Target> activeTargets = FXCollections.observableArrayList();
-	private final Map<PushJob, TransferStats> stats = new HashMap<>();
+	private final Map<TargetJob<?, ?>, TransferStats> stats = new HashMap<>();
 	private final ObjectProperty<TransferStats> summary = new SimpleObjectProperty<>(new TransferStats());
 	private final PushSFTPUIApp context;
 	private final BooleanProperty busy;
@@ -195,7 +186,7 @@ public class FileTransferService implements Closeable, Reporter {
 		return summary;
 	}
 
-	public ObservableList<PushJob> getJobs() {
+	public ObservableList<TargetJob<?, ?>> getJobs() {
 		return jobs;
 	}
 
@@ -211,54 +202,49 @@ public class FileTransferService implements Closeable, Reporter {
 		return targets;
 	}
 
-	public void drop(Target target, List<Path> files) throws SshException, IOException {
+	public void drop(Target target, List<Path> files) throws Exception {
 
 		var prefs = context.getContainer().getAppPreferences();
-		var agentSocket = prefs.get("agentSocket", "");
+		var taskBldr = target.createTransferTask(context);
 
-		var task = PushJobBuilder.builder().
-				withVerbose(prefs.getBoolean("verbose", false))
-				.withAgentSocket(agentSocket.equals("") ? Optional.empty() : Optional.of(agentSocket))
-				.withPaths(files)
-				.withTarget(() -> {
-					var idx = targets.indexOf(target);
-					if(idx == -1)
-						throw new IllegalStateException("Target has been removed.");
-					else
-						return targets.get(idx);
-				})
-				.withSerializer((t) -> {
-					Platform.runLater(() -> {
-						var idx = targets.indexOf(target);
-						if(idx == -1) {
-							targets.add(t);
-						}
-						else {
-							targets.set(idx, t);
-						}
-					});
-				})
-				.withReporter(this)
-				.withHostKeyVerification(context.createHostKeyVerificationPrompt())
-				.withPassphrasePrompt(context.createPassphrasePrompt(target))
-				.withPassword(context.createPasswordPrompt(target)).build();
+		taskBldr.withVerbose(prefs.getBoolean("verbose", false))
+		.withPaths(files)
+		.withPassword(context.createPasswordPrompt(target))
+		.withTarget(() -> {
+			var idx = targets.indexOf(target);
+			if(idx == -1)
+				throw new IllegalStateException("Target has been removed.");
+			else
+				return targets.get(idx);
+		})
+		.withSerializer((t) -> {
+			Platform.runLater(() -> {
+				var idx = targets.indexOf(target);
+				if(idx == -1) {
+					targets.add(t);
+				}
+				else {
+					targets.set(idx, t);
+				}
+			});
+		})
+		.withReporter(this);
+		
+		var task = taskBldr.build();
 		
 		task.setOnCancelled(evt -> {
 			context.notification(NotificationType.ERROR, RESOURCES.getString("toast.cancelled.title"), //$NON-NLS-1$ //$NON-NLS-2$
-					MessageFormat.format(RESOURCES.getString("toast.cancelled.text"), files.size(), target.username(),
-							target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
+					MessageFormat.format(RESOURCES.getString("toast.cancelled.text"), files.size(), target.uri()));
 		});
 		task.setOnFailed(evt -> {
 			var e = task.exceptionNow();
 			LOG.error("Failed.", e);
 			context.notification(NotificationType.ERROR, RESOURCES.getString("toast.error.title"), //$NON-NLS-1$ //$NON-NLS-2$
-					MessageFormat.format(RESOURCES.getString("toast.error.text"), files.size(), target.username(),
-							target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
+					MessageFormat.format(RESOURCES.getString("toast.error.text"), files.size(), target.uri()));
 		});
 		task.setOnSucceeded(evt -> {
 			context.notification(NotificationType.SUCCESS, RESOURCES.getString("toast.completed.title"), //$NON-NLS-1$ //$NON-NLS-2$
-					MessageFormat.format(RESOURCES.getString("toast.completed.text"), files.size(), target.username(),
-							target.hostname(), target.port(), target.remoteFolder().map(Path::toString).orElse("")));
+					MessageFormat.format(RESOURCES.getString("toast.completed.text"), files.size(), target.uri()));
 		});
 		
 		jobs.add(task);
@@ -322,7 +308,7 @@ public class FileTransferService implements Closeable, Reporter {
 				withSerializer(() -> {
 					var ob = Json.createArrayBuilder();
 					for (var target : targets) {
-						ob.add(toJsonObject(target));
+						ob.add(target.toJsonObject());
 					}
 					return ob.build();
 				});
@@ -331,7 +317,7 @@ public class FileTransferService implements Closeable, Reporter {
 		store.retrieve();
 
 		if (targets.isEmpty()) {
-			targets.add(TargetBuilder.builder().build());
+			targets.add(new SshTargetBuilder().build());
 		}
 
 		targets.addListener((ListChangeListener.Change<? extends Target> c) -> {
@@ -342,53 +328,20 @@ public class FileTransferService implements Closeable, Reporter {
 	}
 
 	private static Target fromJsonObject(JsonObject obj) {
-		return TargetBuilder.builder()
-				.withHostname(obj.getString("hostname", ""))
-				.withUsername(obj.getString("username", ""))
-				.withPort(obj.getInt("port", 22))
-				.withChunks(obj.getInt("chunks", 3))
-				.withDisplayName(obj.getString("displayName", null))
-				.withIdentity(emptyPathIfBlankString(obj.getString("privateKey", "")))
-				.withPreferredIdentity(emptyPathIfBlankString(obj.getString("preferredPrivateKey", "")))
-				.withRemoteFolder(emptyPathIfBlankString(obj.getString("remoteFolder", "")))
-				.withAgent(obj.getBoolean("agentAuthentication", true))
-				.withPassword(obj.getBoolean("passwordAuthentication", true))
-				.withUnsafePassword(obj.getString("unsafePassword", null))
-				.withIdentities(obj.getBoolean("defaultIdentities", true))
-				.withMode(Mode.valueOf(obj.getString("mode", Mode.CHUNKED.name())))
-				.withVerifyIntegrity(obj.getBoolean("verifyIntegrity", false))
-				.withMultiplex(obj.getBoolean("multiplex", false))
-				.withIgnoreIntegrity(obj.getBoolean("ignoreIntegrity", false))
-				.withAuthenticationTimeout(obj.getInt("authenticationTimeout", 120))
-				.withHash(RemoteHash.valueOf(obj.getString("hash", RemoteHash.sha512.name())))
-				.build();
-	}
-
-	private static JsonValue toJsonObject(Target target) {
-		var bldr = Json.createObjectBuilder();
-		bldr.add("hostname", target.hostname());
-		bldr.add("username", target.username());
-		target.displayName().ifPresent(d -> bldr.add("displayName", d));
-		target.unsafePassword().ifPresent(d -> bldr.add("unsafePassword", d));
-		bldr.add("port", target.port());
-		bldr.add("chunks", target.chunks());
-		bldr.add("privateKey", target.identity().map(Path::toString).orElse(""));
-		bldr.add("preferredPrivateKey", target.preferredIdentity().map(Path::toString).orElse(""));
-		bldr.add("remoteFolder", target.remoteFolder().map(Path::toString).orElse(""));
-		bldr.add("agentAuthentication", target.agent());
-		bldr.add("passwordAuthentication", target.password());
-		bldr.add("defaultIdentities", target.identities());
-		bldr.add("mode", target.mode().name());
-		bldr.add("verifyIntegrity", target.verifyIntegrity());
-		bldr.add("multiplex", target.multiplex());
-		bldr.add("ignoreIntegrity", target.ignoreIntegrity());
-		bldr.add("authenticationTimeout", target.authenticationTimeout());
-		bldr.add("hash", target.hash().name());
-		return bldr.build();
+		var type = obj.getString("type", SshTarget.class.getName());
+		if(type.equals(SshTarget.class.getName())) {
+			return SshTarget.fromJsonObject(obj);
+		}
+		else if(type.equals(HttpTarget.class.getName())) {
+			return HttpTarget.fromJsonObject(obj);
+		}
+		else {
+			throw new IllegalArgumentException("Unknown type " + type);
+		}
 	}
 
 	@Override
-	public void report(PushJob job, long length, long totalSoFar, long time) {
+	public void report(TargetJob<?,?> job, long length, long totalSoFar, long time) {
 		Platform.runLater(() -> {
 			stats.put(job, new TransferStats(time, length, totalSoFar));
 			rebuildStats();

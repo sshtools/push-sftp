@@ -3,11 +3,12 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.intTextfieldValue;
 import static com.sshtools.jajafx.FXUtil.makeIntegerTextField;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.sshtools.client.sftp.RemoteHash;
 import com.sshtools.jajafx.AbstractTile;
-import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
+import com.sshtools.pushsftp.jfx.SshTarget.SshTargetBuilder;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -39,6 +40,7 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	CheckBox ignoreIntegrity;
 
+	Optional<Runnable> onDelete;
 
 	@Override
 	public void shown() {
@@ -48,7 +50,7 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	public void hidden() {
 	}
 
-	public void save(TargetBuilder builder) {
+	public void save(SshTargetBuilder builder) {
 		builder.
 				withChunks(intTextfieldValue(chunks)).
 				withPassword(passwordAuthentication.isSelected()).
@@ -98,7 +100,7 @@ public class AdvancedEditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	public void close() {
 	}
 
-	public void setTarget(Target target) {
+	public void setTarget(SshTarget target) {
 		chunks.setText(String.valueOf(target.chunks()));
 		agentAuthentication.setSelected(target.agent());
 		passwordAuthentication.setSelected(target.password());

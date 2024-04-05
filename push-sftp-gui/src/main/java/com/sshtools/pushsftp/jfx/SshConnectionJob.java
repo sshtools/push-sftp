@@ -9,8 +9,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +27,9 @@ import com.sshtools.client.SshClient.SshClientBuilder;
 import com.sshtools.client.SshClientContext;
 import com.sshtools.common.knownhosts.HostKeyVerification;
 import com.sshtools.common.ssh.SshException;
-import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
+import com.sshtools.pushsftp.jfx.SshTarget.SshTargetBuilder;
 
-import javafx.concurrent.Task;
-
-public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V> {
+public abstract class SshConnectionJob<V> extends TargetJob<V, SshTarget> implements Callable<V> {
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(SshConnectionJob.class.getName());
 	final static Logger LOG = LoggerFactory.getLogger(SshConnectionJob.class);
 
@@ -61,22 +57,12 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 
 	}
 
-	public static abstract class AbstractSshConnectionJobBuilder<J extends SshConnectionJob<?>, B extends AbstractSshConnectionJobBuilder<J, B>> {
-		private Optional<Supplier<Target>> target = Optional.empty();
+	public static abstract class AbstractSshConnectionJobBuilder<J extends SshConnectionJob<?>, B extends AbstractSshConnectionJobBuilder<J, B>> extends AbstractTargetJobBuilder<SshTarget, J, B> {
 		private Optional<String> agentSocket = Optional.empty();
-		private boolean verbose;
 		private Optional<String> agentName = Optional.empty();
 		private Optional<PassphrasePrompt> passphrasePrompt = Optional.empty();
-		private Optional<PasswordPrompt> password = Optional.empty();
 		private Optional<HostKeyVerification> hostKeyVerification = Optional.empty();
-		private Optional<Consumer<Target>> serializer = Optional.empty();
 		
-		@SuppressWarnings("unchecked")
-		public B withSerializer(Consumer<Target> serializer) {
-			this.serializer = Optional.of(serializer);
-			return (B)this;
-		}
-
 		public B withHostKeyVerification(HostKeyVerification hostKeyVerification) {
 			return withHostKeyVerification(Optional.of(hostKeyVerification));
 		}
@@ -94,40 +80,6 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		@SuppressWarnings("unchecked")
 		public B withPassphrasePrompt(Optional<PassphrasePrompt> passphrasePrompt) {
 			this.passphrasePrompt = passphrasePrompt;
-			return (B) this;
-		}
-
-		public B withPassword(String password) {
-			return withPassword(() -> password);
-		}
-
-		public B withPassword(PasswordPrompt password) {
-			return withPassword(Optional.of(password));
-		}
-
-		@SuppressWarnings("unchecked")
-		public B withPassword(Optional<PasswordPrompt> password) {
-			this.password = password;
-			return (B) this;
-		}
-
-		public B withVerbose() {
-			return withVerbose(true);
-		}
-
-		@SuppressWarnings("unchecked")
-		public B withVerbose(boolean verbose) {
-			this.verbose = verbose;
-			return (B) this;
-		}
-
-		public B withTarget(Target target) {
-			return withTarget(() -> target);
-		}
-
-		@SuppressWarnings("unchecked")
-		public B withTarget(Supplier<Target> target) {
-			this.target = Optional.of(target);
 			return (B) this;
 		}
 
@@ -154,26 +106,19 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 		public abstract J build();
 	}
 
-	protected final Supplier<Target> target;
 	protected final Optional<String> agentSocket;
 	protected final String agentName;
-	protected final boolean verbose;
-	protected final Optional<Consumer<Target>> serializer;
 	protected final Optional<PassphrasePrompt> passphrasePrompt;
-	protected final Optional<PasswordPrompt> password;
 	protected final Optional<HostKeyVerification> hostKeyVerification;
 	
 	private SshClient ssh;
 
 	protected SshConnectionJob(AbstractSshConnectionJobBuilder<?, ?> builder) {
-		this.target = builder.target.orElseThrow(() -> new IllegalStateException("Target must be provided.")); //$NON-NLS-1$
+		super(builder);
 		this.agentSocket = builder.agentSocket;
-		this.verbose = builder.verbose;
 		this.agentName = builder.agentName.orElse("PSFTP"); //$NON-NLS-1$
 		this.passphrasePrompt = builder.passphrasePrompt;
-		this.password = builder.password;
 		this.hostKeyVerification = builder.hostKeyVerification;
-		this.serializer = builder.serializer;
 	}
 
 	@Override
@@ -261,7 +206,7 @@ public abstract class SshConnectionJob<V> extends Task<V> implements Callable<V>
 					serializer.ifPresent(s -> {
 						var path = authenticator.getCurrentPath();
 						if(!path.equals(target.preferredIdentity().orElse(null))) {
-							s.accept(TargetBuilder.builder().
+							s.accept(new SshTargetBuilder().
 									fromTarget(target).
 									withPreferredIdentity(path).
 									build());

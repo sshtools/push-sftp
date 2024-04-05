@@ -1,6 +1,5 @@
 package com.sshtools.pushsftp.jfx;
 
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -14,7 +13,6 @@ import com.sshtools.jajafx.PageTransition;
 import com.sshtools.jajafx.PrefBind;
 import com.sshtools.jajafx.ScrollStack;
 import com.sshtools.pushsftp.jfx.FileTransferService.TransferUnit;
-import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
 
 import eu.hansolo.medusa.Gauge;
 import javafx.beans.binding.Bindings;
@@ -205,8 +203,7 @@ public class DropPage extends AbstractTile<PushSFTPUIApp> implements PreferenceC
 
 	@FXML
 	void addTarget(ActionEvent evt) {
-		getTiles().popup(EditTargetPage.class, PageTransition.FROM_RIGHT).setTarget(TargetBuilder.builder().build(),
-				(newTarget) -> getContext().getService().getTargets().add(newTarget), Optional.empty());
+		getTiles().popup(TargetTypePage.class, PageTransition.FROM_RIGHT);	
 	}
 
 	@FXML

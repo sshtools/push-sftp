@@ -15,7 +15,7 @@
 		<main.class>com.sshtools.pushsftp.jfx.PushSFTPUIApp</main.class>
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 		<gluonfx.maven.plugin.version>1.0.16</gluonfx.maven.plugin.version>
-		<javafx.version>17.0.7-ea+1</javafx.version>
+		<javafx.version>22</javafx.version>
 		
 		<install4j.phase>continuous</install4j.phase>
 		<install4j.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</install4j.mediaTypes>
@@ -140,8 +140,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
-			<artifactId>jajafx</artifactId>
-			<version>0.9.4</version>
+			<artifactId>jajafx-lib</artifactId>
+			<version>0.9.5-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sshtools</groupId>
+			<artifactId>jajafx-sequins</artifactId>
+			<version>0.9.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
@@ -464,6 +469,7 @@
 									<variables>
 										<install4j.phase>${install4j.phase}</install4j.phase>
 										<install4j.appleId>${install4j.appleId}</install4j.appleId>
+										<install4j.appleIdPassword>${install4j.appleIdPassword}</install4j.appleIdPassword>
 										<install4j.macSigning>${install4j.macSigning}</install4j.macSigning>
 										<install4j.windowsSigning>${install4j.windowsSigning}</install4j.windowsSigning>>
 										<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>

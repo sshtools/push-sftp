@@ -21,17 +21,21 @@
             <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="spaced" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Label styleClass="h2" text="%title" />
-                  <HBox alignment="CENTER_LEFT" styleClass="spaced">
-                     <children>
-                        <Label prefWidth="120.0" text="%agentSocket" />
-                        <TextField fx:id="agentSocket" prefWidth="350.0">
+                  <BorderPane>
+                     <left>
+                        <Label prefWidth="120.0" text="%agentSocket" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <Button mnemonicParsing="false" onAction="#browseAgentSocket" text="%browse" BorderPane.alignment="CENTER" />
+                     </right>
+                     <center>
+                        <TextField fx:id="agentSocket" BorderPane.alignment="CENTER">
                            <tooltip>
                               <Tooltip text="%agentSocket.toolTip" />
                            </tooltip>
                         </TextField>
-                        <Button mnemonicParsing="false" onAction="#browseAgentSocket" text="%browse" />
-                     </children>
-                  </HBox>
+                     </center>
+                  </BorderPane>
                   <CheckBox fx:id="verbose" mnemonicParsing="false" text="%verbose">
                      <tooltip>
                         <Tooltip text="%verbose.toolTip" />

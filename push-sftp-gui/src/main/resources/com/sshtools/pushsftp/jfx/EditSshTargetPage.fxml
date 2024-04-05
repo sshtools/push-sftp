@@ -15,7 +15,7 @@
 <?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.EditTargetPage">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.EditSshTargetPage">
    <center>
       <AnchorPane>   <children>
            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -26,7 +26,12 @@
                            <children>
                               <VBox prefWidth="300.0">
                                  <children>
-                                    <Label styleClass="h2" text="%target" />
+                                    <TextFlow prefWidth="400.0" styleClass="bpad">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="muted" text="%info" />
+                                       </children>
+                                    </TextFlow>
+                                    <Label layoutX="10.0" layoutY="10.0" styleClass="h3" text="%target" />
                                     <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="26.0" styleClass="spaced">
                                        <children>
                                           <Label prefWidth="120.0" text="%displayName" />
@@ -133,11 +138,7 @@
                   </AnchorPane>
                </center>
                <top>
-                  <TextFlow prefWidth="400.0" styleClass="bpad" BorderPane.alignment="CENTER">
-                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="muted" text="%info" />
-                     </children>
-                  </TextFlow>
+                  <Label styleClass="h2" text="%type" BorderPane.alignment="CENTER_LEFT" />
                </top>
             </BorderPane>
          </children>

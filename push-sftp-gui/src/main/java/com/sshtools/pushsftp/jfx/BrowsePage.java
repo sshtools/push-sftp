@@ -114,7 +114,7 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 	void refreshView() {
 	}
 
-	void setTarget(Target target, Optional<String> originalPath) throws Exception {
+	void setTarget(SshTarget target, Optional<String> originalPath) throws Exception {
 
 		var context = getContext();
 		var prefs = context.getContainer().getAppPreferences();
@@ -189,10 +189,10 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 		boolean loaded;
 		boolean loading;
 		Path path;
-		Target target;
+		SshTarget target;
 		List<FileTreeItem> newItems = Collections.emptyList();
 
-		public FileTreeItem(Path path, Target target) {
+		public FileTreeItem(Path path, SshTarget target) {
 			super(path);
 
 			this.path = path;

@@ -12,10 +12,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-import com.sshtools.jajafx.AbstractTile;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
-import com.sshtools.pushsftp.jfx.Target.TargetBuilder;
+import com.sshtools.pushsftp.jfx.SshTarget.SshTargetBuilder;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -23,9 +22,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
-public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
+public class EditSshTargetPage extends AbstractEditTargetPage<SshTarget> {
 
-	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(EditTargetPage.class.getName());
+	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(EditSshTargetPage.class.getName());
 
 	@FXML
 	TextField username;
@@ -44,16 +43,7 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	@FXML
 	HBox unsafePasswordContainer;
 
-	private Consumer<Target> onSave;
-	private Optional<Runnable> onDelete;
-
-	private Target target;
-
 	private AdvancedEditTargetPage advanced;
-
-	@Override
-	public void shown() {
-	}
 
 	@Override
 	public void hidden() {
@@ -69,8 +59,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 		getTiles().remove(this);
 	}
 
-	private TargetBuilder createTarget() {
-		return TargetBuilder.builder().
+	private SshTargetBuilder createTarget() {
+		return new SshTargetBuilder().
 				fromTarget(target).
 				withUsername(textOrPrompt(username)).
 				withUnsafePassword(FXUtil.optionalText(unsafePassword.getText())).
@@ -82,24 +72,13 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	}
 
 	@FXML
-	private void cancel() {
-		getTiles().remove(this);
-	}
-
-	@FXML
 	private void advanced() {
 		advanced = getContext().getTiles().popup(AdvancedEditTargetPage.class, PageTransition.FROM_RIGHT);
 		advanced.setTarget(target);
 	}
 
-	@FXML
-	private void delete() {
-		onDelete.ifPresent(r -> r.run());
-		getTiles().remove(this);
-	}
-
 	@Override
-	protected void onConfigure() {
+	protected void onEditConfigure() {
 		username.setPromptText(System.getProperty("user.name"));
 		makeIntegerTextField(0, 65535, port);
 		unsafePasswordContainer.managedProperty().bind(unsafePasswordContainer.visibleProperty());
@@ -123,18 +102,8 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	}
 
 	@Override
-	public void close() {
-	}
-
-	public void setTarget(Target target, Consumer<Target> onSave, Optional<Consumer<Target>> onDelete) {
-		this.onSave = onSave;
-		this.target = target;
-		this.onDelete = onDelete.map(r -> new Runnable() {
-			@Override
-			public void run() {
-				r.accept(target);
-			}
-		});
+	protected void onSetTarget(SshTarget target, Consumer<SshTarget> onSave, Optional<Consumer<SshTarget>> onDelete) {
+		
 		displayName.setText(target.displayName().orElse(""));
 		username.setText(target.username());
 		username.textProperty().addListener((c, o, n) -> rebuildDisplayNamePrompt());
@@ -151,10 +120,6 @@ public class EditTargetPage extends AbstractTile<PushSFTPUIApp> {
 	}
 
 	private void rebuildDisplayNamePrompt() {
-		displayName
-				.setPromptText(textOrPrompt(username) + "@" + textOrPrompt(hostname) + ":" + FXUtil.textOrPrompt(port)
-						+ ((remoteFolder.getText().equals("")) ? "/~"
-								: (remoteFolder.getText().startsWith("/") ? remoteFolder.getText()
-										: "/" + remoteFolder.getText())));
+		displayName.setPromptText(SshTarget.sshDisplayName(Integer.parseInt(FXUtil.textOrPrompt(port)), textOrPrompt(username), textOrPrompt(hostname), remoteFolder.getText()));
 	}
 }

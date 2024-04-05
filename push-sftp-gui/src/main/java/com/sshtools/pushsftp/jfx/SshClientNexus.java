@@ -4,7 +4,7 @@ import com.sshtools.client.SshClient;
 
 public class SshClientNexus {
 	
-	public SshClient acquireClient(Target target) {
+	public SshClient acquireClient(SshTarget target) {
 		throw new UnsupportedOperationException();
 	}
 	

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sshtools.pushsftp.jfx.TargetTypePage">   <children>
+     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <AnchorPane>
+               <children>
+                  <HBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <VBox alignment="CENTER_LEFT" styleClass="spaced">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                                 <children>
+                                    <RadioButton fx:id="ssh" mnemonicParsing="false" onMouseClicked="#selectAndNext" prefWidth="200.0" selected="true" styleClass="rpad" text="%ssh">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="action" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <Label onMouseClicked="#ssh" prefWidth="300.0" text="%ssh.info" wrapText="true">
+                                       <styleClass>
+                                          <String fx:value="muted" />
+                                          <String fx:value="lpad" />
+                                       </styleClass></Label>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <RadioButton fx:id="sfx" mnemonicParsing="false" onMouseClicked="#selectAndNext" prefWidth="200.0" styleClass="rpad" text="%sfx" toggleGroup="$action" />
+                                    <Label onMouseClicked="#sfx" prefWidth="300.0" text="%sfx.info" wrapText="true">
+                                       <styleClass>
+                                          <String fx:value="muted" />
+                                          <String fx:value="lpad" />
+                                       </styleClass>
+                                    </Label>
+                                 </children>
+                                 <styleClass>
+                                    <String fx:value="spaced" />
+                                    <String fx:value="tpad" />
+                                 </styleClass>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </center>
+         <top>
+            <BorderPane BorderPane.alignment="CENTER">
+               <bottom>
+                  <Label styleClass="muted" text="%info" BorderPane.alignment="CENTER_LEFT" />
+               </bottom>
+               <top>
+                  <Label styleClass="h2" text="%title" textAlignment="CENTER" BorderPane.alignment="CENTER_LEFT" />
+               </top>
+            </BorderPane>
+         </top>
+         <bottom>
+            <BorderPane BorderPane.alignment="CENTER">
+               <center>
+                  <HBox alignment="CENTER_LEFT" styleClass="spaced">
+                     <children>
+                        <Hyperlink fx:id="next" onAction="#next" text="%next">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-arrow-circle-right" iconSize="48" styleClass="icon-accent" />
+                           </graphic>
+                        </Hyperlink>
+                     </children>
+                  </HBox>
+               </center>
+               <right>
+                  <Hyperlink fx:id="back" contentDisplay="RIGHT" onAction="#back" text="%back" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

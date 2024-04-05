@@ -3,7 +3,6 @@ package com.sshtools.pushsftp.jfx;
 import static com.sshtools.jajafx.FXUtil.load;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +17,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sshtools.common.ssh.SshException;
 import com.sshtools.jajafx.FXUtil;
 import com.sshtools.jajafx.PageTransition;
 import com.sshtools.pushsftp.jfx.PushSFTPUIApp.NotificationType;
@@ -202,8 +200,21 @@ public class DropTarget extends StackPane implements Initializable {
 
 	@FXML
 	void edit(ActionEvent evt) {
+		if(target instanceof SshTarget ssht) {
+			edit(ssht, EditSshTargetPage.class);
+		}
+		else if(target instanceof HttpTarget httpt) {
+			edit(httpt, EditHttpTargetPage.class);
+		}
+		else {
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	private <TARG extends Target> void edit(TARG target, Class<? extends AbstractEditTargetPage<TARG>> clazz) {
 		var targets = context.getService().getTargets();
-		context.getTiles().popup(EditTargetPage.class, PageTransition.FROM_RIGHT).setTarget(target, (newTarget) -> {
+		var pg = context.getTiles().popup(clazz, PageTransition.FROM_RIGHT);		
+		pg.setTarget(target, (newTarget) -> {
 			var idx = targets.indexOf(target);
 			targets.set(idx, newTarget);
 		}, Optional.of((t) -> {
@@ -214,7 +225,7 @@ public class DropTarget extends StackPane implements Initializable {
 	private void drop(List<Path> files) {
 		try {
 			service.drop(target, files);
-		} catch (IOException | SshException e) {
+		} catch (Exception e) {
 			LOG.error("Failed to drop files.", e);
 			context.notification(NotificationType.ERROR, DropPage.RESOURCES.getString("error.failedToDrop"), e.getMessage());
 		}

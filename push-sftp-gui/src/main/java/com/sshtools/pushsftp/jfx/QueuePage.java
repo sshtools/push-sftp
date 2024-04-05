@@ -17,13 +17,13 @@ public class QueuePage extends AbstractTile<PushSFTPUIApp> {
 	final static ResourceBundle RESOURCES = ResourceBundle.getBundle(QueuePage.class.getName());
 
 	@FXML
-	private TaskProgressView<PushJob> jobs;
+	private TaskProgressView<TargetJob<?, ?>> jobs;
 
 	@Override
 	protected void onConfigure() {
 		var service = getContext().getService();
 
-		service.getJobs().addListener((ListChangeListener.Change<? extends PushJob> c) -> {
+		service.getJobs().addListener((ListChangeListener.Change<? extends TargetJob<?, ?>> c) -> {
 			while (c.next()) {
 				if (c.wasReplaced()) {
 					jobs.getTasks().setAll(service.getJobs());
