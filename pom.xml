@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sshtools</groupId>
 	<artifactId>push-sftp-group</artifactId>
-	<version>0.9.0</version>
+	<version>0.9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
 		<maven.compiler.target>17</maven.compiler.target>
