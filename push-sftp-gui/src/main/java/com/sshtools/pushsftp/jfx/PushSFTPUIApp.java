@@ -50,7 +50,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI> {
+public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFTPUIApp>> {
 	
 	public enum NotificationType {
 		ERROR,

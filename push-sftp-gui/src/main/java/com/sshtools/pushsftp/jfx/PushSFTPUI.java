@@ -7,6 +7,7 @@ import com.sshtools.common.logger.Log;
 import com.sshtools.common.logger.Log.Level;
 import com.sshtools.common.ssh.components.jce.JCEProvider;
 import com.sshtools.jajafx.JajaApp;
+import com.sshtools.jajafx.JajaFXAppWindow;
 import com.sshtools.jaul.AppCategory;
 import com.sshtools.jaul.ArtifactVersion;
 import com.sshtools.jaul.JaulApp;
@@ -18,7 +19,7 @@ import picocli.CommandLine.Option;
 
 @Command(name = "filedrop", mixinStandardHelpOptions = true, description = "Simple graphical user interface for push files to an SFTP server as fast as possible.", versionProvider = PushSFTPUI.Version.class)
 @JaulApp(id = "com.sshtools.FileDrop", category = AppCategory.GUI, updaterId = "54", updatesUrl = "https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml")
-public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
+public class PushSFTPUI extends JajaApp<PushSFTPUIApp, JajaFXAppWindow<PushSFTPUIApp>> {
 
 	public final static class Version implements IVersionProvider {
 		@Override
@@ -28,7 +29,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp> {
 				synergyVersion = ArtifactVersion.getVersion("com.sshtools.hotfixes", "maverick-synergy-client");
 			}
 			return new String[] {
-					ArtifactVersion.getVersion("filedrop", "com.sshtools", "push-sftp-gui"),
+					ArtifactVersion.getVersion("com.sshtools", "push-sftp-gui"),
 					MessageFormat.format("using Maverick Synergy {0}",synergyVersion)
 					};
 		}
