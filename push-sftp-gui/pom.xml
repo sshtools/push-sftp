@@ -151,7 +151,7 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jaul</artifactId>
-			<version>0.9.9</version>
+			<version>0.9.11-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>pt.davidafsilva.apple</groupId>
