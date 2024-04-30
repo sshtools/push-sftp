@@ -24,7 +24,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp, JajaFXAppWindow<PushSFTPU
 	public final static class Version implements IVersionProvider {
 		@Override
 		public String[] getVersion() throws Exception {
-			var synergyVersion = ArtifactVersion.getVersion("com.sshtools", "maverick-synergy-client");
+			var synergyVersion = ArtifactVersion.getVersion("filedrop", "com.sshtools", "maverick-synergy-client");
 			if(synergyVersion.equals("DEV_VERSION")) {
 				synergyVersion = ArtifactVersion.getVersion("com.sshtools.hotfixes", "maverick-synergy-client");
 			}
