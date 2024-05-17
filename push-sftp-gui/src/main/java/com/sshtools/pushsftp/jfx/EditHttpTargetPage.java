@@ -61,7 +61,20 @@ public class EditHttpTargetPage extends AbstractEditTargetPage<HttpTarget> {
 
 	private void rebuildDisplayNamePrompt() {
 		try {
-			displayName.setPromptText(HttpTarget.httpDisplayName(new URL(url.getText()).toURI()));
+			var urltext = url.getText();
+			if(urltext.contains("/app/ui/incoming/")) {
+				urltext = urltext.replace("/app/ui/incoming/", "/upload/public/");
+				url.setText(urltext);
+				int idx = urltext.indexOf("/upload/public/") + 15;
+				if(url.caretPositionProperty().get() < idx) {
+					url.positionCaret(idx);
+				}
+				else if(url.caretPositionProperty().get() > urltext.length()) {
+					url.positionCaret(urltext.length());
+				}
+				return;
+			}
+			displayName.setPromptText(HttpTarget.httpDisplayName(new URL(urltext).toURI()));
 		} catch (Exception e) {
 			displayName.setPromptText("");
 		}
