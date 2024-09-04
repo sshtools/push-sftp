@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.6" transformSequenceNumber="10">
+<install4j version="10.0.8" transformSequenceNumber="10">
   <directoryPresets config="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="JADAPTIVE Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
       <variable name="install4j.phase" value="continuous" description="The phase under which the updates.xml will be initially placed. Usually &quot;continuous&quot;" />
       <variable name="install4j.appleId" value="unset@logonbox.com" description="The apple ID to use for notarisation" />
-      <variable name="install4j.macSigning" value="false" description="Whether to sig for Mac" />
       <variable name="install4j.macPkcs12File" value="~/.jadaptive-developer-id.p12" description="Location of Mac developer certificate" />
-      <variable name="install4j.windowsSigning" value="false" description="Whether to sig for Windows" />
       <variable name="install4j.windowsKeystoreIssuer" value="Sectigo Public Code Signing CA EV R36" description="Windows key store issuer" />
       <variable name="install4j.windowsKeystoreSerial" value="6a2d74c3e24c71aa08000ead302fbd46" description="Windows key store serial" />
       <variable name="install4j.windowsKeystoreSubject" value="Jadaptive Limited" description="Windows key store subject" />
@@ -27,7 +25,7 @@
         <entry>jansi*</entry>
       </macSearchedJars>
     </codeSigning>
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/latest">
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="21/jdk-21.0.4+7">
       <modules>
         <defaultModules set="jre" />
         <module name="jdk.unsupported" />
@@ -46,7 +44,7 @@
   <launchers>
     <launcher name="push-sftp" id="25" excludeFromMenu="true">
       <executable name="push-sftp" stderrFile="${installer:sys.userHome}/.pushsftp/error.log" redirectStdout="true" stdoutFile="${installer:sys.userHome}/.pushsftp/output.log" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module"  vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
+      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}">
         <modulePath>
           <directory location="lib" failOnError="false" />
         </modulePath>
@@ -54,7 +52,7 @@
     </launcher>
     <launcher name="push-sftp-prompt" id="116" excludeFromMenu="true">
       <executable name="push-sftp-prompt" stderrFile="${installer:sys.userHome}/.pushsftp/error.log" redirectStdout="true" stdoutFile="${installer:sys.userHome}/.pushsftp/output.log" executableMode="console" changeWorkingDirectory="false" />
-      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module"  vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}" arguments="--prompt">
+      <java mainClass="com.sshtools.pushsftp/com.sshtools.pushsftp.PSFTPInteractive" mainMode="module" vmParameters="-Dinstall4j.installationDir=${installer:sys.installationDir}" arguments="--prompt">
         <modulePath>
           <directory location="lib" failOnError="false" />
         </modulePath>

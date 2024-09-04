@@ -10,14 +10,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maverick.synergy.version>3.1.0-SNAPSHOT</maverick.synergy.version>
-		<!-- For configuring Install4J -->
-		<build.phase>continuous</build.phase>
-		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
 		<build.arch>${os.arch}</build.arch>
 		<build.platform>${build.os.family}-${os.arch}</build.platform>
 		<build.projectProperties>${project.basedir}/hypersocket.build.properties</build.projectProperties>
 		<build.userProperties>${user.home}/.hypersocket.build.properties</build.userProperties>
-		
+		<!-- For configuring Install4J -->
+		<install4j.phase>continuous</install4j.phase>
+		<install4j.updatesBase>http://localhost/${project.name}</install4j.updatesBase>
+		<install4j.jaulAppId>UNSET</install4j.jaulAppId>
+		<install4j.jaulUpdaterId>999</install4j.jaulUpdaterId>
+		<install4j.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</install4j.mediaTypes>
+		<install4j.macPkcs12File>${user.home}/.jadaptive-developer-id.p12</install4j.macPkcs12File>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
@@ -220,6 +223,27 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>1.8</version>
+				</plugin>
+				<plugin>
+					<groupId>com.install4j</groupId>
+					<artifactId>install4j-maven</artifactId>
+					<version>10.0.7</version>
+					<configuration>
+						<variables>
+							<install4j.phase>${install4j.phase}</install4j.phase>
+							<install4j.appleId>${install4j.appleId}</install4j.appleId>
+							<install4j.macPkcs12File>${install4j.macPkcs12File}</install4j.macPkcs12File>
+							<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
+							<install4j.windowsKeystoreSerial>${install4j.windowsKeystoreSerial}</install4j.windowsKeystoreSerial>>
+							<install4j.windowsKeystoreSubject>${install4j.windowsKeystoreSubject}</install4j.windowsKeystoreSubject>
+							<install4j.updatesBase>${install4j.updatesBase}</install4j.updatesBase>
+							<install4j.jaulAppId>${install4j.jaulAppId}</install4j.jaulAppId>
+							<install4j.jaulUpdaterId>${install4j.jaulUpdaterId}</install4j.jaulUpdaterId>
+						</variables>
+						<mediaTypes>${install4j.mediaTypes}</mediaTypes>
+						<verbose>true</verbose>
+						<release>${product.version}-${build.number}</release>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
