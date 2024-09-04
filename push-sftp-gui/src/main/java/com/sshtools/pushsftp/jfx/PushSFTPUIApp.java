@@ -37,11 +37,11 @@ import com.sshtools.jajafx.Tiles;
 import com.sshtools.jajafx.UpdatePage;
 import com.sshtools.jajafx.progress.PasswordPage;
 import com.sshtools.jajafx.progress.YesNoPage;
+import com.sshtools.twoslices.BasicToastHint;
 import com.sshtools.twoslices.Toast;
 import com.sshtools.twoslices.ToastType;
 import com.sshtools.twoslices.ToasterFactory;
 import com.sshtools.twoslices.ToasterSettings.SystemTrayIconMode;
-import com.sshtools.twoslices.impl.JavaFXToaster;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -92,19 +92,19 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFT
 
 	private void configureToaster() {
 		var settings = ToasterFactory.getSettings();
-		var properties = settings.getProperties();
+		var properties = settings.getHints();
 		settings.setAppName(RESOURCES.getString("title")); 
 		settings.setSystemTrayIconMode(SystemTrayIconMode.HIDDEN);
 		if( System.getProperty("os.name").toLowerCase().contains("mac os") || System.getProperty("os.name").toLowerCase().contains("windows")) {
-			settings.setPreferredToasterClassName(JavaFXToaster.class.getName());
+			settings.setPreferredToasterClassName("com.sshtools.twoslices.impl.JavaFXToaster");
 		}
-		properties.put(JavaFXToaster.DARK, isDarkMode());
+		properties.put(BasicToastHint.DARK, isDarkMode());
 		ObservableList<String> l = FXCollections.observableArrayList();
 		addCommonStylesheets(l);
-		properties.put(JavaFXToaster.STYLESHEETS, l);
-		properties.put(JavaFXToaster.COLLAPSE_MESSAGE, RESOURCES.getString("collapse"));
-		properties.put(JavaFXToaster.THRESHOLD, 6);
-		properties.put(JavaFXToaster.TYPE_ICON_GENERATOR, new Function<ToastType, Node>() {
+		properties.put(BasicToastHint.STYLESHEETS, l);
+		properties.put(BasicToastHint.COLLAPSE_MESSAGE, RESOURCES.getString("collapse"));
+		properties.put(BasicToastHint.THRESHOLD, 6);
+		properties.put(BasicToastHint.TYPE_ICON_GENERATOR, new Function<ToastType, Node>() {
 			@Override
 			public Node apply(ToastType t) {
 				Node node = createNode(t);

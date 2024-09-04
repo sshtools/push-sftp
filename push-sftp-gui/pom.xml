@@ -15,7 +15,7 @@
 		<main.class>com.sshtools.pushsftp.jfx.PushSFTPUIApp</main.class>
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 		<gluonfx.maven.plugin.version>1.0.16</gluonfx.maven.plugin.version>
-		<javafx.version>22</javafx.version>
+        <javafx.version>21.0.4-ea+1</javafx.version>
 		
 		<install4j.phase>continuous</install4j.phase>
 		<install4j.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</install4j.mediaTypes>
@@ -102,7 +102,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-swing</artifactId>
-			<version>${javafx.version}</version>
+			<version>${javafx.version}</version> 
 		</dependency>
 		<dependency>
 			<groupId>com.install4j</groupId>
@@ -114,7 +114,7 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>two-slices</artifactId>
-			<version>0.9.1</version>
+			<version>0.9.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
