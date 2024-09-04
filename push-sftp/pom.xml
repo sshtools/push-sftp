@@ -21,7 +21,7 @@
 		<install4j.phase>continuous</install4j.phase>
 		<install4j.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</install4j.mediaTypes>
 		<install4j.macSigning>true</install4j.macSigning>
-		<install4j.macPkcs12File>~/.logonbox-developer-id.p12</install4j.macPkcs12File>
+		<install4j.macPkcs12File>${user.home}/.jadaptive-developer-id.p12</install4j.macPkcs12File>
 		<install4j.windowsSigning>true</install4j.windowsSigning>
 		<install4j.updatesBase>http://localhost/${project.name}</install4j.updatesBase>
 		<install4j.jaulAppId>com.sshtools.PushSFTP</install4j.jaulAppId>
