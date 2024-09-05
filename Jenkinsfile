@@ -27,7 +27,7 @@ pipeline {
 					 		withMaven(
 					 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde'
 					 		) {
-					 		  	sh 'mvn -U -Dbuild.mediaTypes=unixInstaller,unixArchive,linuxRPM,linuxDeb ' +
+					 		  	sh 'mvn -U -Dinstall4j.mediaTypes=unixInstaller,unixArchive,linuxRPM,linuxDeb ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.disableSigning=true ' +
 					 		  	   '-DbuildInstaller=true clean package'
@@ -67,7 +67,7 @@ pipeline {
 					 		withMaven(
 					 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde'
 					 		) {
-					 		  	bat 'mvn -U -Dinstall4j.verbose=true -Dbuild.mediaTypes=windows,windowsArchive ' +
+					 		  	bat 'mvn -U -Dinstall4j.verbose=true -Dinstall4j.mediaTypes=windows,windowsArchive ' +
 					 		  	    '"-Dbuild.projectProperties=%BUILD_PROPERTIES%" ' +
 				 		  	        '-DbuildInstaller=true clean package'
 					 		  	
@@ -107,9 +107,8 @@ pipeline {
 					 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde'
 					 		) {
 					 			// -Dinstall4j.disableNotarization=true 
-					 		  	sh 'mvn -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
+					 		  	sh 'mvn -U -Dinstall4j.mediaTypes=macos,macosFolder,macosFolderArchive ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
-					 		  	    '-Dinstall4j.disableSigning=true ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
