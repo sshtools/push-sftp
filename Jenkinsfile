@@ -107,7 +107,7 @@ pipeline {
 					 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde'
 					 		) {
 					 			// -Dinstall4j.disableNotarization=true 
-					 		  	sh 'mvn -U -Dinstall4j.mediaTypes=macos,macosFolder,macosFolderArchive ' +
+					 		  	sh 'mvn -X -U -Dinstall4j.mediaTypes=macos,macosFolder,macosFolderArchive ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.debug=true ' +
 					 		  	   '-DbuildInstaller=true clean package'
