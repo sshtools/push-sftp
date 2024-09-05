@@ -231,7 +231,6 @@
 					<configuration>
 						<variables>
 							<install4j.phase>${install4j.phase}</install4j.phase>
-							<install4j.appleId>${install4j.appleId}</install4j.appleId>
 							<install4j.macPkcs12File>${install4j.macPkcs12File}</install4j.macPkcs12File>
 							<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
 							<install4j.windowsKeystoreSerial>${install4j.windowsKeystoreSerial}</install4j.windowsKeystoreSerial>>
