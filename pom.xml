@@ -14,13 +14,11 @@
 		<build.platform>${build.os.family}-${os.arch}</build.platform>
 		<build.projectProperties>${project.basedir}/hypersocket.build.properties</build.projectProperties>
 		<build.userProperties>${user.home}/.hypersocket.build.properties</build.userProperties>
-		<!-- For configuring Install4J -->
-		<install4j.phase>continuous</install4j.phase>
+		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
+		<build.buildIds></build.buildIds>
 		<install4j.updatesBase>http://localhost/${project.name}</install4j.updatesBase>
 		<install4j.jaulAppId>UNSET</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>999</install4j.jaulUpdaterId>
-		<install4j.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</install4j.mediaTypes>
-		<install4j.macPkcs12File>${user.home}/.logonbox-developer-id.p12</install4j.macPkcs12File>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
@@ -231,6 +229,7 @@
 					<configuration>
 						<variables>
 							<install4j.phase>${install4j.phase}</install4j.phase>
+                            <install4j.exeSuffix>${build.exe.suffix}</install4j.exeSuffix>
 							<install4j.appleId>${install4j.appleId}</install4j.appleId>
 							<install4j.macPkcs12File>${install4j.macPkcs12File}</install4j.macPkcs12File>
 							<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
@@ -240,7 +239,8 @@
 							<install4j.jaulAppId>${install4j.jaulAppId}</install4j.jaulAppId>
 							<install4j.jaulUpdaterId>${install4j.jaulUpdaterId}</install4j.jaulUpdaterId>
 						</variables>
-						<mediaTypes>${install4j.mediaTypes}</mediaTypes>
+                        <mediaTypes>${build.mediaTypes}</mediaTypes>
+                        <buildIds>${build.buildIds}</buildIds>
 						<verbose>true</verbose>
 						<release>${product.version}-${build.number}</release>
 					</configuration>
