@@ -20,7 +20,7 @@
 		<install4j.jaulAppId>UNSET</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>999</install4j.jaulUpdaterId>
 		<install4j.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</install4j.mediaTypes>
-		<install4j.macPkcs12File>${user.home}/.jadaptive-developer-id.p12</install4j.macPkcs12File>
+		<install4j.macPkcs12File>${user.home}/.logonbox-developer-id.p12</install4j.macPkcs12File>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
@@ -231,6 +231,7 @@
 					<configuration>
 						<variables>
 							<install4j.phase>${install4j.phase}</install4j.phase>
+							<install4j.appleId>${install4j.appleId}</install4j.appleId>
 							<install4j.macPkcs12File>${install4j.macPkcs12File}</install4j.macPkcs12File>
 							<install4j.windowsKeystoreIssuer>${install4j.windowsKeystoreIssuer}</install4j.windowsKeystoreIssuer>>
 							<install4j.windowsKeystoreSerial>${install4j.windowsKeystoreSerial}</install4j.windowsKeystoreSerial>>
