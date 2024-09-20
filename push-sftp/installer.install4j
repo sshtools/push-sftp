@@ -23,6 +23,7 @@
         <entry>install4j-*</entry>
         <entry>jline-*</entry>
         <entry>jansi*</entry>
+        <entry>jna.*</entry>
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="21/jdk-21.0.4+7">
