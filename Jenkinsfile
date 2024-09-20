@@ -4,6 +4,13 @@ pipeline {
 		maven 'Maven 3.9.0' 
 		jdk 'Graal JDK 17' 
 	}
+	
+	environment {
+	    /* Constants / Configuration */
+	    BUILD_PROPERTIES_ID = "b60f3998-d8fd-434b-b3c8-ed52aa52bc2e"
+	    BUILD_PROPERTIES_NAME = "jadaptive.build.properties"
+	    MAVEN_CONFIG_ID = "14324b85-c597-44e8-a575-61f925dba528"
+	}
 
 	stages {
 		stage ('PushSFTP and FileDrop Installers') {
@@ -18,14 +25,14 @@ pipeline {
 					steps {
 						configFileProvider([
 					 			configFile(
-					 				fileId: 'b60f3998-d8fd-434b-b3c8-ed52aa52bc2e',  
+					 				fileId: "${env.BUILD_PROPERTIES_ID}",  
 					 				replaceTokens: true,
-					 				targetLocation: 'jadaptive.build.properties',
+					 				targetLocation: "${env.BUILD_PROPERTIES_NAME}",
 					 				variable: 'BUILD_PROPERTIES'
 					 			)
 					 		]) {
 					 		withMaven(
-					 			globalMavenSettingsConfig: '4bc608a8-6e52-4765-bd72-4763f45bfbde'
+					 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}"
 					 		) {
 					 		  	sh 'mvn -U -Dbuild.mediaTypes=unixInstaller,unixArchive,linuxRPM,linuxDeb ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
@@ -58,14 +65,14 @@ pipeline {
 					steps {
 						configFileProvider([
 					 			configFile(
-					 				fileId: 'b60f3998-d8fd-434b-b3c8-ed52aa52bc2e9',  
+					 				fileId: "${env.BUILD_PROPERTIES_ID}",  
 					 				replaceTokens: true,
-					 				targetLocation: 'jadaptive.build.properties',
+					 				targetLocation: "${env.BUILD_PROPERTIES_NAME}",
 					 				variable: 'BUILD_PROPERTIES'
 					 			)
 					 		]) {
 					 		withMaven(
-					 			globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528'
+					 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}"
 					 		) {
 					 		  	bat 'mvn -U -Dinstall4j.verbose=true -Dbuild.mediaTypes=windows,windowsArchive ' +
 					 		  	    '"-Dbuild.projectProperties=%BUILD_PROPERTIES%" ' +
@@ -97,14 +104,14 @@ pipeline {
 					steps {
 						configFileProvider([
 					 			configFile(
-					 				fileId: 'b60f3998-d8fd-434b-b3c8-ed52aa52bc2e',  
+					 				fileId: "${env.BUILD_PROPERTIES_ID}",  
 					 				replaceTokens: true,
-					 				targetLocation: 'jadaptive.build.properties',
+					 				targetLocation: "${env.BUILD_PROPERTIES_NAME}",
 					 				variable: 'BUILD_PROPERTIES'
 					 			)
 					 		]) {
 					 		withMaven(
-					 			globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528'
+					 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}"
 					 		) {
 					 			// -Dinstall4j.disableNotarization=true 
 					 		  	sh 'mvn -X -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
@@ -137,7 +144,7 @@ pipeline {
 			steps {
     			/* Clean */
     			withMaven(
-		 			globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528',
+		 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}"
 		 		) {
 					sh 'mvn clean'
 		 		}
@@ -182,7 +189,7 @@ pipeline {
     			
     			/* Merge all updates.xml into one */
     			withMaven(
-		 			globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528',
+		 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}",
 		 		) {
 					sh 'mvn -P merge-installers -pl push-sftp-gui com.sshtools:updatesxmlmerger-maven-plugin:merge'
 					sh 'mvn -P merge-installers -pl push-sftp com.sshtools:updatesxmlmerger-maven-plugin:merge'
