@@ -12,8 +12,8 @@
 		<maverick.synergy.version>3.1.0-SNAPSHOT</maverick.synergy.version>
 		<build.arch>${os.arch}</build.arch>
 		<build.platform>${build.os.family}-${os.arch}</build.platform>
-		<build.projectProperties>${project.basedir}/hypersocket.build.properties</build.projectProperties>
-		<build.userProperties>${user.home}/.hypersocket.build.properties</build.userProperties>
+		<build.projectProperties>${project.basedir}/jadaptive.build.properties</build.projectProperties>
+		<build.userProperties>${user.home}/.jadaptive.build.properties</build.userProperties>
 		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
 		<build.buildIds></build.buildIds>
 		<install4j.phase>continuous</install4j.phase>
