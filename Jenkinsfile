@@ -110,6 +110,8 @@ pipeline {
 					 		  	sh 'mvn -X -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.debug=true ' +
+					 			   '-Dinstall4j.disableNotarization=true ' + 
+					 		  	   '-Dinstall4j.disableSigning=true ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
