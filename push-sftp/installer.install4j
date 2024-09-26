@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.8" transformSequenceNumber="10">
-  <directoryPresets config="./target/push-sftp-0.0.1-SNAPSHOT.jar" />
+  <directoryPresets config="./target/dependencies/common" />
   <application name="Push SFTP" applicationId="0130-3508-4958-2598" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="push-sftp" publisher="JADAPTIVE Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="17">
     <variables>
       <variable name="install4j.phase" value="continuous" description="The phase under which the updates.xml will be initially placed. Usually &quot;continuous&quot;" />
@@ -61,6 +61,10 @@
     </launcher>
   </launchers>
   <installerGui autoUpdateDescriptorUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${compiler:install4j.phase}/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp/${compiler:sys.version}/">
+    <customCode>
+      <archive location="./target/dependencies/common/slf4j-api.jar" />
+      <archive location="./target/dependencies/common/jaul.jar" />
+    </customCode>
     <applications>
       <application id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication">
         <startup>
@@ -233,26 +237,9 @@ return console.askOkCancel(message, true);
                 </serializedBean>
                 <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
               </action>
-              <action id="110" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0" failureStrategy="askRetryQuit">
+              <action id="119" beanClass="com.sshtools.jaul.RegisterJaulAppAction" rollbackBarrierExitCode="0">
                 <serializedBean>
-                  <property name="arguments" type="array" elementType="string" length="1">
-                    <element index="0">--jaul-register</element>
-                  </property>
-                  <property name="executable">
-                    <object class="java.io.File">
-                      <string>push-sftp</string>
-                    </object>
-                  </property>
-                  <property name="stderrRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.OutputRedirectionMode" value="INHERIT" />
-                  <property name="stdinRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.InputRedirectionMode" value="INHERIT" />
-                  <property name="stdoutRedirectionMode" type="enum" class="com.install4j.runtime.installer.helper.launching.OutputRedirectionMode" value="INHERIT" />
-                  <property name="timeout" type="int" value="20" />
-                  <property name="wait" type="boolean" value="true" />
-                  <property name="workingDirectory">
-                    <object class="java.io.File">
-                      <string>.</string>
-                    </object>
-                  </property>
+                  <property name="appCategory" type="enum" class="com.sshtools.jaul.AppCategory" value="CLI" />
                 </serializedBean>
               </action>
             </actions>
@@ -313,25 +300,7 @@ return console.askYesNo(message, true);
           </screen>
           <screen id="27" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" rollbackBarrierExitCode="0">
             <actions>
-              <action id="111" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
-                <serializedBean>
-                  <property name="arguments" type="array" elementType="string" length="1">
-                    <element index="0">--jaul-deregister</element>
-                  </property>
-                  <property name="executable">
-                    <object class="java.io.File">
-                      <string>push-sftp</string>
-                    </object>
-                  </property>
-                  <property name="timeout" type="int" value="20" />
-                  <property name="wait" type="boolean" value="true" />
-                  <property name="workingDirectory">
-                    <object class="java.io.File">
-                      <string>.</string>
-                    </object>
-                  </property>
-                </serializedBean>
-              </action>
+              <action id="120" beanClass="com.sshtools.jaul.DeregisterJaulAppAction" rollbackBarrierExitCode="0" />
               <action id="29" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" actionElevationType="elevated" rollbackBarrierExitCode="0" />
             </actions>
             <formComponents>
