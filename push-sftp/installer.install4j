@@ -1196,12 +1196,15 @@ return true;</property>
     <windows name="Windows" id="34" installDir="Push SFTP" architecture="64">
       <jreBundle usePack200="false" />
     </windows>
-    <macosFolder name="macOS Folder" id="36" architecture="universal" signLaunchers="true">
+    <macosFolder name="macOS Folder (Intel)" id="36" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-x86_64-${compiler:sys.version}" signLaunchers="true">
       <jreBundle usePack200="false" />
     </macosFolder>
     <linuxRPM name="Linux RPM" id="37" />
     <unixInstaller name="Unix Installer" id="46" />
     <unixArchive name="Unix Archive" id="112" />
     <windowsArchive name="Windows Archive" id="113" architecture="64" />
+    <macosFolder name="macOS Folder (Arm)" id="118" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" architecture="aarch64" signLaunchers="true">
+      <jreBundle usePack200="false" />
+    </macosFolder>
   </mediaSets>
 </install4j>

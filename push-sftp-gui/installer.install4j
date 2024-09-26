@@ -1271,7 +1271,7 @@ return true;</property>
       </exclude>
       <jreBundle usePack200="false" />
     </windows>
-    <macosFolder name="macOS Folder" id="36" architecture="universal" signLaunchers="true">
+    <macosFolder name="macOS Folder (Intel)" id="36" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-x86_64-${compiler:sys.version}" signLaunchers="true">
       <exclude>
         <entry location="win" />
         <entry location="linux" />
@@ -1290,5 +1290,12 @@ return true;</property>
         <entry location="win" />
       </exclude>
     </unixInstaller>
+    <macosFolder name="macOS Folder (Arm)" id="128" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" architecture="aarch64" signLaunchers="true">
+      <exclude>
+        <entry location="win" />
+        <entry location="linux" />
+      </exclude>
+      <jreBundle usePack200="false" />
+    </macosFolder>
   </mediaSets>
 </install4j>
