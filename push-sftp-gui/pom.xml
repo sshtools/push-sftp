@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>com.install4j</groupId>
 			<artifactId>install4j-runtime</artifactId>
-			<version>10.0.6</version>
+			<version>10.0.8</version>
 			<!-- MUST be provided, the runtime is added by I4J itself -->
 			<scope>provided</scope>
 		</dependency>
@@ -140,17 +140,17 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx-lib</artifactId>
-			<version>0.9.5-SNAPSHOT</version>
+			<version>0.9.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx-sequins</artifactId>
-			<version>0.9.5-SNAPSHOT</version>
+			<version>0.9.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jaul</artifactId>
-			<version>0.9.11-SNAPSHOT</version>
+			<version>0.9.12-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>pt.davidafsilva.apple</groupId>
