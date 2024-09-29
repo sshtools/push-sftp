@@ -21,6 +21,7 @@
 		<install4j.updatesBase>http://localhost/${project.name}</install4j.updatesBase>
 		<install4j.jaulAppId>UNSET</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>999</install4j.jaulUpdaterId>
+		<install4j.jaulBranches></install4j.jaulBranches>
 	</properties>
 	<modules>
 		<module>push-sftp</module>
@@ -240,6 +241,7 @@
 							<install4j.updatesBase>${install4j.updatesBase}</install4j.updatesBase>
 							<install4j.jaulAppId>${install4j.jaulAppId}</install4j.jaulAppId>
 							<install4j.jaulUpdaterId>${install4j.jaulUpdaterId}</install4j.jaulUpdaterId>
+							<install4j.jaulBranches>${install4j.jaulBranches}</install4j.jaulBranches>
 						</variables>
                         <mediaTypes>${build.mediaTypes}</mediaTypes>
                         <buildIds>${build.buildIds}</buildIds>

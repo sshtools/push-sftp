@@ -292,7 +292,7 @@ return true;</property>
                 </serializedBean>
                 <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
               </action>
-              <action id="129" beanClass="com.sshtools.jaul.RegisterJaulAppAction" rollbackBarrierExitCode="0">
+              <action id="129" beanClass="com.sshtools.jaul.RegisterJaulAppAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
                   <property name="appCategory" type="enum" class="com.sshtools.jaul.AppCategory" value="GUI" />
                 </serializedBean>
