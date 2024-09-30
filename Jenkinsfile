@@ -16,11 +16,11 @@ pipeline {
 		stage ('PushSFTP and FileDrop Installers') {
 			parallel {
 				/*
-				 * Linux Installers and Packages
+				 * Linux Intel Installers and Packages
 				 */
-				stage ('Linux PushSFTP and FileDrop Installers') {
+				stage ('Linux Intel PushSFTP and FileDrop Installers') {
 					agent {
-						label 'install4j && linux'
+						label 'install4j && linux && x86_64'
 					}
 					steps {
 						configFileProvider([
@@ -49,6 +49,45 @@ pipeline {
 			        			}
 			        			dir('push-sftp/target/media') {
 									stash includes: 'updates.xml', name: 'linux-updates-xml'
+			        			}
+					 		}
+        				}
+					}
+				}
+				/*
+				 * Linux Aarch64 Installers and Packages
+				 */
+				stage ('Linux Aarch64 PushSFTP and FileDrop Installers') {
+					agent {
+						label 'install4j && linux && aarch64'
+					}
+					steps {
+						configFileProvider([
+					 			configFile(
+					 				fileId: "${env.BUILD_PROPERTIES_ID}",  
+					 				replaceTokens: true,
+					 				targetLocation: "${env.BUILD_PROPERTIES_NAME}",
+					 				variable: 'BUILD_PROPERTIES'
+					 			)
+					 		]) {
+					 		withMaven(
+					 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}"
+					 		) {
+					 		  	sh 'mvn -U -Dbuild.mediaTypes=unixInstaller,unixArchive,linuxRPM,linuxDeb ' +
+					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
+					 		  	   '-Dinstall4j.disableSigning=true ' +
+					 		  	   '-DbuildInstaller=true clean package'
+					 		  	
+					 		  	/* Stash installers */
+			        			stash includes: 'push-sftp/target/media/*', name: 'linux-aarch64-cli'
+			        			stash includes: 'push-sftp-gui/target/media/*', name: 'linux-aarch64-gui'
+			        			
+			        			/* Stash updates.xml */
+			        			dir('push-sftp-gui/target/media') {
+									stash includes: 'updates.xml', name: 'linux-aarch64-gui-updates-xml'
+			        			}
+			        			dir('push-sftp/target/media') {
+									stash includes: 'updates.xml', name: 'linux-aarch64-updates-xml'
 			        			}
 					 		}
         				}
@@ -95,11 +134,11 @@ pipeline {
 				}
 				
 				/*
-				 * MacOS installers
+				 * MacOS Intel installers
 				 */
-				stage ('MacOS PushSFTP and FileDrop Installers') {
+				stage ('MacOS Intel PushSFTP and FileDrop Installers') {
 					agent {
-						label 'install4j && macos'
+						label 'install4j && macos && x86_64'
 					}
 					steps {
 						configFileProvider([
@@ -134,6 +173,47 @@ pipeline {
         				}
 					}
 				}
+				
+				/*
+				 * MacOS Aarch64 installers
+				 */
+				stage ('MacOS Aarch64 PushSFTP and FileDrop Installers') {
+					agent {
+						label 'install4j && macos && aarch64'
+					}
+					steps {
+						configFileProvider([
+					 			configFile(
+					 				fileId: "${env.BUILD_PROPERTIES_ID}",  
+					 				replaceTokens: true,
+					 				targetLocation: "${env.BUILD_PROPERTIES_NAME}",
+					 				variable: 'BUILD_PROPERTIES'
+					 			)
+					 		]) {
+					 		withMaven(
+					 			globalMavenSettingsConfig: "${env.MAVEN_CONFIG_ID}"
+					 		) {
+					 			// -Dinstall4j.disableNotarization=true 
+					 		  	sh 'mvn -X -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
+					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
+					 		  	   '-Dinstall4j.debug=true ' +
+					 		  	   '-DbuildInstaller=true clean package'
+					 		  	
+					 		  	/* Stash installers */
+			        			stash includes: 'push-sftp/target/media/*', name: 'macos-aarc64-cli'
+			        			stash includes: 'push-sftp-gui/target/media/*', name: 'macos-aarc64-gui'
+			        			
+			        			/* Stash updates.xml */
+			        			dir('push-sftp-gui/target/media') {
+									stash includes: 'updates.xml', name: 'macos-aarc64-gui-updates-xml'
+			        			}
+			        			dir('push-sftp/target/media') {
+									stash includes: 'updates.xml', name: 'macos-aarc64-updates-xml'
+			        			}
+					 		}
+        				}
+					}
+				}
 			}
 		}
 		
@@ -162,14 +242,21 @@ pipeline {
 				/* Unstash installers */
 	 		  	unstash 'linux-cli'
 	 		  	unstash 'linux-gui'
+	 		  	unstash 'linux-aarch64-cli'
+	 		  	unstash 'linux-aarch64-gui'
 	 		  	unstash 'windows-cli'
 	 		  	unstash 'windows-gui'
 	 		  	unstash 'macos-cli'
 	 		  	unstash 'macos-gui'
+	 		  	unstash 'macos-aarch64-cli'
+	 		  	unstash 'macos-aarch64-gui'
 	 		  	
 				/* Unstash updates.xml */
 	 		  	dir('push-sftp-gui/target/media-linux') {
 	 		  		unstash 'linux-gui-updates-xml'
+    			}
+    			dir('push-sftp-gui/target/media-linux-aarch64') {
+	 		  		unstash 'linux-aarch64-gui-updates-xml'
     			}
 	 		  	dir('push-sftp-gui/target/media-windows') {
 	 		  		unstash 'windows-gui-updates-xml'
@@ -179,6 +266,9 @@ pipeline {
     			}
 	 		  	dir('push-sftp/target/media-linux') {
 	 		  		unstash 'linux-updates-xml'
+    			}
+	 		  	dir('push-sftp/target/media-linux-aarch64') {
+	 		  		unstash 'linux-aarch64-updates-xml'
     			}
 	 		  	dir('push-sftp/target/media-windows') {
 	 		  		unstash 'windows-updates-xml'

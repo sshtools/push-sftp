@@ -40,6 +40,8 @@
       <mountPoint id="46" location="win" />
       <mountPoint id="47" location="linux" />
       <mountPoint id="126" />
+      <mountPoint id="131" location="linux-aarch64" />
+      <mountPoint id="132" location="mac-aarch64" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="24" file="./target/push-sftp-gui.jar" />
@@ -48,6 +50,8 @@
       <dirEntry mountPoint="46" file="./target/dependencies/win" subDirectory="win" />
       <dirEntry mountPoint="47" file="./target/dependencies/linux" subDirectory="linux" />
       <fileEntry mountPoint="126" file="./src/main/resources/com/sshtools/pushsftp/jfx/icon.png" />
+      <dirEntry mountPoint="131" file="./target/dependencies/linux-aarch64" subDirectory="linux" />
+      <dirEntry mountPoint="132" file="./target/dependencies/mac-aarch64" subDirectory="mac" />
     </entries>
   </files>
   <launchers>
@@ -59,6 +63,8 @@
           <directory location="mac" failOnError="false" />
           <directory location="win" failOnError="false" />
           <directory location="linux" failOnError="false" />
+          <directory location="linux-aarch64" failOnError="false" />
+          <directory location="mac-aarch64" failOnError="false" />
         </modulePath>
       </java>
       <iconImageFiles>
@@ -1229,10 +1235,12 @@ return true;</property>
     </styles>
   </installerGui>
   <mediaSets>
-    <linuxDeb name="Linux Deb Archive" id="26">
+    <linuxDeb name="Linux Deb Archive (Intel)" id="26" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-amd64-${compiler:sys.version}" architectureSet="true" architecture="amd64">
       <exclude>
         <entry location="mac" />
         <entry location="win" />
+        <entry location="linux-aarch64" />
+        <entry location="mac-aarch64" />
       </exclude>
     </linuxDeb>
     <windows name="Windows" id="34" installDir="Jadaptive\FileDrop" architecture="64">
@@ -1246,27 +1254,55 @@ return true;</property>
       <exclude>
         <entry location="win" />
         <entry location="linux" />
+        <entry location="mac-aarch64" />
       </exclude>
       <jreBundle usePack200="false" />
     </macosFolder>
-    <linuxRPM name="Linux RPM" id="37">
+    <linuxRPM name="Linux RPM (Intel)" id="37" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-x86_64-${compiler:sys.version}" arch="x86_64">
       <exclude>
         <entry location="mac" />
         <entry location="win" />
       </exclude>
     </linuxRPM>
-    <unixInstaller name="Unix Installer" id="116">
+    <unixInstaller name="Linux Installer (Intel)" id="116" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-amd64-${compiler:sys.version}">
       <exclude>
         <entry location="mac" />
         <entry location="win" />
+        <entry location="linux-aarch64" />
       </exclude>
     </unixInstaller>
     <macosFolder name="macOS Folder (Arm)" id="128" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" architecture="aarch64" signLaunchers="true">
       <exclude>
+        <entry location="mac" />
         <entry location="win" />
         <entry location="linux" />
       </exclude>
       <jreBundle usePack200="false" />
     </macosFolder>
+    <linuxDeb name="Linux Deb Archive (Arm)" id="138" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-amd64-${compiler:sys.version}" architectureSet="true" architecture="aarch64">
+      <exclude>
+        <entry location="mac" />
+        <entry location="win" />
+        <entry location="linux" />
+        <entry location="mac-aarch64" />
+      </exclude>
+      <jreBundle platform="linux-aarch64" />
+    </linuxDeb>
+    <linuxRPM name="Linux RPM (Arm)" id="145" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" arch="aarch64">
+      <exclude>
+        <entry location="mac" />
+        <entry location="win" />
+        <entry location="linux" />
+        <entry location="mac-aarch64" />
+      </exclude>
+    </linuxRPM>
+    <unixInstaller name="Linux Installer (Arm)" id="151" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}">
+      <exclude>
+        <entry location="mac" />
+        <entry location="win" />
+        <entry location="linux" />
+      </exclude>
+      <jreBundle platform="linux-aarch64" />
+    </unixInstaller>
   </mediaSets>
 </install4j>

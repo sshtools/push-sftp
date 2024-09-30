@@ -415,6 +415,44 @@
 								</configuration>
 							</execution>
 							<execution>
+								<id>copy-javafx-mac-aarch64</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<stripVersion>true</stripVersion>
+									<outputDirectory>
+										${project.build.directory}/dependencies/mac-aarch64</outputDirectory>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-base</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>mac-aarch64</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-controls</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>mac-aarch64</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-graphics</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>mac-aarch64</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-fxml</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>mac-aarch64</classifier>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
 								<id>copy-javafx-linux</id>
 								<phase>package</phase>
 								<goals>
@@ -448,6 +486,44 @@
 											<artifactId>javafx-fxml</artifactId>
 											<version>${javafx.version}</version>
 											<classifier>linux</classifier>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-javafx-linux-aarch64</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<stripVersion>true</stripVersion>
+									<outputDirectory>
+										${project.build.directory}/dependencies/linux-aarch64</outputDirectory>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-base</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>linux-aarch64</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-controls</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>linux-aarch64</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-graphics</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>linux-aarch64</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openjfx</groupId>
+											<artifactId>javafx-fxml</artifactId>
+											<version>${javafx.version}</version>
+											<classifier>linux-aarch64</classifier>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
