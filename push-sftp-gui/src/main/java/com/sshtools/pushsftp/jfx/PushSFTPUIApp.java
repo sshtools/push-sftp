@@ -87,7 +87,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFT
 
 	@Override
 	protected JajaFXAppWindow createAppWindow(Stage stage) {
-		return new JajaFXAppWindow(stage, createContent(stage), this, 480, 660);
+		var wnd =  new JajaFXAppWindow(stage, this, 480, 660);
+		wnd.setContent(createContent(stage, wnd));
+		return wnd;
 	}
 
 	private void configureToaster() {
@@ -407,8 +409,9 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFT
 	}
 
 	@Override
-	protected Node createContent(Stage stage) {
-		tiles = new Tiles<>(this);
+	protected Node createContent(Stage stage, JajaFXAppWindow<PushSFTPUIApp> window) {
+
+		tiles = new Tiles<>(this, window);
 		tiles.add(DropPage.class);
 		tiles.getStyleClass().add("padded");
 		return tiles;
