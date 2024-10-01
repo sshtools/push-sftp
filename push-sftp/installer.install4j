@@ -15,6 +15,7 @@
       <variable name="install4j.updatesBase" value="http://localhost/${compiler:install4j.phase}/updates.xml" description="The base folder (on S3 usually) where updates are" />
       <variable name="install4j.jaulAppId" value="UNSET" description="The Jaul update system app Id, e.g. com.sshtools.MyApp" />
       <variable name="install4j.jaulUpdaterId" value="999" description="The ID (in this install4j project) of the updater application. Its a bit annoying we can't get this automatically!" />
+      <variable name="install4j.jaulBranches" description="Branches" />
     </variables>
     <codeSigning macEnabled="true" macPkcs12File="${compiler:install4j.macPkcs12File}" windowsEnabled="true" windowsKeySource="windows" macNotarize="true" appleId="${compiler:install4j.appleId}">
       <windowsKeystoreIdentifier issuer="${compiler:install4j.windowsKeystoreIssuer}" serial="${compiler:install4j.windowsKeystoreSerial}" subject="${compiler:install4j.windowsKeystoreSubject}" />
