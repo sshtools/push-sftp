@@ -161,7 +161,7 @@ pipeline {
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.debug=true ' +
 					 		  	   '-Dbuild.buildIds=36 ' +
-					 		  	   '-Dbuild.gui.buildIds=128 ' +
+					 		  	   '-Dbuild.gui.buildIds=36 ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
@@ -202,8 +202,8 @@ pipeline {
 					 			// -Dinstall4j.disableNotarization=true 
 					 		  	sh 'mvn -X -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
-					 		  	   '-Dbuild.buildIds=133 ' +
-					 		  	   '-Dbuild.gui.buildIds=36 ' +
+					 		  	   '-Dbuild.buildIds=118 ' +
+					 		  	   '-Dbuild.gui.buildIds=128 ' +
 					 		  	   '-Dinstall4j.debug=true ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
