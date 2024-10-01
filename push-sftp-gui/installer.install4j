@@ -1279,7 +1279,7 @@ return true;</property>
       </exclude>
       <jreBundle usePack200="false" />
     </macosFolder>
-    <linuxDeb name="Linux Deb Archive (Arm)" id="138" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-amd64-${compiler:sys.version}" architectureSet="true" architecture="aarch64">
+    <linuxDeb name="Linux Deb Archive (Arm)" id="138" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" architectureSet="true" architecture="aarch64">
       <exclude>
         <entry location="mac" />
         <entry location="win" />
