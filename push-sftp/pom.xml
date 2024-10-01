@@ -275,13 +275,6 @@
 					</arguments>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.install4j</groupId>
-				<artifactId>install4j-maven</artifactId>
-				<configuration>
-                    <buildIds>${build.buildIds}</buildIds>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 

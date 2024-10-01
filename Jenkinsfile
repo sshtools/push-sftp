@@ -266,23 +266,31 @@ pipeline {
     			dir('push-sftp-gui/target/media-linux-aarch64') {
 	 		  		unstash 'linux-aarch64-gui-updates-xml'
     			}
-	 		  	dir('push-sftp-gui/target/media-windows') {
-	 		  		unstash 'windows-gui-updates-xml'
-    			}
-	 		  	dir('push-sftp-gui/target/media-macos') {
-	 		  		unstash 'macos-gui-updates-xml'
-    			}
 	 		  	dir('push-sftp/target/media-linux') {
 	 		  		unstash 'linux-updates-xml'
     			}
 	 		  	dir('push-sftp/target/media-linux-aarch64') {
 	 		  		unstash 'linux-aarch64-updates-xml'
     			}
+    			
+	 		  	dir('push-sftp-gui/target/media-windows') {
+	 		  		unstash 'windows-gui-updates-xml'
+    			}
 	 		  	dir('push-sftp/target/media-windows') {
 	 		  		unstash 'windows-updates-xml'
     			}
+    			
+	 		  	dir('push-sftp-gui/target/media-macos') {
+	 		  		unstash 'macos-gui-updates-xml'
+    			}
 	 		  	dir('push-sftp/target/media-macos') {
 	 		  		unstash 'macos-updates-xml'
+    			}
+    			dir('push-sftp-gui/target/media-macos-aarch64') {
+	 		  		unstash 'macos-aarch64-gui-updates-xml'
+    			}
+	 		  	dir('push-sftp/target/media-macos-aarch64') {
+	 		  		unstash 'macos-aarch64-updates-xml'
     			}
     			
     			/* Merge all updates.xml into one */
