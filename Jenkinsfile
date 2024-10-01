@@ -200,15 +200,15 @@ pipeline {
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
-			        			stash includes: 'push-sftp/target/media/*', name: 'macos-aarc64-cli'
-			        			stash includes: 'push-sftp-gui/target/media/*', name: 'macos-aarc64-gui'
+			        			stash includes: 'push-sftp/target/media/*', name: 'macos-aarch64-cli'
+			        			stash includes: 'push-sftp-gui/target/media/*', name: 'macos-aarch64-gui'
 			        			
 			        			/* Stash updates.xml */
 			        			dir('push-sftp-gui/target/media') {
-									stash includes: 'updates.xml', name: 'macos-aarc64-gui-updates-xml'
+									stash includes: 'updates.xml', name: 'macos-aarch64-gui-updates-xml'
 			        			}
 			        			dir('push-sftp/target/media') {
-									stash includes: 'updates.xml', name: 'macos-aarc64-updates-xml'
+									stash includes: 'updates.xml', name: 'macos-aarch64-updates-xml'
 			        			}
 					 		}
         				}
