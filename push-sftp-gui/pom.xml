@@ -15,7 +15,7 @@
 		<main.class>com.sshtools.pushsftp.jfx.PushSFTPUIApp</main.class>
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 		<gluonfx.maven.plugin.version>1.0.16</gluonfx.maven.plugin.version>
-        <javafx.version>21.0.4-ea+1</javafx.version>
+        <javafx.version>23</javafx.version>
 		
 		<install4j.jaulAppId>com.sshtools.FileDrop</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>54</install4j.jaulUpdaterId>
