@@ -84,7 +84,7 @@
       </iconImageFiles>
     </launcher>
   </launchers>
-  <installerGui autoUpdateDescriptorUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${compiler:install4j.phase}/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${compiler:sys.version}/">
+  <installerGui autoUpdateDescriptorUrl="${compiler:install4j.updatesBase}/${compiler:install4j.phase}/updates.xml" useAutoUpdateBaseUrl="true" autoUpdateBaseUrl="${compiler:install4j.updatesBase}/${compiler:sys.version}/">
     <customCode>
       <scanDirectory location="./target/dependencies/common" />
     </customCode>
