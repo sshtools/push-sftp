@@ -169,16 +169,6 @@
 					<groupId>com.sshtools</groupId>
 					<artifactId>updatesxmlmerger-maven-plugin</artifactId>
 					<version>0.0.1</version>
-					<configuration>
-						<inputs>
-							<input>${project.build.directory}/media-macos/updates.xml</input>
-							<input>${project.build.directory}/media-macos-aarch64/updates.xml</input>
-							<input>${project.build.directory}/media-windows/updates.xml</input>
-							<input>${project.build.directory}/media-linux/updates.xml</input>
-							<input>${project.build.directory}/media-linux-aarch64/updates.xml</input>
-						</inputs>
-						<output>${project.build.directory}/media/updates.xml</output>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -248,6 +238,7 @@
 							<install4j.jaulUpdaterId>${install4j.jaulUpdaterId}</install4j.jaulUpdaterId>
 							<install4j.jaulBranches>${install4j.jaulBranches}</install4j.jaulBranches>
 						</variables>
+                    	<buildIds>${build.buildIds}</buildIds>
                         <mediaTypes>${build.mediaTypes}</mediaTypes>
 						<verbose>true</verbose>
 						<release>${product.version}-${build.number}</release>

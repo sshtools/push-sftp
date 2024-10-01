@@ -19,6 +19,7 @@
 		
 		<install4j.jaulAppId>com.sshtools.FileDrop</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>54</install4j.jaulUpdaterId>
+		<install4j.updatesBase>https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml</install4j.updatesBase>
 	</properties>
 	<url>https://jadaptive.com</url>
 	<licenses>
