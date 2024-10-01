@@ -37,6 +37,8 @@ pipeline {
 					 		  	sh 'mvn -U -Dbuild.mediaTypes=unixInstaller,unixArchive,linuxRPM,linuxDeb ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.disableSigning=true ' +
+					 		  	   '-Dbuild.buildIds=26,37,46,112 ' +
+					 		  	   '-Dbuild.gui.buildIds=25,37,116 ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
@@ -76,6 +78,8 @@ pipeline {
 					 		  	sh 'mvn -U -Dbuild.mediaTypes=unixInstaller,unixArchive,linuxRPM,linuxDeb ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.disableSigning=true ' +
+					 		  	   '-Dbuild.buildIds=118,122,133,137 ' +
+					 		  	   '-Dbuild.gui.buildIds=138,145,151 ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
@@ -156,6 +160,8 @@ pipeline {
 					 		  	sh 'mvn -X -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
 					 		  	   '-Dinstall4j.debug=true ' +
+					 		  	   '-Dbuild.buildIds=36 ' +
+					 		  	   '-Dbuild.gui.buildIds=128 ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	
 					 		  	/* Stash installers */
@@ -196,6 +202,8 @@ pipeline {
 					 			// -Dinstall4j.disableNotarization=true 
 					 		  	sh 'mvn -X -U -Dbuild.mediaTypes=macos,macosFolder,macosFolderArchive ' +
 					 		  	   '-Dbuild.projectProperties=$BUILD_PROPERTIES ' +
+					 		  	   '-Dbuild.buildIds=133 ' +
+					 		  	   '-Dbuild.gui.buildIds=36 ' +
 					 		  	   '-Dinstall4j.debug=true ' +
 					 		  	   '-DbuildInstaller=true clean package'
 					 		  	

@@ -16,6 +16,7 @@
 		<build.userProperties>${user.home}/.jadaptive.build.properties</build.userProperties>
 		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
 		<build.buildIds></build.buildIds>
+		<build.gui.buildIds></build.gui.buildIds>
 		<install4j.phase>continuous</install4j.phase>
 		<install4j.exe.suffix></install4j.exe.suffix>
 		<install4j.updatesBase>http://localhost/${project.name}</install4j.updatesBase>
@@ -246,7 +247,6 @@
 							<install4j.jaulBranches>${install4j.jaulBranches}</install4j.jaulBranches>
 						</variables>
                         <mediaTypes>${build.mediaTypes}</mediaTypes>
-                        <buildIds>${build.buildIds}</buildIds>
 						<verbose>true</verbose>
 						<release>${product.version}-${build.number}</release>
 					</configuration>

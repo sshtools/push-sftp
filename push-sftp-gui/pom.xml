@@ -541,8 +541,8 @@
 									<goal>compile</goal>
 								</goals>
 								<configuration>
-									<projectFile>
-										${project.basedir}/installer.install4j</projectFile>
+                    				<buildIds>${build.gui.buildIds}</buildIds>
+									<projectFile>${project.basedir}/installer.install4j</projectFile>
 								</configuration>
 							</execution>
 						</executions>
