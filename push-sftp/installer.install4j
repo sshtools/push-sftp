@@ -1172,8 +1172,8 @@ return true;</property>
       <jreBundle usePack200="false" />
     </macosFolder>
     <linuxRPM name="Linux RPM (Intel)" id="37" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-x86_64-${compiler:sys.version}" arch="x86_64" />
-    <unixInstaller name="Linux Installer (Intel)" id="46" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-amd64-${compiler:sys.version}" />
-    <unixArchive name="Linux Archive (Intel)" id="112" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-amd64-${compiler:sys.version}" />
+    <unixInstaller name="Linux Installer (Intel)" id="46" mediaFileName="${compiler:sys.shortName}-linux-amd64-${compiler:sys.version}" />
+    <unixArchive name="Linux Archive (Intel)" id="112" mediaFileName="${compiler:sys.shortName}-linux-amd64-${compiler:sys.version}" />
     <windowsArchive name="Windows Archive" id="113" architecture="64" />
     <macosFolder name="macOS Folder (Arm)" id="118" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" architecture="aarch64" signLaunchers="true">
       <jreBundle usePack200="false" />
@@ -1184,10 +1184,10 @@ return true;</property>
     <linuxRPM name="Linux RPM (Aarch64)" id="127" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" arch="aarch64">
       <jreBundle platform="linux-aarch64" />
     </linuxRPM>
-    <unixInstaller name="Linux Installer (Arm)" id="133" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}">
+    <unixInstaller name="Linux Installer (Arm)" id="133" mediaFileName="${compiler:sys.shortName}-linux-aarch64-${compiler:sys.version}">
       <jreBundle platform="linux-aarch64" />
     </unixInstaller>
-    <unixArchive name="Linux Archive (Arm)" id="137" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}">
+    <unixArchive name="Linux Archive (Arm)" id="137" mediaFileName="${compiler:sys.shortName}-linux-aarch64-${compiler:sys.version}">
       <jreBundle platform="linux-aarch64" />
     </unixArchive>
   </mediaSets>
