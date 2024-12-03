@@ -117,7 +117,7 @@ public class BrowsePage extends AbstractTile<PushSFTPUIApp> {
 	void setTarget(SshTarget target, Optional<String> originalPath) throws Exception {
 
 		var context = getContext();
-		var prefs = context.getContainer().getAppPreferences();
+		var prefs = context.getContainer().getUserPreferences();
 		var agentSocket = prefs.get("agentSocket", "");
 		var job = SshConnectionJob.forConnection()
 				.withTarget(target)
