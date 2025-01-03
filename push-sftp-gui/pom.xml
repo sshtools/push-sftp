@@ -141,12 +141,12 @@
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx-lib</artifactId>
-			<version>0.9.6-SNAPSHOT</version>
+			<version>0.9.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx-sequins</artifactId>
-			<version>0.9.6-SNAPSHOT</version>
+			<version>0.9.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
