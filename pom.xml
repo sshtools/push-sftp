@@ -2,19 +2,19 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sshtools</groupId>
 	<artifactId>push-sftp-group</artifactId>
-	<version>0.9.1-SNAPSHOT</version>
+	<version>0.9.1</version>
 	<packaging>pom</packaging>
 	<properties>
 		<maven.compiler.target>21</maven.compiler.target>
 		<maven.compiler.source>21</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maverick.synergy.version>3.1.0-SNAPSHOT</maverick.synergy.version>
+		<maverick.synergy.version>3.1.4</maverick.synergy.version>
 		<build.arch>${os.arch}</build.arch>
 		<build.platform>${build.os.family}-${os.arch}</build.platform>
 		<build.projectProperties>${project.basedir}/jadaptive.build.properties</build.projectProperties>
 		<build.userProperties>${user.home}/.jadaptive.build.properties</build.userProperties>
-		<build.mediaTypes>windows,unixInstaller,macos,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosArchive,macosFolderArchive</build.mediaTypes>
+		<build.mediaTypes>windows,unixInstaller,macosFolder,windowsArchive,unixArchive,linuxRPM,linuxDeb,macosFolderArchive</build.mediaTypes>
 		<build.buildIds></build.buildIds>
 		<build.gui.buildIds></build.gui.buildIds>
 		<install4j.phase>continuous</install4j.phase>
@@ -206,11 +206,6 @@
 					<version>3.5.0</version>
 				</plugin>
 				<plugin>
-					<groupId>com.install4j</groupId>
-					<artifactId>install4j-maven</artifactId>
-					<version>10.0.4</version>
-				</plugin>
-				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>3.3.0</version>
@@ -223,9 +218,13 @@
 				<plugin>
 					<groupId>com.install4j</groupId>
 					<artifactId>install4j-maven</artifactId>
-					<version>10.0.8</version>
+					<version>11.0.5</version>
 					<configuration>
 						<variables>
+							<!--For install4j11 -->
+                            <license>${install4j.testing.license}</license>
+                            <installDir>${install4j11.home}</installDir>
+                                    
 							<install4j.phase>${install4j.phase}</install4j.phase>
                             <install4j.exeSuffix>${install4j.exe.suffix}</install4j.exeSuffix>
 							<install4j.appleId>${install4j.appleId}</install4j.appleId>
@@ -237,6 +236,12 @@
 							<install4j.jaulAppId>${install4j.jaulAppId}</install4j.jaulAppId>
 							<install4j.jaulUpdaterId>${install4j.jaulUpdaterId}</install4j.jaulUpdaterId>
 							<install4j.jaulBranches>${install4j.jaulBranches}</install4j.jaulBranches>
+							<install4j.appleIdPassword>${install4j.appleIdPassword}</install4j.appleIdPassword>
+                            <install4j.appleIssuerId>${install4j.appleIssuerId}</install4j.appleIssuerId>
+                            <install4j.appleKeyId>${install4j.appleKeyId}</install4j.appleKeyId>
+                            <install4j.applePrivateKeyFile>${install4j.applePrivateKeyFile}</install4j.applePrivateKeyFile>
+                            <install4j.safeNet.pin>${install4j.safeNet.pin}</install4j.safeNet.pin>
+							<install4j.timestamp.server>${install4j.timestamp.server}</install4j.timestamp.server>
 						</variables>
                     	<buildIds>${build.buildIds}</buildIds>
                         <mediaTypes>${build.mediaTypes}</mediaTypes>
@@ -248,50 +253,5 @@
 		</pluginManagement>
 	</build>
 	<repositories>
-		<repository>
-			<id>oss-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<snapshots />
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>sshtools-releases</id>
-			<name>sshtools-releases</name>
-			<releases />
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<url>https://artifactory.jadaptive.com/public-releases</url>
-		</repository>
-		<repository>
-			<id>sshtools-snapshots</id>
-			<name>sshtools-snapshots</name>
-			<snapshots />
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<url>https://artifactory.jadaptive.com/public-snapshots</url>
-		</repository>
-		<repository>
-			<id>ext-snapshots-local</id>
-			<name>ext-snapshots-local</name>
-			<snapshots />
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<url>https://artifactory.jadaptive.com/ext-snapshots-local</url>
-		</repository>
-		<repository>
-			<id>ej-technologies</id>
-			<url>https://maven.ej-technologies.com/repository</url>
-		</repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>ej-technologies</id>
-			<url>https://maven.ej-technologies.com/repository</url>
-		</pluginRepository>
-	</pluginRepositories>
 </project>

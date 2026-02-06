@@ -3,6 +3,8 @@ module com.sshtools.pushsftp.jfx {
 	requires transitive java.net.http;
 	requires transitive com.sshtools.jajafx;
 	requires transitive com.sshtools.jajafx.sequins;
+	requires transitive com.sshtools.jajafx.updateable;
+	requires transitive com.sshtools.jajafx.jmetro;
 	requires org.kordamp.ikonli.fontawesome5;
 	requires com.sshtools.sequins;
 	requires org.controlsfx.controls;

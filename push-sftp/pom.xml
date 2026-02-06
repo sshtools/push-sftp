@@ -5,7 +5,7 @@
 	<artifactId>push-sftp</artifactId>
 	<parent>
 		<groupId>com.sshtools</groupId>
-		<version>0.9.1-SNAPSHOT</version>
+		<version>0.9.1</version>
 		<artifactId>push-sftp-group</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
@@ -16,7 +16,7 @@
 		<psftp.args>-X</psftp.args>
 		<graalvm.version>21.2.0</graalvm.version>
 		<main.class>com.sshtools.pushsftp.PSFTPInteractive</main.class>
-		<synergy.version>3.1.0-SNAPSHOT</synergy.version>
+		<synergy.version>3.1.4</synergy.version>
 		
 		<install4j.jaulAppId>com.sshtools.PushSFTP</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>47</install4j.jaulUpdaterId>
@@ -26,19 +26,19 @@
 		<dependency>
 			<groupId>com.install4j</groupId>
 			<artifactId>install4j-runtime</artifactId>
-			<version>10.0.8</version>
+			<version>11.0.5</version>
 			<!-- MUST be provided, the runtime is added by I4J itself -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>command-utils</artifactId>
-			<version>1.1.1-SNAPSHOT</version>
+			<version>1.1.1</version>
 		</dependency> 
 		<dependency>
 		    <groupId>me.tongfei</groupId>
 		    <artifactId>progressbar</artifactId>
-		    <version>0.9.4</version>
+		    <version>0.10.0</version>
 		    <exclusions>
 		    	<exclusion>
 		    		<groupId>org.jline</groupId>
@@ -97,7 +97,7 @@
 				<dependency>
 					<groupId>com.install4j</groupId>
 					<artifactId>install4j-runtime</artifactId>
-					<version>10.0.6</version>
+					<version>11.0.5</version>
 				</dependency>
 			</dependencies>
 			
@@ -236,6 +236,10 @@
 									<goal>compile</goal>
 								</goals>
 								<configuration>
+									<!--For install4j11 -->
+		                            <license>${install4j.testing.license}</license>
+		                            <installDir>${install4j11.home}</installDir>
+                            
 									<projectFile>${project.basedir}/installer.install4j</projectFile>
 								</configuration>
 							</execution>
@@ -278,14 +282,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>oss-snapshots</id>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</repository>
-	</repositories>
 </project>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.8" transformSequenceNumber="10">
+<install4j version="11.0.5" transformSequenceNumber="11">
   <directoryPresets config="./target/dependencies" />
   <application name="FileDrop" applicationId="1464-8895-9044-3070" mediaDir="target/media" mediaFilePattern="${compiler:sys.shortName}-${compiler:sys.platform}-${compiler:sys.version}" shortName="filedrop" publisher="JADAPTIVE Limited" publisherWeb="https://jadaptive.com" version="0.0.1" allPathsRelative="true" convertDotsToUnderscores="false" macVolumeId="ffee23fd2eeafa87" javaMinVersion="21">
     <searchSequence>
@@ -16,8 +16,14 @@
       <variable name="install4j.jaulAppId" value="UNSET" description="The Jaul update system app Id, e.g. com.sshtools.MyApp" />
       <variable name="install4j.jaulUpdaterId" value="999" description="The ID (in this install4j project) of the updater application. Its a bit annoying we can't get this automatically!" />
       <variable name="install4j.jaulBranches" description="Description" />
+      <variable name="install4j.appleIdPassword" />
+      <variable name="install4j.appleIssuerId" />
+      <variable name="install4j.appleKeyId" />
+      <variable name="install4j.applePrivateKeyFile" />
+      <variable name="install4j.safeNet.pin" />
+      <variable name="install4j.timestamp.server" />
     </variables>
-    <codeSigning macEnabled="true" macPkcs12File="${compiler:install4j.macPkcs12File}" windowsEnabled="true" windowsKeySource="windows" macNotarize="true" appleId="${compiler:install4j.appleId}">
+    <codeSigning macEnabled="true" macPkcs12File="${compiler:install4j.macPkcs12File}" windowsEnabled="true" windowsKeySource="executable" windowsExecutable="scsigntool -pin &quot;${compiler:install4j.safeNet.pin}&quot; sign /tr &quot;${compiler:install4j.timestamp.server}&quot; /fd sha256 /td sha256 /a &quot;$EXECUTABLE&quot;" macNotarize="true" macApiIssuer="${compiler:install4j.appleIssuerId}" macApiKey="${compiler:install4j.appleKeyId}" macApiPrivateKey="${compiler:install4j.applePrivateKeyFile}">
       <windowsKeystoreIdentifier issuer="${compiler:install4j.windowsKeystoreIssuer}" serial="${compiler:install4j.windowsKeystoreSerial}" subject="${compiler:install4j.windowsKeystoreSubject}" />
       <macSearchedJars>
         <entry>jna-*</entry>
@@ -28,6 +34,7 @@
         <entry>jline-*</entry>
         <entry>jansi*</entry>
         <entry>jna.*</entry>
+        <entry>fxthemes.jar</entry>
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="AdoptOpenJDK" release="21/jdk-21.0.4+7">
@@ -1254,7 +1261,7 @@ return true;</property>
       </exclude>
       <jreBundle usePack200="false" />
     </windows>
-    <macosFolder name="macOS Folder (Intel)" id="36" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-x86_64-${compiler:sys.version}" signLaunchers="true">
+    <macosFolder name="macOS Folder (Intel)" id="36" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-x86_64-${compiler:sys.version}" architecture="amd64">
       <exclude>
         <entry location="win" />
         <entry location="linux" />
@@ -1275,7 +1282,7 @@ return true;</property>
         <entry location="linux-aarch64" />
       </exclude>
     </unixInstaller>
-    <macosFolder name="macOS Folder (Arm)" id="128" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}" architecture="aarch64" signLaunchers="true">
+    <macosFolder name="macOS Folder (Arm)" id="128" mediaFileName="${compiler:sys.shortName}-${compiler:sys.platform}-aarch64-${compiler:sys.version}">
       <exclude>
         <entry location="mac" />
         <entry location="win" />

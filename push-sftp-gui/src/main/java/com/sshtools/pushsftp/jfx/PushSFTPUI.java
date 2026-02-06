@@ -6,8 +6,8 @@ import java.util.Optional;
 import com.sshtools.common.logger.Log;
 import com.sshtools.common.logger.Log.Level;
 import com.sshtools.common.ssh.components.jce.JCEProvider;
-import com.sshtools.jajafx.JajaApp;
-import com.sshtools.jajafx.JajaFXAppWindow;
+import com.sshtools.jajafx.updateable.UpdateableJajaApp;
+import com.sshtools.jajafx.updateable.UpdateableJajaFXAppWindow;
 import com.sshtools.jaul.AppCategory;
 import com.sshtools.jaul.ArtifactVersion;
 import com.sshtools.jaul.JaulApp;
@@ -19,7 +19,7 @@ import picocli.CommandLine.Option;
 
 @Command(name = "filedrop", mixinStandardHelpOptions = true, description = "Simple graphical user interface for push files to an SFTP server as fast as possible.", versionProvider = PushSFTPUI.Version.class)
 @JaulApp(id = "com.sshtools.FileDrop", category = AppCategory.GUI, updaterId = "54", updatesUrl = "https://sshtools-public.s3.eu-west-1.amazonaws.com/push-sftp-gui/${phase}/updates.xml")
-public class PushSFTPUI extends JajaApp<PushSFTPUIApp, JajaFXAppWindow<PushSFTPUIApp>> {
+public class PushSFTPUI extends UpdateableJajaApp<PushSFTPUIApp, UpdateableJajaFXAppWindow<PushSFTPUIApp>> {
 
 	public final static class Version implements IVersionProvider {
 		@Override
@@ -39,7 +39,7 @@ public class PushSFTPUI extends JajaApp<PushSFTPUIApp, JajaFXAppWindow<PushSFTPU
 		JCEProvider.enableBouncyCastle(true);
 	}
 	
-	public final static class PushSFTPUIBuilder extends JajaAppBuilder<PushSFTPUI, PushSFTPUIBuilder, PushSFTPUIApp> {
+	public final static class PushSFTPUIBuilder extends UpdateableJajaAppBuilder<PushSFTPUI, PushSFTPUIBuilder, PushSFTPUIApp> {
 		
 		private PushSFTPUIBuilder() {
 		}

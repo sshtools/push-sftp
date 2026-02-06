@@ -31,12 +31,12 @@ import com.sshtools.common.ssh.SshException;
 import com.sshtools.common.ssh.components.SshPublicKey;
 import com.sshtools.jajafx.AboutPage;
 import com.sshtools.jajafx.JajaApp;
-import com.sshtools.jajafx.JajaFXApp;
-import com.sshtools.jajafx.JajaFXAppWindow;
 import com.sshtools.jajafx.Tiles;
-import com.sshtools.jajafx.UpdatePage;
 import com.sshtools.jajafx.progress.PasswordPage;
 import com.sshtools.jajafx.progress.YesNoPage;
+import com.sshtools.jajafx.updateable.UpdatePage;
+import com.sshtools.jajafx.updateable.UpdateableJajaFXApp;
+import com.sshtools.jajafx.updateable.UpdateableJajaFXAppWindow;
 import com.sshtools.twoslices.BasicToastHint;
 import com.sshtools.twoslices.Toast;
 import com.sshtools.twoslices.ToastType;
@@ -50,7 +50,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFTPUIApp>> {
+public class PushSFTPUIApp extends UpdateableJajaFXApp<PushSFTPUI, UpdateableJajaFXAppWindow<PushSFTPUIApp>> {
 	
 	public enum NotificationType {
 		ERROR,
@@ -86,8 +86,8 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFT
 	}
 
 	@Override
-	protected JajaFXAppWindow createAppWindow(Stage stage) {
-		var wnd =  new JajaFXAppWindow(stage, this, 480, 660);
+	protected UpdateableJajaFXAppWindow<PushSFTPUIApp> createAppWindow(Stage stage) {
+		var wnd =  new UpdateableJajaFXAppWindow<>(stage, this, 480, 660);
 		wnd.setContent(createContent(stage, wnd));
 		return wnd;
 	}
@@ -409,7 +409,7 @@ public class PushSFTPUIApp extends JajaFXApp<PushSFTPUI, JajaFXAppWindow<PushSFT
 	}
 
 	@Override
-	protected Node createContent(Stage stage, JajaFXAppWindow<PushSFTPUIApp> window) {
+	protected Node createContent(Stage stage, UpdateableJajaFXAppWindow<PushSFTPUIApp> window) {
 
 		tiles = new Tiles<>(this, window);
 		tiles.add(DropPage.class);

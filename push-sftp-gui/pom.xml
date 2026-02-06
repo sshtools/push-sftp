@@ -5,7 +5,7 @@
 	<artifactId>push-sftp-gui</artifactId>
 	<parent>
 		<groupId>com.sshtools</groupId>
-		<version>0.9.1-SNAPSHOT</version>
+		<version>0.9.1</version>
 		<artifactId>push-sftp-group</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
@@ -16,6 +16,7 @@
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 		<gluonfx.maven.plugin.version>1.0.16</gluonfx.maven.plugin.version>
         <javafx.version>23</javafx.version>
+        <jajafx.version>0.9.10</jajafx.version>
 		
 		<install4j.jaulAppId>com.sshtools.FileDrop</install4j.jaulAppId>
 		<install4j.jaulUpdaterId>54</install4j.jaulUpdaterId>
@@ -102,19 +103,19 @@
 		<dependency>
 			<groupId>com.install4j</groupId>
 			<artifactId>install4j-runtime</artifactId>
-			<version>10.0.8</version>
+			<version>11.0.5</version>
 			<!-- MUST be provided, the runtime is added by I4J itself -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>two-slices</artifactId>
-			<version>0.9.5-SNAPSHOT</version>
+			<version>0.9.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>simjac</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.2</version> 
 		</dependency>
 		<dependency>
 			<groupId>com.github.hypfvieh</groupId>
@@ -138,15 +139,73 @@
 			<artifactId>sequins</artifactId>
 			<version>0.0.4</version>
 		</dependency>
+		
+		<!-- TODO: We shouldn't need to incluide this or transit below explicitly.
+		           jajafx should pull them in as dependencies of the theme modules.
+		 -->
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jmetro</artifactId>
+            <version>11.6.16</version>
+            <exclusions>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-fxml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>	
+        <dependency>
+            <groupId>com.pixelduke</groupId>
+            <artifactId>transit</artifactId>
+            <version>2.0.0</version>
+            
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+            
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx-lib</artifactId>
-			<version>0.9.6</version>
+			<version>${jajafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sshtools</groupId>
+			<artifactId>jajafx-updateable</artifactId>
+			<version>${jajafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sshtools</groupId>
+			<artifactId>jajafx-jmetro</artifactId>
+			<version>${jajafx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
 			<artifactId>jajafx-sequins</artifactId>
-			<version>0.9.6</version>
+			<version>${jajafx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sshtools</groupId>
@@ -542,6 +601,10 @@
 									<goal>compile</goal>
 								</goals>
 								<configuration>
+									<!--For install4j11 -->
+		                            <license>${install4j.testing.license}</license>
+		                            <installDir>${install4j11.home}</installDir>
+		                            
                     				<buildIds>${build.gui.buildIds}</buildIds>
 									<projectFile>${project.basedir}/installer.install4j</projectFile>
 								</configuration>
